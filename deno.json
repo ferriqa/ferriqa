@@ -1,16 +1,13 @@
 {
-    "workspace": [
-        "./packages/core",
-        "./packages/adapters-db",
-        "./packages/client-sdk",
-        "./packages/i18n",
-        "./packages/cli"
-    ],
-    "nodeModulesDir": "auto",
-    "compilerOptions": {
-        "lib": [
-            "deno.window",
-            "dom"
-        ]
-    }
+  "workspace": [
+    "./packages/core",
+    "./packages/adapters-db",
+    "./packages/client-sdk",
+    "./packages/i18n",
+    "./packages/cli"
+  ],
+  "nodeModulesDir": "auto",
+  "compilerOptions": {
+    "lib": ["deno.window", "dom"]
+  }
 }

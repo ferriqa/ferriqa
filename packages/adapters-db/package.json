@@ -1,13 +1,13 @@
 {
-    "name": "@ferriqa/adapters-db",
-    "version": "0.0.1",
-    "type": "module",
-    "dependencies": {
-        "@ferriqa/core": "workspace:*",
-        "drizzle-orm": "latest"
-    },
-    "devDependencies": {
-        "better-sqlite3": "latest",
-        "bun-types": "latest"
-    }
+  "name": "@ferriqa/adapters-db",
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": {
+    "@ferriqa/core": "workspace:*",
+    "drizzle-orm": "latest"
+  },
+  "devDependencies": {
+    "better-sqlite3": "latest",
+    "bun-types": "latest"
+  }
 }

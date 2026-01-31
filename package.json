@@ -1,21 +1,26 @@
 {
-    "name": "ferriqa-monorepo",
-    "private": true,
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ],
-    "scripts": {
-        "dev": "bun --filter \"*\" dev",
-        "dev:bun": "bun run packages/core/src/index.ts",
-        "dev:node": "node --import tsx packages/core/src/index.ts",
-        "dev:deno": "deno run --allow-all packages/core/src/index.ts",
-        "test:all": "bun test && node --import tsx --test packages/core/src/**/*.test.ts && deno test --allow-all"
-    },
-    "devDependencies": {
-        "@types/node": "^25.1.0",
-        "bun-types": "^1.3.8",
-        "tsx": "^4.21.0",
-        "typescript": "^5.3.3"
-    }
+  "name": "ferriqa-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun --filter \"*\" dev",
+    "dev:bun": "bun run packages/core/src/index.ts",
+    "dev:node": "node --import tsx packages/core/src/index.ts",
+    "dev:deno": "deno run --allow-all packages/core/src/index.ts",
+    "test:all": "bun test && node --import tsx --test packages/core/src/**/*.test.ts && deno test --allow-all",
+    "lint": "oxlint",
+    "format": "prettier --write .",
+    "check": "prettier --check . && oxlint"
+  },
+  "devDependencies": {
+    "@types/node": "^25.1.0",
+    "bun-types": "^1.3.8",
+    "oxlint": "^1.42.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.3.3"
+  }
 }

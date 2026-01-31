@@ -1,18 +1,13 @@
 {
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "strict": true,
-        "skipLibCheck": true,
-        "types": [
-            "bun-types",
-            "node"
-        ],
-        "paths": {
-            "@ferriqa/*": [
-                "./packages/*/src"
-            ]
-        }
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["bun-types", "node"],
+    "paths": {
+      "@ferriqa/*": ["./packages/*/src"]
     }
+  }
 }

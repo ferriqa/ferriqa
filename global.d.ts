@@ -1,5 +1,5 @@
 declare global {
-    var Deno: any;
+  var Deno: any;
 }
 
-export { };
+export {};
