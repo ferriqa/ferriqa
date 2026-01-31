@@ -1,0 +1,12 @@
+{
+    "name": "@ferriqa/core",
+    "version": "0.0.1",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts",
+        "./runtime": "./src/runtime.ts"
+    },
+    "scripts": {
+        "dev": "bun --watch src/index.ts"
+    }
+}
