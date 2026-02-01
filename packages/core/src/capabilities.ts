@@ -1,6 +1,6 @@
 // Runtime capability detection - Feature matrix for Bun, Node.js, and Deno
 
-import { getRuntimeInfo, isBun, isDeno, isNode } from "./runtime";
+import { getRuntimeInfo, isBun, isDeno, isNode } from "./runtime.ts";
 
 /**
  * Detected runtime capabilities
