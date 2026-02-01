@@ -45,7 +45,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       # NOTE: Deno doesn't use 'deno install' for dependencies - it fetches on-the-fly
       - name: Add @cross/test and @std/assert
