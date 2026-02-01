@@ -11,8 +11,8 @@ import {
   expect,
   beforeAll,
   afterAll,
-} from "../../testing/index.js";
-import { MockDatabaseAdapter } from "../../testing/mocks.js";
+} from "../../testing/index.ts";
+import { MockDatabaseAdapter } from "../../testing/mocks.ts";
 
 describe("Database Adapter Integration", () => {
   let db: MockDatabaseAdapter;

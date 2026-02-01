@@ -4,14 +4,14 @@
  * Tests that verify functionality across Bun, Node.js, and Deno runtimes.
  */
 
-import { describe, it, expect } from "../../testing/index.js";
+import { describe, it, expect } from "../../testing/index.ts";
 import {
   isBun,
   isDeno,
   isNode,
   getRuntimeId,
   getRuntimeInfo,
-} from "../../runtime.js";
+} from "../../runtime.ts";
 
 describe("Cross-Runtime Compatibility", () => {
   describe("Runtime Detection", () => {

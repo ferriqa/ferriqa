@@ -4,12 +4,12 @@
  * Tests for the hook registry and hook execution.
  */
 
-import { describe, it, expect } from "../../testing/index.js";
+import { describe, it, expect } from "../../testing/index.ts";
 import {
   HookRegistry,
   createHookRegistry,
   HookExecutionError,
-} from "../../hooks/index.js";
+} from "../../hooks/index.ts";
 
 describe("Hook System", () => {
   describe("HookRegistry", () => {

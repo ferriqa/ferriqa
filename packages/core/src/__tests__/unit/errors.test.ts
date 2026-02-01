@@ -17,7 +17,7 @@ import {
   isHookExecutionError,
   isHookValidationError,
   safeHook,
-} from "../../hooks/index.js";
+} from "../../hooks/index.ts";
 
 test("Error Handling - HookExecutionError should create error with correct properties", () => {
   const original = new Error("Test error");
