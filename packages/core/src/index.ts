@@ -27,6 +27,9 @@ export {
   getCapabilitySummary,
 } from "./capabilities";
 
+// Error handling system
+export * from "./errors/index.js";
+
 // Re-export everything from runtime for convenience
 export * from "./runtime";
 export * from "./capabilities";

@@ -12,10 +12,18 @@ export const isDeno = typeof Deno !== "undefined";
 export const isNode = !isBun && !isDeno && typeof process !== "undefined";
 
 /**
+ * Runtime information structure
+ */
+export interface RuntimeInfo {
+  name: string;
+  version: string;
+}
+
+/**
  * Get basic runtime information
  * @returns Object containing runtime name and version
  */
-export function getRuntimeInfo(): { name: string; version: string } {
+export function getRuntimeInfo(): RuntimeInfo {
   if (isBun) {
     return { name: "Bun", version: Bun?.version || "unknown" };
   }
