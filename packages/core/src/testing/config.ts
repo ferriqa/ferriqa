@@ -22,9 +22,15 @@ export const defaultTestConfig: TestRunnerConfig = {
 
 /**
  * Load test configuration from environment variables
+ * NOTE: Cross-runtime safe - returns empty config if process.env not available (Deno/browser)
  */
 export function loadTestConfigFromEnv(): Partial<TestRunnerConfig> {
   const config: Partial<TestRunnerConfig> = {};
+
+  // CROSS-RUNTIME: Check if process.env exists before accessing (Deno doesn't have process)
+  if (typeof process === "undefined" || !process.env) {
+    return config;
+  }
 
   // FERRIQA_TEST_TIMEOUT - Test timeout in milliseconds
   const timeout = process.env.FERRIQA_TEST_TIMEOUT;
@@ -80,9 +86,14 @@ export type TestEnvironment = "unit" | "integration" | "e2e" | "cross-runtime";
 
 /**
  * Get current test environment
+ * NOTE: Cross-runtime safe - defaults to "unit" if process.env not available
  */
 export function getTestEnvironment(): TestEnvironment {
-  const env = process.env.FERRIQA_TEST_ENV;
+  // CROSS-RUNTIME: Safe access to process.env with fallback
+  const env =
+    typeof process !== "undefined" && process.env
+      ? process.env.FERRIQA_TEST_ENV
+      : undefined;
   if (
     env === "unit" ||
     env === "integration" ||
@@ -135,8 +146,14 @@ export function getTestConfigForEnvironment(
 
 /**
  * Check if running in CI environment
+ * NOTE: Cross-runtime safe - returns false if process.env not available
  */
 export function isCI(): boolean {
+  // CROSS-RUNTIME: Guard for Deno/browser environments where process is undefined
+  if (typeof process === "undefined" || !process.env) {
+    return false;
+  }
+
   return !!(
     process.env.CI ||
     process.env.CONTINUOUS_INTEGRATION ||

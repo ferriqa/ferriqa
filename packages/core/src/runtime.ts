@@ -8,7 +8,11 @@ export const isBun = typeof Bun !== "undefined";
 /** Detect if running in Deno runtime */
 export const isDeno = typeof Deno !== "undefined";
 
-/** Detect if running in Node.js runtime */
+/**
+ * Detect if running in Node.js runtime
+ * NOTE: This assumes process global indicates Node.js. Edge cases exist (Electron, polyfilled envs)
+ * but these are acceptable for a library targeting Bun/Node/Deno specifically.
+ */
 export const isNode = !isBun && !isDeno && typeof process !== "undefined";
 
 /**
@@ -31,7 +35,13 @@ export function getRuntimeInfo(): RuntimeInfo {
     return { name: "Deno", version: Deno?.version?.deno || "unknown" };
   }
   if (isNode) {
-    return { name: "Node.js", version: process.version };
+    // DEFENSIVE: Validate this is actually Node.js by checking process.version
+    // Some environments (browser polyfills, edge runtimes) may have process global without version
+    const version = process?.version;
+    if (version) {
+      return { name: "Node.js", version };
+    }
+    // If no version, fall through to Unknown - this isn't really Node.js
   }
   return { name: "Unknown", version: "0.0.0" };
 }

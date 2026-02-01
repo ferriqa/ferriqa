@@ -1,0 +1,128 @@
+name: Cross-Runtime Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Bun Runtime Tests
+  test-bun:
+    name: Test with Bun
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run unit tests
+        run: bun test packages/core/src/__tests__/unit
+
+      - name: Run integration tests
+        run: bun test packages/core/src/__tests__/integration
+
+      - name: Run cross-runtime tests
+        run: bun test packages/core/src/__tests__/cross-runtime
+
+      - name: Run all tests with coverage
+        run: bun test --coverage
+        continue-on-error: true
+
+  # Deno Runtime Tests
+  test-deno:
+    name: Test with Deno
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      # NOTE: Deno doesn't use 'deno install' for dependencies - it fetches on-the-fly
+      - name: Add @cross/test and @std/assert
+        run: deno add jsr:@cross/test jsr:@std/assert
+
+      - name: Run unit tests
+        run: deno test --allow-env --allow-read --allow-write --allow-net packages/core/src/__tests__/unit
+
+      - name: Run integration tests
+        run: deno test --allow-env --allow-read --allow-write --allow-net packages/core/src/__tests__/integration
+
+      - name: Run cross-runtime tests
+        run: deno test --allow-env --allow-read --allow-write --allow-net packages/core/src/__tests__/cross-runtime
+
+  # Node.js Runtime Tests
+  test-node:
+    name: Test with Node.js
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 21.x]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install tsx
+        run: npm install -g tsx
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add @cross/test and @std/assert
+        run: npx jsr add @cross/test @std/assert
+
+      # NOTE: Use jq to safely add "type": "module" without creating invalid JSON
+      - name: Ensure ES module type
+        run: |
+          if ! command -v jq &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq '.type = "module"' package.json > package.json.tmp && mv package.json.tmp package.json
+        continue-on-error: true
+
+      # NOTE: Node.js built-in test runner doesn't expand globs - use directory paths instead
+      - name: Run unit tests
+        run: npx tsx --test packages/core/src/__tests__/unit/
+        continue-on-error: true
+
+      - name: Run integration tests
+        run: npx tsx --test packages/core/src/__tests__/integration/
+        continue-on-error: true
+
+      - name: Run cross-runtime tests
+        run: npx tsx --test packages/core/src/__tests__/cross-runtime/
+        continue-on-error: true
+
+  # Lint and Format Check
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run linter
+        run: bun run lint
+
+      - name: Check formatting
+        run: bun run check

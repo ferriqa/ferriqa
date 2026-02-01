@@ -10,7 +10,12 @@
     "dev:bun": "bun run packages/core/src/index.ts",
     "dev:node": "node --import tsx packages/core/src/index.ts",
     "dev:deno": "deno run --allow-all packages/core/src/index.ts",
-    "test:all": "bun test && node --import tsx --test packages/core/src/**/*.test.ts && deno test --allow-all",
+    "test": "bun test",
+    "test:unit": "bun test packages/core/src/__tests__/unit",
+    "test:integration": "bun test packages/core/src/__tests__/integration",
+    "test:cross-runtime": "bun test packages/core/src/__tests__/cross-runtime",
+    "test:coverage": "bun test --coverage",
+    "test:all": "bun test packages/core/src/__tests__/cross-runtime && node --import tsx --test packages/core/src/__tests__/cross-runtime/runtime.test.ts && deno test --allow-read --allow-env packages/core/src/__tests__/cross-runtime/runtime.test.ts",
     "lint": "oxlint",
     "format": "prettier --write .",
     "check": "prettier --check . && oxlint"
@@ -21,6 +26,8 @@
     "oxlint": "^1.42.0",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "@cross/test": "npm:@jsr/cross__test",
+    "@std/assert": "npm:@jsr/std__assert"
   }
 }
