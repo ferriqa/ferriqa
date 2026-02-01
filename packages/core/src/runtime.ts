@@ -2,6 +2,12 @@
  * Runtime detection utilities for Bun, Node.js, and Deno
  */
 
+// Declare optional globals for cross-runtime compatibility
+declare const Bun: { version?: string } | undefined;
+declare const process:
+  | { version?: string; env?: Record<string, string> }
+  | undefined;
+
 /** Detect if running in Bun runtime */
 export const isBun = typeof Bun !== "undefined";
 
@@ -29,7 +35,7 @@ export interface RuntimeInfo {
  */
 export function getRuntimeInfo(): RuntimeInfo {
   if (isBun) {
-    return { name: "Bun", version: Bun?.version || "unknown" };
+    return { name: "Bun", version: (Bun as typeof Bun)?.version || "unknown" };
   }
   if (isDeno) {
     return { name: "Deno", version: Deno?.version?.deno || "unknown" };
@@ -37,7 +43,7 @@ export function getRuntimeInfo(): RuntimeInfo {
   if (isNode) {
     // DEFENSIVE: Validate this is actually Node.js by checking process.version
     // Some environments (browser polyfills, edge runtimes) may have process global without version
-    const version = process?.version;
+    const version = (process as typeof process)?.version;
     if (version) {
       return { name: "Node.js", version };
     }

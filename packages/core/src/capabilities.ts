@@ -1,5 +1,11 @@
 // Runtime capability detection - Feature matrix for Bun, Node.js, and Deno
 
+// Declare optional globals for cross-runtime compatibility
+declare const Buffer:
+  | { from(data: string, encoding?: string): unknown }
+  | undefined;
+declare const require: (id: string) => any;
+
 import { getRuntimeInfo, isBun, isDeno, isNode } from "./runtime.ts";
 
 /**

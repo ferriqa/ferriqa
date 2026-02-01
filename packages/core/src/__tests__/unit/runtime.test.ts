@@ -4,6 +4,9 @@
  * Tests for runtime detection utilities.
  */
 
+// Declare optional globals for cross-runtime compatibility
+declare const Bun: unknown;
+
 import { test } from "@cross/test";
 import { assertEquals, assertNotEquals } from "@std/assert";
 import {

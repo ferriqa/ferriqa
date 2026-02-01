@@ -5,6 +5,9 @@
  * Provides a unified API for test runner configuration.
  */
 
+// Declare optional globals for cross-runtime compatibility
+declare const process: { platform?: string } | undefined;
+
 import { isBun, isDeno, isNode } from "../runtime.ts";
 
 /**

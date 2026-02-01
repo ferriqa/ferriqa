@@ -5,6 +5,11 @@
  * Handles environment-based configuration for tests.
  */
 
+// Declare optional globals for cross-runtime compatibility
+declare const process:
+  | { env?: Record<string, string | undefined>; platform?: string }
+  | undefined;
+
 import type { TestRunnerConfig } from "./runner.ts";
 
 /**
