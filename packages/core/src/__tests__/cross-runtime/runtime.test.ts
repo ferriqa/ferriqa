@@ -53,7 +53,8 @@ describe("Cross-Runtime Compatibility", () => {
   describe("Environment Variables", () => {
     it("should have process.env or Deno.env", () => {
       const hasEnv =
-        typeof process !== "undefined" || typeof Deno !== "undefined";
+        typeof (globalThis as any).process !== "undefined" ||
+        typeof Deno !== "undefined";
       expect(hasEnv).toBe(true);
     });
   });
