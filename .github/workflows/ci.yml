@@ -75,11 +75,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install tsx
-        run: npm install -g tsx
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
+
+      - name: Install tsx
+        run: pnpm add -g tsx
 
       - name: Add @cross/test and @std/assert
         run: npx jsr add @cross/test @std/assert
