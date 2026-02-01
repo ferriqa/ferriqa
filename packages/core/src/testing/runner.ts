@@ -5,9 +5,6 @@
  * Provides a unified API for test runner configuration.
  */
 
-// Declare optional globals for cross-runtime compatibility
-declare const process: { platform?: string } | undefined;
-
 import { isBun, isDeno, isNode } from "../runtime.ts";
 
 /**
@@ -18,8 +15,9 @@ import { isBun, isDeno, isNode } from "../runtime.ts";
  */
 function shellEscape(str: string): string {
   // Detect platform and use appropriate escaping
+  const gProcess = (globalThis as any).process;
   const isWindows =
-    typeof process !== "undefined" && process.platform === "win32";
+    typeof gProcess !== "undefined" && gProcess?.platform === "win32";
 
   if (isWindows) {
     // Windows: Use double quotes and escape internal double quotes

@@ -179,7 +179,9 @@ export function detectCapabilities(): RuntimeCapabilities {
     workerThreads: false,
     cluster: false,
     osInfo: false,
-    envVars: typeof process !== "undefined" && !!process.env,
+    envVars:
+      typeof (globalThis as any).process !== "undefined" &&
+      !!(globalThis as any).process?.env,
 
     // Data formats
     json: true,
@@ -261,7 +263,7 @@ function detectBunCapabilities(caps: RuntimeCapabilities): void {
 
   // SQLite - Bun has built-in support
   try {
-    caps.sqlite = typeof (Bun as any).sqlite !== "undefined";
+    caps.sqlite = typeof (globalThis as any).Bun?.sqlite !== "undefined";
   } catch {
     caps.sqlite = false;
   }
@@ -347,8 +349,9 @@ function detectNodeCapabilities(caps: RuntimeCapabilities): void {
 function detectPackageManager(): "npm" | "yarn" | "pnpm" | "bun" | null {
   if (!isNode) return null;
 
-  const execPath = process.env.npm_execpath || "";
-  const userAgent = process.env.npm_config_user_agent || "";
+  const gProcess = (globalThis as any).process;
+  const execPath = gProcess?.env?.npm_execpath || "";
+  const userAgent = gProcess?.env?.npm_config_user_agent || "";
 
   if (execPath.includes("bun") || userAgent.includes("bun")) {
     return "bun";
@@ -380,12 +383,13 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
   let execPath = "";
 
   if (isBun) {
-    platform = (Bun as any)?.platform || "unknown";
-    arch = (Bun as any)?.arch || "unknown";
-    os = (Bun as any)?.os || "unknown";
-    cpuCount = (Bun as any)?.cpus?.length || 1;
-    totalMemory = (Bun as any)?.memory?.total || 0;
-    execPath = (Bun as any)?.main || "";
+    const gBun = (globalThis as any).Bun;
+    platform = gBun?.platform || "unknown";
+    arch = gBun?.arch || "unknown";
+    os = gBun?.os || "unknown";
+    cpuCount = gBun?.cpus?.length || 1;
+    totalMemory = gBun?.memory?.total || 0;
+    execPath = gBun?.main || "";
   } else if (isDeno) {
     platform = (Deno as any)?.build?.os || "unknown";
     arch = (Deno as any)?.build?.arch || "unknown";
@@ -394,12 +398,13 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
     totalMemory = (Deno as any)?.systemMemoryInfo?.total || 0;
     execPath = (Deno as any)?.mainModule || "";
   } else if (isNode) {
-    platform = process.platform;
-    arch = process.arch;
-    os = process.platform;
+    const gProcess = (globalThis as any).process;
+    platform = gProcess?.platform;
+    arch = gProcess?.arch;
+    os = gProcess?.platform;
     cpuCount = require("os").cpus().length;
     totalMemory = require("os").totalmem();
-    execPath = process.execPath;
+    execPath = gProcess?.execPath;
   }
 
   return {

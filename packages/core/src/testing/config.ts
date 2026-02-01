@@ -5,11 +5,6 @@
  * Handles environment-based configuration for tests.
  */
 
-// Declare optional globals for cross-runtime compatibility
-declare const process:
-  | { env?: Record<string, string | undefined>; platform?: string }
-  | undefined;
-
 import type { TestRunnerConfig } from "./runner.ts";
 
 /**
@@ -33,38 +28,43 @@ export function loadTestConfigFromEnv(): Partial<TestRunnerConfig> {
   const config: Partial<TestRunnerConfig> = {};
 
   // CROSS-RUNTIME: Check if process.env exists before accessing (Deno doesn't have process)
-  if (typeof process === "undefined" || !process.env) {
+  if (
+    typeof (globalThis as any).process === "undefined" ||
+    !(globalThis as any).process?.env
+  ) {
     return config;
   }
 
+  const env = (globalThis as any).process?.env;
+
   // FERRIQA_TEST_TIMEOUT - Test timeout in milliseconds
-  const timeout = process.env.FERRIQA_TEST_TIMEOUT;
+  const timeout = env?.FERRIQA_TEST_TIMEOUT;
   if (timeout) {
     config.timeout = parseInt(timeout, 10);
   }
 
   // FERRIQA_TEST_PARALLEL - Enable parallel execution
-  const parallel = process.env.FERRIQA_TEST_PARALLEL;
+  const parallel = env?.FERRIQA_TEST_PARALLEL;
   if (parallel !== undefined) {
     config.parallel = parallel === "true" || parallel === "1";
   }
 
   // FERRIQA_TEST_COVERAGE - Enable coverage reporting
-  const coverage = process.env.FERRIQA_TEST_COVERAGE;
+  const coverage = env?.FERRIQA_TEST_COVERAGE;
   if (coverage !== undefined) {
     config.coverage = coverage === "true" || coverage === "1";
   }
 
   // FERRIQA_TEST_VERBOSE - Verbose output
-  const verbose = process.env.FERRIQA_TEST_VERBOSE;
+  const verbose = env?.FERRIQA_TEST_VERBOSE;
   if (verbose !== undefined) {
     config.verbose = verbose === "true" || verbose === "1";
   }
 
   // FERRIQA_TEST_PATTERN - Test file pattern
-  const pattern = process.env.FERRIQA_TEST_PATTERN;
+  const pattern = env?.FERRIQA_TEST_PATTERN;
   if (pattern) {
-    config.include = pattern.split(",").map((p) => p.trim());
+    config.include = pattern.split(",").map((p: string) => p.trim());
   }
 
   return config;
@@ -96,8 +96,9 @@ export type TestEnvironment = "unit" | "integration" | "e2e" | "cross-runtime";
 export function getTestEnvironment(): TestEnvironment {
   // CROSS-RUNTIME: Safe access to process.env with fallback
   const env =
-    typeof process !== "undefined" && process.env
-      ? process.env.FERRIQA_TEST_ENV
+    typeof (globalThis as any).process !== "undefined" &&
+    (globalThis as any).process?.env
+      ? (globalThis as any).process?.env?.FERRIQA_TEST_ENV
       : undefined;
   if (
     env === "unit" ||
@@ -155,17 +156,22 @@ export function getTestConfigForEnvironment(
  */
 export function isCI(): boolean {
   // CROSS-RUNTIME: Guard for Deno/browser environments where process is undefined
-  if (typeof process === "undefined" || !process.env) {
+  if (
+    typeof (globalThis as any).process === "undefined" ||
+    !(globalThis as any).process?.env
+  ) {
     return false;
   }
 
+  const env = (globalThis as any).process?.env;
+
   return !!(
-    process.env.CI ||
-    process.env.CONTINUOUS_INTEGRATION ||
-    process.env.GITHUB_ACTIONS ||
-    process.env.GITLAB_CI ||
-    process.env.CIRCLECI ||
-    process.env.TRAVIS
+    env?.CI ||
+    env?.CONTINUOUS_INTEGRATION ||
+    env?.GITHUB_ACTIONS ||
+    env?.GITLAB_CI ||
+    env?.CIRCLECI ||
+    env?.TRAVIS
   );
 }
 

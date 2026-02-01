@@ -4,9 +4,6 @@
  * Tests for runtime detection utilities.
  */
 
-// Declare optional globals for cross-runtime compatibility
-declare const Bun: unknown;
-
 import { test } from "@cross/test";
 import { assertEquals, assertNotEquals } from "@std/assert";
 import {
@@ -23,7 +20,7 @@ test("Runtime Detection - isBun should be a boolean", () => {
 });
 
 test("Runtime Detection - isBun should detect Bun runtime correctly", () => {
-  if (typeof Bun !== "undefined") {
+  if (typeof (globalThis as any).Bun !== "undefined") {
     assertEquals(isBun, true);
   } else {
     assertEquals(isBun, false);
