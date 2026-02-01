@@ -86,9 +86,6 @@ jobs:
       - name: Install tsx
         run: pnpm add -g tsx
 
-      - name: Add @cross/test and @std/assert
-        run: npx jsr add @cross/test @std/assert
-
       # NOTE: Use jq to safely add "type": "module" without creating invalid JSON
       - name: Ensure ES module type
         run: |
