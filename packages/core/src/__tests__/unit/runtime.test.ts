@@ -13,7 +13,7 @@ import {
   getRuntimeInfo,
   assertRuntime,
   getRuntimeId,
-} from "../../runtime.js";
+} from "../../runtime.ts";
 
 test("Runtime Detection - isBun should be a boolean", () => {
   assertEquals(typeof isBun, "boolean");
