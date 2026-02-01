@@ -29,5 +29,8 @@
     "typescript": "^5.3.3",
     "@cross/test": "npm:@jsr/cross__test",
     "@std/assert": "npm:@jsr/std__assert"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
   }
 }

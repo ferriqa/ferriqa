@@ -6,7 +6,7 @@
     "./packages/i18n",
     "./packages/cli"
   ],
-  "nodeModulesDir": "auto",
+  "nodeModulesDir": true,
   "compilerOptions": {
     "lib": ["deno.window", "dom"]
   }

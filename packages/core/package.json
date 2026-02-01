@@ -4,9 +4,15 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./runtime": "./src/runtime.ts"
+    "./runtime": "./src/runtime.ts",
+    "./blueprint": "./src/blueprint/index.ts",
+    "./fields": "./src/fields/index.ts",
+    "./validation": "./src/validation/index.ts",
+    "./slug": "./src/slug/index.ts",
+    "./testing": "./src/testing/index.ts"
   },
   "scripts": {
-    "dev": "bun --watch src/index.ts"
+    "dev": "bun --watch src/index.ts",
+    "typecheck": "tsc --noEmit"
   }
 }
