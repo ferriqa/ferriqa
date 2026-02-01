@@ -4,5 +4,5 @@
  * Built-in error logging transports
  */
 
-export { ConsoleTransport } from "./ConsoleTransport.js";
-export { FileTransport } from "./FileTransport.js";
+export { ConsoleTransport } from "./ConsoleTransport.ts";
+export { FileTransport } from "./FileTransport.ts";

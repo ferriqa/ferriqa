@@ -5,11 +5,11 @@
  * Supports pretty and JSON output formats
  */
 
-import type { ErrorTransport, ErrorContext } from "../types.js";
-import { LogLevel } from "../types.js";
-import { FerriqaError } from "../FerriqaError.js";
-import { formatStackTrace } from "../error-formatter.js";
-import { isBun, isDeno, isNode } from "../../runtime.js";
+import type { ErrorTransport, ErrorContext } from "../types.ts";
+import { LogLevel } from "../types.ts";
+import { FerriqaError } from "../FerriqaError.ts";
+import { formatStackTrace } from "../error-formatter.ts";
+import { isBun, isDeno, isNode } from "../../runtime.ts";
 
 /**
  * ANSI color codes for pretty output

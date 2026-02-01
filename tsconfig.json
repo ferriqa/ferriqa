@@ -6,6 +6,7 @@
     "strict": true,
     "skipLibCheck": true,
     "types": ["bun-types", "node"],
+    "allowImportingTsExtensions": true,
     "paths": {
       "@ferriqa/*": ["./packages/*/src"]
     }

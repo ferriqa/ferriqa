@@ -5,8 +5,8 @@
  * Cross-runtime compatible with serialization support
  */
 
-import type { ErrorLogEntry } from "./types.js";
-import { ErrorCode, getDefaultStatusCode } from "./error-codes.js";
+import type { ErrorLogEntry } from "./types.ts";
+import { ErrorCode, getDefaultStatusCode } from "./error-codes.ts";
 
 /**
  * Base error class for all Ferriqa errors

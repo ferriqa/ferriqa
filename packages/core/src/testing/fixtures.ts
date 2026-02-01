@@ -5,8 +5,8 @@
  * Provides reusable test data and objects.
  */
 
-import type { RuntimeInfo } from "../runtime.js";
-import type { RuntimeCapabilities } from "../capabilities.js";
+import type { RuntimeInfo } from "../runtime.ts";
+import type { RuntimeCapabilities } from "../capabilities.ts";
 
 /**
  * Mock runtime information for testing

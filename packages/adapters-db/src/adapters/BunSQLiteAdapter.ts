@@ -11,8 +11,8 @@ import type {
   DatabaseTransaction,
   IsolationLevel,
   QueryResult,
-} from "../types.js";
-import { AdapterState, FerriqaDatabaseError, ErrorCode } from "../types.js";
+} from "../types.ts";
+import { AdapterState, FerriqaDatabaseError, ErrorCode } from "../types.ts";
 
 // bun:sqlite is built into Bun runtime
 // We use dynamic import to avoid errors in other runtimes

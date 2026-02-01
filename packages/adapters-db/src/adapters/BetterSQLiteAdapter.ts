@@ -11,8 +11,8 @@ import type {
   DatabaseTransaction,
   IsolationLevel,
   QueryResult,
-} from "../types.js";
-import { AdapterState, FerriqaDatabaseError, ErrorCode } from "../types.js";
+} from "../types.ts";
+import { AdapterState, FerriqaDatabaseError, ErrorCode } from "../types.ts";
 
 // better-sqlite3 types
 type BetterSQLite3Database = {

@@ -28,19 +28,19 @@ export {
 } from "./capabilities";
 
 // Error handling system
-export * from "./errors/index.js"; // .js extension required for ESM bundler resolution
+export * from "./errors/index.ts"; // .js extension required for ESM bundler resolution
 
 // Blueprint Engine - Content Modeling & Schema
-export * from "./blueprint/index.js"; // .js extension required for ESM bundler resolution
+export * from "./blueprint/index.ts"; // .js extension required for ESM bundler resolution
 
 // Field Types Registry
-export * from "./fields/index.js"; // .js extension required for ESM bundler resolution
+export * from "./fields/index.ts"; // .js extension required for ESM bundler resolution
 
 // Validation Engine
-export * from "./validation/index.js"; // .js extension required for ESM bundler resolution
+export * from "./validation/index.ts"; // .js extension required for ESM bundler resolution
 
 // Slug Management
-export * from "./slug/index.js"; // .js extension required for ESM bundler resolution
+export * from "./slug/index.ts"; // .js extension required for ESM bundler resolution
 
 // Note: Testing utilities are available as a separate import:
 //   import * as testing from "@ferriqa/core/testing"

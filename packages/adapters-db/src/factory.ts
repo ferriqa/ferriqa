@@ -9,14 +9,14 @@ import type {
   DatabaseAdapter,
   DatabaseConfig,
   AdapterFactoryOptions,
-} from "./types.js";
-import { FerriqaDatabaseError, ErrorCode } from "./types.js";
+} from "./types.ts";
+import { FerriqaDatabaseError, ErrorCode } from "./types.ts";
 import { isBun, isDeno, isNode } from "@ferriqa/core";
 
 // Import adapters
-import { BunSQLiteAdapter } from "./adapters/BunSQLiteAdapter.js";
-import { BetterSQLiteAdapter } from "./adapters/BetterSQLiteAdapter.js";
-import { DenoSQLiteAdapter } from "./adapters/DenoSQLiteAdapter.js";
+import { BunSQLiteAdapter } from "./adapters/BunSQLiteAdapter.ts";
+import { BetterSQLiteAdapter } from "./adapters/BetterSQLiteAdapter.ts";
+import { DenoSQLiteAdapter } from "./adapters/DenoSQLiteAdapter.ts";
 
 /**
  * Universal Database Factory

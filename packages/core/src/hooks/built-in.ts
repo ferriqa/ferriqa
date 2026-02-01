@@ -5,7 +5,7 @@
  * These hooks are built into the system and triggered at specific lifecycle points.
  */
 
-import type { HookType } from "./types.js";
+import type { HookType } from "./types.ts";
 
 /**
  * Hook definition structure

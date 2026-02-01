@@ -5,7 +5,7 @@
  * Provides structured error information and recovery mechanisms.
  */
 
-import type { HookResult, FilterResult } from "./types.js";
+import type { HookResult, FilterResult } from "./types.ts";
 
 /**
  * Hook execution error

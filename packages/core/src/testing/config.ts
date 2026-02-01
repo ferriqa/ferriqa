@@ -5,7 +5,7 @@
  * Handles environment-based configuration for tests.
  */
 
-import type { TestRunnerConfig } from "./runner.js";
+import type { TestRunnerConfig } from "./runner.ts";
 
 /**
  * Default test configuration

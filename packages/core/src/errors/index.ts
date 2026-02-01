@@ -29,10 +29,10 @@ export type {
   LogLevelString,
   StackFrame,
   NormalizedStackTrace,
-} from "./types.js";
+} from "./types.ts";
 
 // Enums
-export { LogLevel, LOG_LEVEL_MAP } from "./types.js";
+export { LogLevel, LOG_LEVEL_MAP } from "./types.ts";
 
 // Error classes
 export {
@@ -41,7 +41,7 @@ export {
   FerriqaValidationError,
   FerriqaRuntimeError,
   FerriqaAuthError,
-} from "./FerriqaError.js";
+} from "./FerriqaError.ts";
 
 // Error codes
 export {
@@ -50,7 +50,7 @@ export {
   getErrorPrefix,
   isErrorCategory,
   getDefaultStatusCode,
-} from "./error-codes.js";
+} from "./error-codes.ts";
 
 // Logger
 export {
@@ -58,7 +58,7 @@ export {
   getGlobalLogger,
   setGlobalLogger,
   resetGlobalLogger,
-} from "./error-logger.js";
+} from "./error-logger.ts";
 
 // Configuration
 export {
@@ -67,7 +67,7 @@ export {
   validateConfig,
   DEFAULT_CONFIG,
   CONFIG_PRESETS,
-} from "./config.js";
+} from "./config.ts";
 
 // Formatters
 export {
@@ -76,16 +76,16 @@ export {
   stackTraceToJSON,
   getRuntimeStackFormat,
   cleanStackTracePaths,
-} from "./error-formatter.js";
+} from "./error-formatter.ts";
 
 // Transports
-export { ConsoleTransport, FileTransport } from "./transports/index.js";
+export { ConsoleTransport, FileTransport } from "./transports/index.ts";
 
 // Extension interface
 export type {
   TransportFactory,
   TransportPackageManifest,
-} from "./extension.js";
+} from "./extension.ts";
 
 export {
   TransportRegistry,
@@ -93,4 +93,4 @@ export {
   createTransportFactory,
   createTransportManifest,
   loadTransportsFromEnv,
-} from "./extension.js";
+} from "./extension.ts";

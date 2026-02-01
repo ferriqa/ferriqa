@@ -10,8 +10,8 @@ import type {
   DatabaseTransaction,
   IsolationLevel,
   QueryResult,
-} from "../types.js";
-import { AdapterState, FerriqaDatabaseError, ErrorCode } from "../types.js";
+} from "../types.ts";
+import { AdapterState, FerriqaDatabaseError, ErrorCode } from "../types.ts";
 
 // Deno sqlite types
 type DenoDatabase = {

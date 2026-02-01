@@ -370,7 +370,7 @@ describe("Hook System", () => {
 
   describe("Global Registry", () => {
     it("should export global hooks instance", async () => {
-      const { hooks } = await import("../../hooks/index.js");
+      const { hooks } = await import("../../hooks/index.ts");
       expect(hooks).toBeDefined();
       expect(typeof hooks.on).toBe("function");
       expect(typeof hooks.emit).toBe("function");

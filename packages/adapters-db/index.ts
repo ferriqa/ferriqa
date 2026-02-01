@@ -13,26 +13,26 @@ export type {
   QueryResult,
   IsolationLevel,
   AdapterFactoryOptions,
-} from "./src/types.js";
+} from "./src/types.ts";
 
 // Main classes (includes enums which are both types and values)
 export {
   FerriqaDatabaseError,
   AdapterState,
   DatabaseErrorType,
-} from "./src/types.js";
+} from "./src/types.ts";
 
 // Adapters
-export { BunSQLiteAdapter } from "./src/adapters/BunSQLiteAdapter.js";
-export { BetterSQLiteAdapter } from "./src/adapters/BetterSQLiteAdapter.js";
-export { DenoSQLiteAdapter } from "./src/adapters/DenoSQLiteAdapter.js";
+export { BunSQLiteAdapter } from "./src/adapters/BunSQLiteAdapter.ts";
+export { BetterSQLiteAdapter } from "./src/adapters/BetterSQLiteAdapter.ts";
+export { DenoSQLiteAdapter } from "./src/adapters/DenoSQLiteAdapter.ts";
 
 // Factory
 export {
   UniversalDBFactory,
   createDatabase,
   createMemoryDatabase,
-} from "./src/factory.js";
+} from "./src/factory.ts";
 
 // Schema
 export {
@@ -47,7 +47,7 @@ export {
   migrations,
   tables,
   type FieldDefinition,
-} from "./src/schema.js";
+} from "./src/schema.ts";
 
 // Migrations
 export type {
@@ -58,9 +58,9 @@ export type {
   RollbackResult,
   MigrationRunnerOptions,
   MigrationDirection,
-} from "./src/migrations/types.js";
+} from "./src/migrations/types.ts";
 
 export {
   MigrationRunner,
   createMigrationRunner,
-} from "./src/migrations/runner.js";
+} from "./src/migrations/runner.ts";

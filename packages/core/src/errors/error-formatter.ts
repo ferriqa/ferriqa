@@ -5,8 +5,8 @@
  * Handles Bun, Node.js, and Deno stack formats
  */
 
-import type { NormalizedStackTrace, StackFrame } from "./types.js";
-import { isBun, isDeno, isNode } from "../runtime.js";
+import type { NormalizedStackTrace, StackFrame } from "./types.ts";
+import { isBun, isDeno, isNode } from "../runtime.ts";
 
 /**
  * Parse a single stack frame

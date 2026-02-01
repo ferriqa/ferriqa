@@ -6,7 +6,7 @@
  */
 
 // Runtime detection - imported from runtime module to avoid duplication
-import { isBun, isDeno, isNode } from "../runtime.js";
+import { isBun, isDeno, isNode } from "../runtime.ts";
 
 // Type definitions for test functions
 export type TestFunction = () => void | Promise<void>;
@@ -464,7 +464,7 @@ export function clearTests(): void {
 export { isBun, isDeno, isNode };
 
 // Re-export all testing modules
-export * from "./runner.js";
-export * from "./fixtures.js";
-export * from "./mocks.js";
-export * from "./config.js";
+export * from "./runner.ts";
+export * from "./fixtures.ts";
+export * from "./mocks.ts";
+export * from "./config.ts";

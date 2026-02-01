@@ -18,8 +18,8 @@ import type {
   IHookRegistry,
   ExecutionOptions,
   ErrorStrategy,
-} from "./types.js";
-import { HOOK_PRIORITY_VALUES } from "./types.js";
+} from "./types.ts";
+import { HOOK_PRIORITY_VALUES } from "./types.ts";
 
 /**
  * Generate unique handler ID

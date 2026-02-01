@@ -6,10 +6,10 @@
  * MUST BE EXPLICITLY ENABLED via FERRIQA_ERROR_FILE_ENABLED
  */
 
-import type { ErrorTransport, ErrorContext } from "../types.js";
-import { LogLevel } from "../types.js";
-import { FerriqaError } from "../FerriqaError.js";
-import { isBun, isDeno, isNode } from "../../runtime.js";
+import type { ErrorTransport, ErrorContext } from "../types.ts";
+import { LogLevel } from "../types.ts";
+import { FerriqaError } from "../FerriqaError.ts";
+import { isBun, isDeno, isNode } from "../../runtime.ts";
 
 /**
  * File Transport implementation

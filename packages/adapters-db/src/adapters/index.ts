@@ -4,6 +4,6 @@
  * Export all database adapter implementations
  */
 
-export { BunSQLiteAdapter } from "./BunSQLiteAdapter.js";
-export { BetterSQLiteAdapter } from "./BetterSQLiteAdapter.js";
-export { DenoSQLiteAdapter } from "./DenoSQLiteAdapter.js";
+export { BunSQLiteAdapter } from "./BunSQLiteAdapter.ts";
+export { BetterSQLiteAdapter } from "./BetterSQLiteAdapter.ts";
+export { DenoSQLiteAdapter } from "./DenoSQLiteAdapter.ts";

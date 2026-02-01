@@ -11,7 +11,7 @@ import {
   getErrorPrefix,
   isErrorCategory,
   getDefaultStatusCode,
-} from "./error-codes.js";
+} from "./error-codes.ts";
 
 describe("Error Codes", () => {
   describe("ErrorCode enum", () => {

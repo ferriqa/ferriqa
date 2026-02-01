@@ -4,7 +4,7 @@
  * Type definitions for database migrations
  */
 
-import type { DatabaseAdapter, DatabaseTransaction } from "../types.js";
+import type { DatabaseAdapter, DatabaseTransaction } from "../types.ts";
 
 /**
  * Migration definition

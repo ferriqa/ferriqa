@@ -46,12 +46,12 @@ export type {
   IHookRegistry,
   ErrorStrategy,
   ExecutionOptions,
-} from "./types.js";
+} from "./types.ts";
 
-export { HOOK_PRIORITY_VALUES } from "./types.js";
+export { HOOK_PRIORITY_VALUES } from "./types.ts";
 
 // Registry
-export { HookRegistry, hooks, createHookRegistry } from "./registry.js";
+export { HookRegistry, hooks, createHookRegistry } from "./registry.ts";
 
 // Built-in hooks
 export type {
@@ -63,7 +63,7 @@ export type {
   BlueprintUpdateContext,
   BlueprintDeleteContext,
   WebhookSendContext,
-} from "./built-in.js";
+} from "./built-in.ts";
 
 export {
   BUILT_IN_HOOKS,
@@ -72,7 +72,7 @@ export {
   getBuiltInHookNames,
   getBuiltInActionHooks,
   getBuiltInFilterHooks,
-} from "./built-in.js";
+} from "./built-in.ts";
 
 // Error handling
 export {
@@ -86,9 +86,9 @@ export {
   isHookExecutionError,
   isHookValidationError,
   safeHook,
-} from "./errors.js";
+} from "./errors.ts";
 
-export type { HookErrorHandler } from "./errors.js";
+export type { HookErrorHandler } from "./errors.ts";
 
 // Convenience exports for the global hooks instance
 /**
@@ -97,8 +97,8 @@ export type { HookErrorHandler } from "./errors.js";
  */
 export function on<T>(
   event: string,
-  callback: import("./types.js").HookCallback<T>,
-  options?: import("./types.js").HookOptions,
+  callback: import("./types.ts").HookCallback<T>,
+  options?: import("./types.ts").HookOptions,
 ): () => void {
   return hooks.on(event, callback, options);
 }
@@ -109,7 +109,7 @@ export function on<T>(
  */
 export function off<T>(
   event: string,
-  callback: import("./types.js").HookCallback<T>,
+  callback: import("./types.ts").HookCallback<T>,
 ): void {
   return hooks.off(event, callback);
 }
@@ -120,8 +120,8 @@ export function off<T>(
  */
 export function addFilter<T>(
   event: string,
-  callback: import("./types.js").FilterCallback<T>,
-  options?: import("./types.js").HookOptions,
+  callback: import("./types.ts").FilterCallback<T>,
+  options?: import("./types.ts").HookOptions,
 ): () => void {
   return hooks.addFilter(event, callback, options);
 }
@@ -132,7 +132,7 @@ export function addFilter<T>(
  */
 export function removeFilter<T>(
   event: string,
-  callback: import("./types.js").FilterCallback<T>,
+  callback: import("./types.ts").FilterCallback<T>,
 ): void {
   return hooks.removeFilter(event, callback);
 }
@@ -144,8 +144,8 @@ export function removeFilter<T>(
 export function emit<T>(
   event: string,
   context: T,
-  options?: import("./types.js").ExecutionOptions,
-): Promise<import("./types.js").HookResult> {
+  options?: import("./types.ts").ExecutionOptions,
+): Promise<import("./types.ts").HookResult> {
   return hooks.emit(event, context, options);
 }
 
@@ -156,10 +156,10 @@ export function emit<T>(
 export function filter<T>(
   event: string,
   data: T,
-  options?: import("./types.js").ExecutionOptions,
-): Promise<import("./types.js").FilterResult<T>> {
+  options?: import("./types.ts").ExecutionOptions,
+): Promise<import("./types.ts").FilterResult<T>> {
   return hooks.filter(event, data, options);
 }
 
 // Re-import hooks for the convenience functions
-import { hooks } from "./registry.js";
+import { hooks } from "./registry.ts";

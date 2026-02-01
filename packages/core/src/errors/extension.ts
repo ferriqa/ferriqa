@@ -11,7 +11,7 @@
  * - @ferriqa/error-transport-webhook (custom webhook)
  */
 
-import type { ErrorTransport, LogLevel } from "./types.js";
+import type { ErrorTransport, LogLevel } from "./types.ts";
 
 /**
  * Transport factory interface

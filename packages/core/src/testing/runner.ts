@@ -5,7 +5,7 @@
  * Provides a unified API for test runner configuration.
  */
 
-import { isBun, isDeno, isNode } from "../runtime.js";
+import { isBun, isDeno, isNode } from "../runtime.ts";
 
 /**
  * Escape special shell characters in a string to prevent command injection.
@@ -343,4 +343,4 @@ export function runIfRunner<T>(runner: TestRunner, fn: () => T): T | undefined {
 /**
  * Cross-runtime test utilities export
  */
-export { isBun, isDeno, isNode } from "../runtime.js";
+export { isBun, isDeno, isNode } from "../runtime.ts";

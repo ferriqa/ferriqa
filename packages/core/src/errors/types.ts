@@ -5,7 +5,7 @@
  * Compatible with Bun, Node.js, and Deno runtimes
  */
 
-import type { RuntimeInfo } from "../runtime.js";
+import type { RuntimeInfo } from "../runtime.ts";
 
 /**
  * Log severity levels

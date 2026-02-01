@@ -10,18 +10,18 @@ import type {
   ErrorContext,
   ErrorLoggerConfig,
   LogLevel,
-} from "./types.js";
-import { LogLevel as LogLevelEnum } from "./types.js";
-import type { FerriqaError } from "./FerriqaError.js";
-import { ConsoleTransport } from "./transports/ConsoleTransport.js";
-import { FileTransport } from "./transports/FileTransport.js";
+} from "./types.ts";
+import { LogLevel as LogLevelEnum } from "./types.ts";
+import type { FerriqaError } from "./FerriqaError.ts";
+import { ConsoleTransport } from "./transports/ConsoleTransport.ts";
+import { FileTransport } from "./transports/FileTransport.ts";
 import {
   buildConfigFromEnv,
   mergeConfig,
   validateConfig,
   DEFAULT_CONFIG,
-} from "./config.js";
-import { getRuntimeInfo, isBun, isDeno, isNode } from "../runtime.js";
+} from "./config.ts";
+import { getRuntimeInfo, isBun, isDeno, isNode } from "../runtime.ts";
 
 /**
  * Generate unique request ID
@@ -258,7 +258,7 @@ export class FerriqaErrorLogger {
     message: string,
     context?: Partial<ErrorContext>,
   ): Promise<void> {
-    const { FerriqaError } = await import("./FerriqaError.js");
+    const { FerriqaError } = await import("./FerriqaError.ts");
 
     const code =
       level >= LogLevelEnum.ERROR ? "SYSTEM_INTERNAL_ERROR" : "SYSTEM_INFO";

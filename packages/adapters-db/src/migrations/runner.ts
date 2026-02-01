@@ -5,8 +5,8 @@
  * Manages migration execution and rollback
  */
 
-import type { DatabaseAdapter, QueryResult } from "../types.js";
-import { FerriqaDatabaseError, ErrorCode } from "../types.js";
+import type { DatabaseAdapter, QueryResult } from "../types.ts";
+import { FerriqaDatabaseError, ErrorCode } from "../types.ts";
 import type {
   Migration,
   MigrationRecord,
@@ -14,7 +14,7 @@ import type {
   MigrationResult,
   RollbackResult,
   MigrationRunnerOptions,
-} from "./types.js";
+} from "./types.ts";
 
 /**
  * Migration runner

@@ -5,8 +5,8 @@
  * Parses FERRIQA_ERROR_* environment variables
  */
 
-import type { ErrorLoggerConfig } from "./types.js";
-import { LogLevel, LOG_LEVEL_MAP, LogLevelString } from "./types.js";
+import type { ErrorLoggerConfig } from "./types.ts";
+import { LogLevel, LOG_LEVEL_MAP, LogLevelString } from "./types.ts";
 
 /**
  * Default configuration values

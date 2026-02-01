@@ -5,8 +5,8 @@ import {
   FerriqaValidationError,
   FerriqaRuntimeError,
   FerriqaAuthError,
-} from "./FerriqaError.js";
-import { ErrorCode } from "./error-codes.js";
+} from "./FerriqaError.ts";
+import { ErrorCode } from "./error-codes.ts";
 
 describe("FerriqaError", () => {
   describe("constructor", () => {

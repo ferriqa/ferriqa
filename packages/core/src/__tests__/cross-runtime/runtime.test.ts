@@ -34,12 +34,12 @@ describe("Cross-Runtime Compatibility", () => {
 
   describe("Module Loading", () => {
     it("should load ES modules", async () => {
-      const { hooks } = await import("../../hooks/index.js");
+      const { hooks } = await import("../../hooks/index.ts");
       expect(hooks).toBeDefined();
     });
 
     it("should support dynamic imports", async () => {
-      const module = await import("../../runtime.js");
+      const module = await import("../../runtime.ts");
       expect(module.getRuntimeId).toBeDefined();
     });
   });
