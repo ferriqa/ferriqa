@@ -1,0 +1,10 @@
+{
+  "name": "@ferriqa/i18n",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "tasks": {
+    "test": "deno test --allow-all"
+  }
+}
