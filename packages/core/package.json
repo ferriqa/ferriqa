@@ -10,6 +10,7 @@
     "./validation": "./src/validation/index.ts",
     "./slug": "./src/slug/index.ts",
     "./content": "./src/content/index.ts",
+    "./hooks": "./src/hooks/index.ts",
     "./testing": "./src/testing/index.ts"
   },
   "scripts": {

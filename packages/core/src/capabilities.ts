@@ -391,12 +391,18 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
     totalMemory = gBun?.memory?.total || 0;
     execPath = gBun?.main || "";
   } else if (isDeno) {
-    platform = (Deno as any)?.build?.os || "unknown";
-    arch = (Deno as any)?.build?.arch || "unknown";
-    os = (Deno as any)?.build?.os || "unknown";
-    cpuCount = (Deno as any)?.systemCpuInfo?.cores || 1;
-    totalMemory = (Deno as any)?.systemMemoryInfo?.total || 0;
-    execPath = (Deno as any)?.mainModule || "";
+    // @ts-ignore - Deno global available in Deno runtime
+    platform = Deno?.build?.os || "unknown";
+    // @ts-ignore
+    arch = Deno?.build?.arch || "unknown";
+    // @ts-ignore
+    os = Deno?.build?.os || "unknown";
+    // @ts-ignore
+    cpuCount = Deno?.systemCpuInfo?.cores || 1;
+    // @ts-ignore
+    totalMemory = Deno?.systemMemoryInfo?.total || 0;
+    // @ts-ignore
+    execPath = Deno?.mainModule || "";
   } else if (isNode) {
     const gProcess = (globalThis as any).process;
     platform = gProcess?.platform;

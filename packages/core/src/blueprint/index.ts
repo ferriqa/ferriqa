@@ -6,3 +6,5 @@
 
 export * from "./types";
 export * from "./validation";
+export { BlueprintService } from "./service";
+export type { BlueprintServiceOptions } from "./service";
