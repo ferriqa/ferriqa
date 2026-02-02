@@ -66,7 +66,9 @@ export type IsolationLevel =
  */
 export class MockDatabaseAdapter implements DatabaseAdapter {
   readonly name = "mock-sqlite";
-  readonly runtime = "mock" as const;
+  // Mock adapter reports as "bun" runtime since tests run with Bun
+  // This satisfies DatabaseAdapter interface while still being identifiable by name
+  readonly runtime = "bun" as const;
   readonly config: DatabaseConfig;
 
   private connected = false;
@@ -181,9 +183,84 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
     // Simple WHERE clause filtering
     if (params && params.length > 0 && sql.toLowerCase().includes("where")) {
       // Very basic filtering for testing
+      // Supports loose equality to handle type differences (e.g., string "1" vs number 1)
       rows = rows.filter((row) => {
         const rowObj = row as Record<string, unknown>;
-        return params.some((param) => Object.values(rowObj).includes(param));
+        return params.some((param) =>
+          Object.values(rowObj).some(
+            (val) =>
+              val === param ||
+              String(val) === String(param) ||
+              (typeof val === "number" &&
+                typeof param === "string" &&
+                val === Number(param)) ||
+              (typeof val === "string" &&
+                typeof param === "number" &&
+                Number(val) === param),
+          ),
+        );
+      });
+    }
+
+    // Parse column aliases from SELECT: SELECT col1 as alias1, col2 as alias2, ...
+    // Handles multiline SELECT statements by using [\s\S] instead of .
+    const selectMatch = sql.match(/select\s+([\s\S]+?)\s+from/i);
+    let columnMappings: Array<{ original: string; alias: string }> = [];
+
+    if (selectMatch && !selectMatch[1].includes("*")) {
+      columnMappings = selectMatch[1].split(",").map((col) => {
+        const trimmed = col.trim();
+        // Match patterns like: col AS alias, col as alias, col alias
+        const aliasMatch = trimmed.match(/^(.+?)\s+(?:as\s+)?(.+)$/i);
+        if (aliasMatch) {
+          return {
+            original: aliasMatch[1].trim().replace(/['"`]/g, ""),
+            alias: aliasMatch[2].trim().replace(/['"`]/g, ""),
+          };
+        }
+        // No alias, column name is used as-is
+        return {
+          original: trimmed.replace(/['"`]/g, ""),
+          alias: trimmed.replace(/['"`]/g, ""),
+        };
+      });
+    }
+
+    // Simple ORDER BY support - must happen BEFORE column aliasing
+    // so we can sort by the original column names
+    const orderByMatch = sql.match(/order\s+by\s+(\w+)(?:\s+(asc|desc))?/i);
+    if (orderByMatch) {
+      const sortColumn = orderByMatch[1];
+      const sortDirection = orderByMatch[2]?.toLowerCase() || "asc";
+
+      rows.sort((a, b) => {
+        const rowA = a as Record<string, unknown>;
+        const rowB = b as Record<string, unknown>;
+        const valA = rowA[sortColumn];
+        const valB = rowB[sortColumn];
+
+        // Handle numeric comparison
+        if (typeof valA === "number" && typeof valB === "number") {
+          return sortDirection === "desc" ? valB - valA : valA - valB;
+        }
+
+        // Handle string comparison
+        const strA = String(valA);
+        const strB = String(valB);
+        const comparison = strA.localeCompare(strB);
+        return sortDirection === "desc" ? -comparison : comparison;
+      });
+    }
+
+    // Transform rows to apply aliases (happens after ORDER BY)
+    if (columnMappings.length > 0) {
+      rows = rows.map((row) => {
+        const rowObj = row as Record<string, unknown>;
+        const newRow: Record<string, unknown> = {};
+        columnMappings.forEach(({ original, alias }) => {
+          newRow[alias] = rowObj[original];
+        });
+        return newRow as T;
       });
     }
 
@@ -201,14 +278,28 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
     const newRow: Record<string, unknown> = { id: this.idCounter++ };
 
     if (params) {
-      // Note: Using generic column names (col0, col1, etc.) is intentional
-      // This is a lightweight mock for testing basic INSERT operations
-      // Full SQL parsing to extract actual column names would add unnecessary
-      // complexity for a mock adapter. Tests should access data via the row ID
-      // or use seedData() for more specific test data.
-      params.forEach((param, index) => {
-        newRow[`col${index}`] = param;
-      });
+      // Extract column names from INSERT statement: INSERT INTO table (col1, col2) VALUES ...
+      const columnMatch = sql.match(/\(([^)]+)\)\s*values/i);
+      if (columnMatch) {
+        // Parse column names from the parentheses
+        const columnNames = columnMatch[1]
+          .split(",")
+          .map((col) => col.trim().replace(/['"`]/g, ""));
+
+        // Map params to their actual column names
+        params.forEach((param, index) => {
+          if (index < columnNames.length) {
+            newRow[columnNames[index]] = param;
+          } else {
+            newRow[`col${index}`] = param;
+          }
+        });
+      } else {
+        // Fallback to generic column names if no explicit columns specified
+        params.forEach((param, index) => {
+          newRow[`col${index}`] = param;
+        });
+      }
     }
 
     tableData.push(newRow);
@@ -222,8 +313,64 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
     const tableName = match ? match[1] : "default";
 
     const tableData = this.data.get(tableName) || [];
-    // Mock update - just return 1 change for simplicity
-    return { changes: params ? 1 : 0 };
+
+    if (!params || params.length === 0) {
+      return { changes: 0 };
+    }
+
+    // Extract SET columns from UPDATE statement: UPDATE table SET col1 = ?, col2 = ? WHERE ...
+    // NOTE: Regex handles both "WHERE" and "JOIN" clauses for edge cases
+    const setMatch = sql.match(/set\s+(.+?)\s+(?:where|join)/i);
+    if (setMatch) {
+      const setClause = setMatch[1];
+      // Extract column names from SET clause (e.g., "col1 = ?, col2 = ?")
+      const columnNames = setClause
+        .split(",")
+        .map((part) => {
+          const colMatch = part.match(/(\w+)\s*=/);
+          return colMatch ? colMatch[1].trim() : null;
+        })
+        .filter((col): col is string => col !== null);
+
+      // Last param is typically the WHERE id
+      const whereId = params[params.length - 1];
+
+      // Find and update matching rows
+      let updatedCount = 0;
+      const updatedData = tableData.map((row) => {
+        const rowObj = row as Record<string, unknown>;
+        // Match by id with type coercion
+        const rowId = rowObj.id;
+        const matches =
+          rowId === whereId ||
+          String(rowId) === String(whereId) ||
+          (typeof rowId === "number" &&
+            typeof whereId === "string" &&
+            rowId === Number(whereId)) ||
+          (typeof rowId === "string" &&
+            typeof whereId === "number" &&
+            Number(rowId) === whereId);
+
+        if (matches) {
+          updatedCount++;
+          // Update the row with new values
+          const updatedRow = { ...rowObj };
+          columnNames.forEach((col, index) => {
+            if (index < params.length - 1) {
+              // Exclude WHERE param
+              updatedRow[col] = params[index];
+            }
+          });
+          return updatedRow;
+        }
+        return row;
+      });
+
+      this.data.set(tableName, updatedData);
+      return { changes: updatedCount };
+    }
+
+    return { changes: 0 };
   }
 
   private mockDelete(sql: string, params?: unknown[]): { changes: number } {
@@ -233,11 +380,23 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
     const tableData = this.data.get(tableName) || [];
     const initialLength = tableData.length;
 
-    // Remove matching rows
+    // Remove matching rows with type coercion support
     if (params && params.length > 0) {
       const filtered = tableData.filter((row) => {
         const rowObj = row as Record<string, unknown>;
-        return !params.some((param) => Object.values(rowObj).includes(param));
+        return !params.some((param) =>
+          Object.values(rowObj).some(
+            (val) =>
+              val === param ||
+              String(val) === String(param) ||
+              (typeof val === "number" &&
+                typeof param === "string" &&
+                val === Number(param)) ||
+              (typeof val === "string" &&
+                typeof param === "number" &&
+                Number(val) === param),
+          ),
+        );
       });
       this.data.set(tableName, filtered);
       return { changes: initialLength - filtered.length };
