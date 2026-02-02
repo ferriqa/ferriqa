@@ -5,11 +5,7 @@
  */
 
 import { describe, it, expect } from "../../testing/index.ts";
-import {
-  HookRegistry,
-  createHookRegistry,
-  HookExecutionError,
-} from "../../hooks/index.ts";
+import { createHookRegistry, HookExecutionError } from "../../hooks/index.ts";
 
 describe("Hook System", () => {
   describe("HookRegistry", () => {

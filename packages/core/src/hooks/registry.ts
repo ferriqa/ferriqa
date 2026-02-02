@@ -17,7 +17,6 @@ import type {
   FilterResult,
   IHookRegistry,
   ExecutionOptions,
-  ErrorStrategy,
 } from "./types.ts";
 import { HOOK_PRIORITY_VALUES } from "./types.ts";
 

@@ -228,7 +228,7 @@ export class BetterSQLiteAdapter implements DatabaseAdapter {
    * Begin a transaction
    */
   async beginTransaction(
-    isolationLevel?: IsolationLevel,
+    _isolationLevel?: IsolationLevel,
   ): Promise<DatabaseTransaction> {
     this.ensureConnected();
 

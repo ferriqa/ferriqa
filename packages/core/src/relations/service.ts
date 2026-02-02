@@ -19,7 +19,6 @@ import type {
   CascadeRule,
   RelationCreateContext,
   RelationDeleteContext,
-  PopulatedRelation,
 } from "./types.ts";
 
 export interface RelationServiceOptions {
@@ -587,7 +586,7 @@ export class RelationService {
   async wouldCreateCircularReference(
     sourceId: string,
     targetId: string,
-    type: RelationType,
+    _type: RelationType,
   ): Promise<boolean> {
     // BFS to check if targetId eventually connects back to sourceId
     // Check both outgoing (target -> X) and incoming (X -> target) relations

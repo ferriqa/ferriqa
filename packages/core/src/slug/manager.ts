@@ -218,7 +218,7 @@ export class SlugManager {
     blueprintId: string,
     slug: string,
     contentId: string,
-    expiresAt?: Date,
+    _expiresAt?: Date,
   ): Promise<void> {
     // Placeholder for future implementation
     // Would require a slug_reservations table

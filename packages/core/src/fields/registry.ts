@@ -22,14 +22,12 @@
 import type {
   FieldTypeHandler,
   FieldRegistryEntry,
-  FieldValidationContext,
   RelationValue,
 } from "./types.ts";
 import type {
   ValidationRule,
   ValidationError,
   FieldOptions,
-  FieldType,
 } from "../blueprint/types.ts";
 
 // Text field handler (P0)
@@ -350,7 +348,7 @@ export const DatetimeField: FieldTypeHandler<string | null> = {
 export const SlugField: FieldTypeHandler<string> = {
   type: "slug",
 
-  validate(value, rules, options): ValidationError[] {
+  validate(value, rules, _options): ValidationError[] {
     const errors: ValidationError[] = [];
     const str = String(value ?? "");
 

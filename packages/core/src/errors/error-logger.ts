@@ -15,12 +15,7 @@ import { LogLevel as LogLevelEnum } from "./types.ts";
 import type { FerriqaError } from "./FerriqaError.ts";
 import { ConsoleTransport } from "./transports/ConsoleTransport.ts";
 import { FileTransport } from "./transports/FileTransport.ts";
-import {
-  buildConfigFromEnv,
-  mergeConfig,
-  validateConfig,
-  DEFAULT_CONFIG,
-} from "./config.ts";
+import { mergeConfig, validateConfig, DEFAULT_CONFIG } from "./config.ts";
 import { getRuntimeInfo, isBun, isDeno, isNode } from "../runtime.ts";
 
 /**

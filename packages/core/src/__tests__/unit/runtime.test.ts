@@ -5,7 +5,7 @@
  */
 
 import { test } from "@cross/test";
-import { assertEquals, assertNotEquals } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import {
   isBun,
   isDeno,

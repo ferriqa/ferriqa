@@ -230,7 +230,7 @@ export class FileTransport implements ErrorTransport {
       // Need to use fs.mkdir equivalent
       // @ts-ignore
       if (typeof Bun !== "undefined") {
-        const path = await import("node:path");
+        await import("node:path");
         const fs = await import("node:fs/promises");
         await fs.mkdir(this.filePath, { recursive: true });
       }
