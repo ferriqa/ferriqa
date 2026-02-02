@@ -6,10 +6,36 @@
  */
 
 // Types
-export * from "./types.ts";
+export type {
+  Content,
+  ContentBaseFields,
+  ContentStatus,
+  PopulatedContent,
+  PopulatedContentItem,
+  CreateContentInput,
+  UpdateContentInput,
+  ContentQuery,
+  FilterCondition,
+  SortCondition,
+  PaginationOptions,
+  PopulateOptions,
+  PaginatedResult,
+  ContentMetadata,
+  ChangeSummary,
+  ValidationResult,
+  ValidationError,
+  ValidationWarning,
+  ContentCreateContext,
+  ContentUpdateContext,
+  ContentDeleteContext,
+  ContentPublishContext,
+} from "./types.ts";
 
 // Query Builder
-export { ContentQueryBuilder } from "./query-builder.ts";
+export {
+  ContentQueryBuilder,
+  type ContentQueryBuilderOptions,
+} from "./query-builder.ts";
 
 // Service
 export { ContentService } from "./service.ts";

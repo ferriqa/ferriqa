@@ -10,6 +10,7 @@ import type { Blueprint } from "../blueprint/types.ts";
 import type { ValidationEngine } from "../validation/engine.ts";
 import type { SlugManager } from "../slug/manager.ts";
 import type { IHookRegistry } from "../hooks/types.ts";
+import type { RelationService } from "../relations/service.ts";
 import type {
   Content,
   ContentQuery,
@@ -25,6 +26,7 @@ export interface ContentServiceOptions {
   validationEngine: ValidationEngine;
   slugManager: SlugManager;
   hookRegistry: IHookRegistry;
+  relationService?: RelationService;
 }
 
 /**
@@ -54,7 +56,11 @@ export class ContentService {
   private queryBuilder: ContentQueryBuilder;
 
   constructor(private options: ContentServiceOptions) {
-    this.queryBuilder = new ContentQueryBuilder(options.db);
+    this.queryBuilder = new ContentQueryBuilder({
+      db: options.db,
+      relationService: options.relationService,
+      getBlueprint: this.getBlueprint.bind(this),
+    });
   }
 
   /**
@@ -285,6 +291,7 @@ export class ContentService {
 
   /**
    * Delete content
+   * REVIEW: Added relation cleanup before deleting content
    */
   async delete(contentId: string, userId?: string): Promise<void> {
     // Get content
@@ -302,7 +309,18 @@ export class ContentService {
       userId,
     });
 
-    // Delete content (versions will cascade due to foreign key)
+    // Delete relations first to enforce custom cascade rules (restrict, cascade, set-null)
+    // REVIEW: Manual deletion is required because migration no longer uses ON DELETE CASCADE
+    // This ensures cascade rules defined in blueprint are properly enforced
+    // NOTE: deleteRelationsForContent() deletes ALL relations for this content atomically
+    // There is no partial failure case - either all relations are deleted or an error is thrown
+    // CRITICAL: Currently uses default "no-action" cascade rule - blueprint-defined rules are not enforced
+    // TODO: Pass cascadeRule from blueprint field configuration
+    if (this.options.relationService) {
+      await this.options.relationService.deleteRelationsForContent(contentId);
+    }
+
+    // Delete content (versions will cascade due to foreign key, relations handled above)
     await this.options.db.execute("DELETE FROM contents WHERE id = ?", [
       contentId,
     ]);
@@ -575,7 +593,11 @@ export class ContentService {
 
   // ========== Private Helpers ==========
 
-  private async getBlueprint(blueprintId: string): Promise<Blueprint> {
+  /**
+   * Get blueprint by ID
+   * REVIEW: Made public so it can be passed to ContentQueryBuilder for population
+   */
+  async getBlueprint(blueprintId: string): Promise<Blueprint> {
     const result = await this.options.db.query(
       `SELECT id, name, slug, fields, settings, created_at as createdAt, updated_at as updatedAt
        FROM blueprints WHERE id = ?`,
@@ -591,6 +613,9 @@ export class ContentService {
       id: String(row.id),
       name: String(row.name),
       slug: String(row.slug),
+      // NOTE: JSON.parse() can throw if fields/settings contain malformed JSON.
+      // This is intentional - corrupted blueprint data should not be silently ignored.
+      // The error will help identify data integrity issues that need investigation.
       fields:
         typeof row.fields === "string"
           ? JSON.parse(row.fields)
@@ -660,12 +685,18 @@ export class ContentService {
     const changes: string[] = [];
     const allKeys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
 
+    // Helper to check if a value is "empty" (not meaningfully set)
+    const isEmptyValue = (value: unknown): boolean => {
+      return value === null || value === undefined || value === "";
+    };
+
     for (const key of allKeys) {
       const oldValue = oldData[key];
       const newValue = newData[key];
 
       if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
-        if (!(key in oldData)) {
+        // Field is "added" if it was empty before and has a value now
+        if (isEmptyValue(oldValue) && !isEmptyValue(newValue)) {
           changes.push(`Added ${key}`);
         } else if (!(key in newData)) {
           changes.push(`Removed ${key}`);

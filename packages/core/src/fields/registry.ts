@@ -24,13 +24,13 @@ import type {
   FieldRegistryEntry,
   FieldValidationContext,
   RelationValue,
-} from "./types";
+} from "./types.ts";
 import type {
   ValidationRule,
   ValidationError,
   FieldOptions,
   FieldType,
-} from "../blueprint/types";
+} from "../blueprint/types.ts";
 
 // Text field handler (P0)
 export const TextField: FieldTypeHandler<string> = {
@@ -608,7 +608,9 @@ export const JSONField: FieldTypeHandler<unknown> = {
   },
 
   serialize(value) {
-    return JSON.stringify(value);
+    // Return value as-is; the content service will JSON.stringify the entire data object
+    // This prevents double-encoding when JSON fields are stored in the database
+    return value;
   },
 
   deserialize(value) {

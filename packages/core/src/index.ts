@@ -45,6 +45,9 @@ export * from "./slug/index.ts"; // .js extension required for ESM bundler resol
 // Content Storage
 export * from "./content/index.ts"; // .js extension required for ESM bundler resolution
 
+// Relations System
+export * from "./relations/index.ts";
+
 // Note: Testing utilities are available as a separate import:
 //   import * as testing from "@ferriqa/core/testing"
 // This keeps the main package clean and prevents confusion about what's intended

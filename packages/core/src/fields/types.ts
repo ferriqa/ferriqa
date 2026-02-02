@@ -10,7 +10,9 @@ import type {
   ValidationError,
   FieldOptions,
   FieldType,
-} from "../blueprint/types";
+} from "../blueprint/types.ts";
+import type { RelationValue } from "../relations/types.ts";
+export type { RelationValue };
 
 export interface FieldTypeHandler<T = unknown> {
   type: FieldType;
@@ -31,13 +33,6 @@ export interface FieldTypeHandler<T = unknown> {
 
   // API response'ta kullanılacak
   toJSON(value: T): unknown;
-}
-
-// Relation value type
-export interface RelationValue {
-  id: string;
-  blueprint: string;
-  [key: string]: unknown;
 }
 
 // Field validation context

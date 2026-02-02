@@ -5,7 +5,7 @@
  * Based on roadmap 2.2 - Dynamic Content Storage
  */
 
-import type { Blueprint } from "../blueprint/types";
+import type { Blueprint } from "../blueprint/types.ts";
 
 // Content status types
 export type ContentStatus = "draft" | "published" | "archived";
@@ -25,9 +25,27 @@ export interface Content {
   publishedBy?: string;
 }
 
+// Base content fields that are always present
+// REVIEW: Added for type safety - ensures populated content has proper base fields
+export interface ContentBaseFields {
+  id: string;
+  blueprintId: string;
+  slug: string;
+  status: ContentStatus;
+}
+
+// Populated content item - represents a content record with its data flattened
+// This is the structure returned when content is populated in relations
+// REVIEW: Fixed type safety - was Record<string, unknown>, now properly typed with base fields
+export type PopulatedContentItem = ContentBaseFields & Record<string, unknown>;
+
 // Content with populated relations
+// This represents content where relation fields have been populated with full content data
+// REVIEW: Fixed type safety - data field now properly typed with PopulatedContentItem
 export interface PopulatedContent extends Content {
-  data: Record<string, unknown>;
+  data: Record<string, PopulatedContentItem | PopulatedContentItem[] | null>;
+  // Marker field for type discrimination
+  _populated: true;
 }
 
 // Create content input
@@ -126,7 +144,7 @@ export {
   ValidationResult,
   ValidationError,
   ValidationWarning,
-} from "../blueprint/types";
+} from "../blueprint/types.ts";
 
 // Content hooks context types
 export interface ContentCreateContext {

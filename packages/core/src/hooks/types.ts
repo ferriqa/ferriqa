@@ -99,3 +99,55 @@ export interface ExecutionOptions {
   errorStrategy?: ErrorStrategy;
   timeout?: number;
 }
+
+// ========== RELATION HOOK CONTEXTS ==========
+
+/**
+ * Relation create hook context
+ * REVIEW: Simplified inline type for consumer convenience
+ * Canonical type with full Relation interface is in relations/types.ts
+ */
+// REVIEW: Type is 'string' instead of 'RelationType' - this is INTENTIONAL
+// This is a simplified inline type for consumer convenience
+// Canonical type with full RelationType is in relations/types.ts
+// Runtime values will match RelationType ("one-to-one" | "one-to-many" | "many-to-many")
+export interface RelationCreateContext {
+  sourceContentId: string;
+  targetContentId: string;
+  type: string;
+  metadata?: Record<string, unknown>;
+  userId?: string;
+}
+
+/**
+ * Relation update hook context
+ * REVIEW: Simplified inline type for consumer convenience
+ * Canonical type with full Relation interface is in relations/types.ts
+ */
+export interface RelationUpdateContext {
+  relation: {
+    id: string;
+    sourceContentId: string;
+    targetContentId: string;
+    type: string;
+    metadata?: Record<string, unknown>;
+  };
+  metadata?: Record<string, unknown>;
+  userId?: string;
+}
+
+/**
+ * Relation delete hook context
+ * REVIEW: Simplified inline type for consumer convenience
+ * Canonical type with full Relation interface is in relations/types.ts
+ */
+export interface RelationDeleteContext {
+  relation: {
+    id: string;
+    sourceContentId: string;
+    targetContentId: string;
+    type: string;
+    metadata?: Record<string, unknown>;
+  };
+  userId?: string;
+}

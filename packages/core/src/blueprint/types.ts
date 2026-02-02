@@ -5,6 +5,14 @@
  * Based on roadmap 2.1 - Blueprint Engine
  */
 
+// Import RelationType from relations to avoid duplicate definition
+// REVIEW: This creates a circular import (blueprint → relations → content → blueprint)
+// This is a DESIGN CHOICE - TypeScript handles type-only circular imports correctly
+// Type-only imports are erased at compile time, so no runtime issues occur
+// Keeping types synchronized across modules is more important than avoiding this cycle
+// If this becomes problematic, move shared types to a dedicated shared/types.ts file
+import type { RelationType } from "../relations/types.ts";
+
 export type FieldType =
   | "text" // Single line text
   | "textarea" // Multi-line text
@@ -72,7 +80,7 @@ export interface FieldOptions {
   // Relation
   relation?: {
     blueprintId: string;
-    type: "one-to-one" | "one-to-many" | "many-to-many";
+    type: RelationType;
     displayField: string; // Hangi field gösterilecek
     filter?: Record<string, unknown>; // Relation filtreleme
   };
