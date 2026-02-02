@@ -1,0 +1,19 @@
+{
+  "name": "@ferriqa/api",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./middleware": "./src/middleware/index.ts"
+  },
+  "scripts": {
+    "dev": "bun --watch src/dev.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ferriqa/core": "workspace:*",
+    "hono": "^4.6.12",
+    "get-port-please": "^3.2.0"
+  }
+}

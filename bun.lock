@@ -5,6 +5,7 @@
     "": {
       "name": "ferriqa-monorepo",
       "dependencies": {
+        "get-port-please": "^3.2.0",
         "zod": "^4.3.6",
       },
       "devDependencies": {
@@ -28,6 +29,15 @@
       "devDependencies": {
         "better-sqlite3": "^11.7.0",
         "bun-types": "^1.1.40",
+      },
+    },
+    "packages/api": {
+      "name": "@ferriqa/api",
+      "version": "0.0.1",
+      "dependencies": {
+        "@ferriqa/core": "workspace:*",
+        "get-port-please": "^3.2.0",
+        "hono": "^4.6.12",
       },
     },
     "packages/core": {
@@ -92,6 +102,8 @@
 
     "@ferriqa/adapters-db": ["@ferriqa/adapters-db@workspace:packages/adapters-db"],
 
+    "@ferriqa/api": ["@ferriqa/api@workspace:packages/api"],
+
     "@ferriqa/core": ["@ferriqa/core@workspace:packages/core"],
 
     "@jsr/cross__runtime": ["@jsr/cross__runtime@1.0.0", "https://npm.jsr.io/~/11/@jsr/cross__runtime/1.0.0.tgz", {}, "sha512-wUtjVBTk65ae4AKQRnxD5x3h4vVmopdKAYie/uS01Qolii2XQ81bKtRTvJ4kx133GYYgIAgyl3ihQ0OK8LcPmQ=="],
@@ -152,9 +164,13 @@
 
     "fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
 
+    "get-port-please": ["get-port-please@3.2.0", "", {}, "sha512-I9QVvBw5U/hw3RmWpYKRumUeaDgxTPd401x364rLmWBJcOQ753eov1eTgzDqRG9bqFIfDc7gfzcQEWrUri3o1A=="],
+
     "get-tsconfig": ["get-tsconfig@4.13.1", "", { "dependencies": { "resolve-pkg-maps": "^1.0.0" } }, "sha512-EoY1N2xCn44xU6750Sx7OjOIT59FkmstNc3X6y5xpz7D5cBtZRe/3pSlTkDJgqsOk3WwZPkWfonhhUJfttQo3w=="],
 
     "github-from-package": ["github-from-package@0.0.0", "", {}, "sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw=="],
+
+    "hono": ["hono@4.11.7", "", {}, "sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw=="],
 
     "ieee754": ["ieee754@1.2.1", "", {}, "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="],
 

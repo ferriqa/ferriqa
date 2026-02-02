@@ -31,6 +31,7 @@
     "@std/assert": "npm:@jsr/std__assert"
   },
   "dependencies": {
+    "get-port-please": "^3.2.0",
     "zod": "^4.3.6"
   }
 }
