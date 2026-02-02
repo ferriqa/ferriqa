@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { authMiddleware } from "../../middleware/auth";
 
 export const v1Routes = new Hono();
 
@@ -74,7 +75,7 @@ export function setupAuthRoutes(
   authLogout: any,
   authRefresh: any,
 ) {
-  v1Routes.get("/users/me", userMe);
+  v1Routes.get("/users/me", authMiddleware(), userMe);
   v1Routes.post("/auth/login", authLogin);
   v1Routes.post("/auth/logout", authLogout);
   v1Routes.post("/auth/refresh", authRefresh);
