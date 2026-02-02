@@ -9,6 +9,7 @@
     "./fields": "./src/fields/index.ts",
     "./validation": "./src/validation/index.ts",
     "./slug": "./src/slug/index.ts",
+    "./content": "./src/content/index.ts",
     "./testing": "./src/testing/index.ts"
   },
   "scripts": {

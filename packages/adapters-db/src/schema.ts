@@ -55,6 +55,8 @@ export const contents = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
+    publishedAt: integer("published_at", { mode: "timestamp" }),
+    publishedBy: integer("published_by").references(() => users.id),
   },
   (table) => ({
     // Composite unique constraint: slug must be unique within a blueprint

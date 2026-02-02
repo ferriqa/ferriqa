@@ -42,6 +42,9 @@ export * from "./validation/index.ts"; // .js extension required for ESM bundler
 // Slug Management
 export * from "./slug/index.ts"; // .js extension required for ESM bundler resolution
 
+// Content Storage
+export * from "./content/index.ts"; // .js extension required for ESM bundler resolution
+
 // Note: Testing utilities are available as a separate import:
 //   import * as testing from "@ferriqa/core/testing"
 // This keeps the main package clean and prevents confusion about what's intended

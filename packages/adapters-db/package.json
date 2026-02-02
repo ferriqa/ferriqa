@@ -2,6 +2,13 @@
   "name": "@ferriqa/adapters-db",
   "version": "0.0.1",
   "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./types": "./src/types.ts",
+    "./schema": "./src/schema.ts",
+    "./factory": "./src/factory.ts",
+    "./migrations": "./src/migrations/runner.ts"
+  },
   "dependencies": {
     "@ferriqa/core": "workspace:*",
     "drizzle-orm": "^0.38.0"
