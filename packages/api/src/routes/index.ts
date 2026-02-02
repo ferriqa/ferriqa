@@ -34,11 +34,13 @@ import {
   webhookDeleteHandler,
   webhookTestHandler,
   webhookDeliveriesHandler,
-  userMeHandler,
+} from "../handlers/mocks";
+import {
   authLoginHandler,
   authLogoutHandler,
   authRefreshHandler,
-} from "../handlers/mocks";
+  userMeHandler,
+} from "../handlers/auth";
 
 export function setupRoutes(app: Hono): void {
   app.get("/health", (c: Context) =>
