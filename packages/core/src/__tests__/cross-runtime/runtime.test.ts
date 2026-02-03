@@ -60,5 +60,4 @@ describe("Cross-Runtime Compatibility", () => {
   });
 });
 
-
 runTests();
