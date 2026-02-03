@@ -12,10 +12,13 @@
     "npm:bun-types@^1.1.40": "1.3.8",
     "npm:bun-types@^1.3.8": "1.3.8",
     "npm:drizzle-orm@0.38": "0.38.4_better-sqlite3@11.10.0_bun-types@1.3.8",
+    "npm:get-port-please@^3.2.0": "3.2.0",
+    "npm:hono@^4.6.12": "4.11.7",
     "npm:oxlint@^1.42.0": "1.42.0",
     "npm:prettier@^3.8.1": "3.8.1",
     "npm:tsx@^4.21.0": "4.21.0",
     "npm:typescript@^5.3.3": "5.9.3",
+    "npm:zod@*": "4.3.6",
     "npm:zod@^4.3.6": "4.3.6"
   },
   "jsr": {
@@ -354,6 +357,9 @@
       "os": ["darwin"],
       "scripts": true
     },
+    "get-port-please@3.2.0": {
+      "integrity": "sha512-I9QVvBw5U/hw3RmWpYKRumUeaDgxTPd401x364rLmWBJcOQ753eov1eTgzDqRG9bqFIfDc7gfzcQEWrUri3o1A=="
+    },
     "get-tsconfig@4.13.1": {
       "integrity": "sha512-EoY1N2xCn44xU6750Sx7OjOIT59FkmstNc3X6y5xpz7D5cBtZRe/3pSlTkDJgqsOk3WwZPkWfonhhUJfttQo3w==",
       "dependencies": [
@@ -362,6 +368,9 @@
     },
     "github-from-package@0.0.0": {
       "integrity": "sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw=="
+    },
+    "hono@4.11.7": {
+      "integrity": "sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw=="
     },
     "ieee754@1.2.1": {
       "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
@@ -551,6 +560,7 @@
         "npm:@jsr/std__assert@*",
         "npm:@types/node@^25.1.0",
         "npm:bun-types@^1.3.8",
+        "npm:get-port-please@^3.2.0",
         "npm:oxlint@^1.42.0",
         "npm:prettier@^3.8.1",
         "npm:tsx@^4.21.0",
@@ -565,6 +575,26 @@
             "npm:better-sqlite3@^11.7.0",
             "npm:bun-types@^1.1.40",
             "npm:drizzle-orm@0.38"
+          ]
+        }
+      },
+      "packages/api": {
+        "packageJson": {
+          "dependencies": [
+            "npm:get-port-please@^3.2.0",
+            "npm:hono@^4.6.12"
+          ]
+        }
+      },
+      "packages/core": {
+        "dependencies": [
+          "jsr:@cross/test@^0.0.14",
+          "jsr:@std/assert@^1.0.18",
+          "npm:zod@^4.3.6"
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:zod@^4.3.6"
           ]
         }
       }

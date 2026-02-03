@@ -12,7 +12,7 @@
  * Integration tests require database mocking which is tracked as future work.
  */
 
-import { describe, it, expect } from "../../testing/index.ts";
+import { describe, it, expect, runTests } from "../../testing/index.ts";
 import type {
   Relation,
   RelationType,
@@ -305,3 +305,5 @@ describe("Relation Service", () => {
     expect(true).toBe(true);
   });
 });
+
+runTests();

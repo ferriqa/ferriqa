@@ -1,0 +1,20 @@
+{
+  "name": "@ferriqa/core",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./src/index.ts",
+    "./runtime": "./src/runtime.ts",
+    "./blueprint": "./src/blueprint/index.ts",
+    "./fields": "./src/fields/index.ts",
+    "./validation": "./src/validation/index.ts",
+    "./slug": "./src/slug/index.ts",
+    "./content": "./src/content/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "imports": {
+    "zod": "npm:zod@^4.3.6",
+    "@cross/test": "jsr:@cross/test@^0.0.14",
+    "@std/assert": "jsr:@std/assert@^1.0.18"
+  }
+}

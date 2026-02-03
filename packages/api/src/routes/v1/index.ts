@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../../middleware/auth";
 import { requirePermission } from "../../middleware/permissions";
+import {
+  filterFieldLevels,
+  filterBlueprintFieldLevels,
+} from "../../middleware/field-permissions";
 
 export const v1Routes = new Hono();
 
@@ -15,12 +19,14 @@ export function setupBlueprintRoutes(
     "/blueprints",
     authMiddleware(),
     requirePermission("blueprint:read"),
+    filterBlueprintFieldLevels(),
     blueprintList,
   );
   v1Routes.get(
     "/blueprints/:id",
     authMiddleware(),
     requirePermission("blueprint:read"),
+    filterBlueprintFieldLevels(),
     blueprintGet,
   );
   v1Routes.post(
@@ -59,18 +65,21 @@ export function setupContentRoutes(
     "/contents",
     authMiddleware(),
     requirePermission("content:read"),
+    filterFieldLevels(),
     contentList,
   );
   v1Routes.get(
     "/contents/:id",
     authMiddleware(),
     requirePermission("content:read"),
+    filterFieldLevels(),
     contentGet,
   );
   v1Routes.get(
     "/contents/by-slug/:slug",
     authMiddleware(),
     requirePermission("content:read"),
+    filterFieldLevels(),
     contentBySlug,
   );
   v1Routes.post(

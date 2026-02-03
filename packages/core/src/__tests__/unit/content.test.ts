@@ -9,7 +9,7 @@
  * operations (CRUD, query filtering, error handling) should be added separately.
  */
 
-import { describe, it, expect } from "../../testing/index.ts";
+import { describe, it, expect, runTests } from "../../testing/index.ts";
 import type { Blueprint } from "../../blueprint/types.ts";
 import type {
   Content,
@@ -255,3 +255,5 @@ describe("Content Validation", () => {
     });
   });
 });
+
+runTests();

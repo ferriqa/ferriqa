@@ -33,6 +33,7 @@ function generateHandlerId(): string {
 export class HookRegistry implements IHookRegistry {
   private handlers: Map<string, Array<HookHandler<unknown>>> = new Map();
   private handlerIds: Map<string, Set<string>> = new Map();
+  private registrationCounter = 0;
 
   /**
    * Register an action hook
@@ -52,14 +53,21 @@ export class HookRegistry implements IHookRegistry {
       priority: HOOK_PRIORITY_VALUES[options.priority ?? "normal"],
       once: options.once ?? false,
       type: "action",
+      index: this.registrationCounter++,
     };
 
     // Add to handlers map
     const existing = this.handlers.get(event) || [];
     existing.push(handler as HookHandler<unknown>);
 
-    // Sort by priority (descending - higher priority runs first)
-    existing.sort((a, b) => b.priority - a.priority);
+    // Sort by priority (descending), then by index (ascending) for stable sort
+    // Higher priority runs first, same priority maintains insertion order
+    existing.sort((a, b) => {
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
+      return a.index - b.index;
+    });
 
     this.handlers.set(event, existing);
 
@@ -90,14 +98,21 @@ export class HookRegistry implements IHookRegistry {
       priority: HOOK_PRIORITY_VALUES[options.priority ?? "normal"],
       once: options.once ?? false,
       type: "filter",
+      index: this.registrationCounter++,
     };
 
     // Add to handlers map
     const existing = this.handlers.get(event) || [];
     existing.push(handler as unknown as HookHandler<unknown>);
 
-    // Sort by priority (descending)
-    existing.sort((a, b) => b.priority - a.priority);
+    // Sort by priority (descending), then by index (ascending) for stable sort
+    // Higher priority runs first, same priority maintains insertion order
+    existing.sort((a, b) => {
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
+      return a.index - b.index;
+    });
 
     this.handlers.set(event, existing);
 
@@ -213,51 +228,92 @@ export class HookRegistry implements IHookRegistry {
 
     const errors: Array<{ handlerId: string; error: Error }> = [];
     const errorStrategy = options.errorStrategy ?? "continue";
-    // RACE CONDITION FIX: Collect once handler IDs during execution, remove after Promise.all
-    // Prevents concurrent array modifications when multiple once handlers run in parallel
-    const onceHandlerIds: string[] = [];
 
-    // Execute handlers in parallel
-    const promises = actionHandlers.map(async (handler) => {
-      try {
-        const result = (handler.callback as HookCallback<T>)(context);
+    // DEBUG: Log the number of actionHandlers found
+    console.log(
+      `[DEBUG emit] event: ${event}, actionHandlers count: ${actionHandlers.length}`,
+    );
 
-        // Handle async callbacks
-        if (result instanceof Promise) {
-          await result;
-        }
+    if (errorStrategy === "stop") {
+      // SEQUENTIAL EXECUTION: When errorStrategy is "stop", execute handlers one by one
+      // This ensures that if one handler throws, subsequent handlers don't run
+      let caughtError: Error | null = null;
+      for (let i = 0; i < actionHandlers.length; i++) {
+        const handler = actionHandlers[i];
+        // DEBUG: Log each handler's index, id, and that it's being executed
+        console.log(
+          `[DEBUG emit] errorStrategy: stop, executing handler index: ${i}, id: ${handler.id}, type: ${handler.type}`,
+        );
+        try {
+          const result = (handler.callback as HookCallback<T>)(context);
 
-        // Collect once handler IDs (don't remove during parallel execution)
-        if (handler.once) {
-          onceHandlerIds.push(handler.id);
-        }
-      } catch (error) {
-        errors.push({
-          handlerId: handler.id,
-          error: error instanceof Error ? error : new Error(String(error)),
-        });
+          // Handle async callbacks
+          if (result instanceof Promise) {
+            await result;
+          }
 
-        if (errorStrategy === "stop") {
-          throw error;
+          // Remove once handlers immediately after execution
+          if (handler.once) {
+            this.removeHandlerById(event, handler.id);
+          }
+        } catch (error) {
+          // DEBUG: Log when an error is caught
+          console.log(
+            `[DEBUG emit] error caught from handler index: ${i}, id: ${handler.id}, error: ${error instanceof Error ? error.message : error}`,
+          );
+          caughtError =
+            error instanceof Error ? error : new Error(String(error));
+          errors.push({
+            handlerId: handler.id,
+            error: caughtError,
+          });
+          // Stop execution on first error
+          // DEBUG: Log when break happens
+          console.log(
+            `[DEBUG emit] breaking loop due to error, handler index: ${i}`,
+          );
+          break;
         }
       }
-    });
+      // Re-throw the caught error so the caller sees it when errorStrategy is "stop"
+      if (caughtError) {
+        throw caughtError;
+      }
+    } else {
+      // PARALLEL EXECUTION: When errorStrategy is "continue", execute handlers in parallel
+      // RACE CONDITION FIX: Collect once handler IDs during execution, remove after Promise.all
+      // Prevents concurrent array modifications when multiple once handlers run in parallel
+      const onceHandlerIds: string[] = [];
 
-    try {
+      const promises = actionHandlers.map(async (handler) => {
+        try {
+          const result = (handler.callback as HookCallback<T>)(context);
+
+          // Handle async callbacks
+          if (result instanceof Promise) {
+            await result;
+          }
+
+          // Collect once handler IDs (don't remove during parallel execution)
+          if (handler.once) {
+            onceHandlerIds.push(handler.id);
+          }
+        } catch (error) {
+          errors.push({
+            handlerId: handler.id,
+            error: error instanceof Error ? error : new Error(String(error)),
+          });
+          // Don't throw - continue executing other handlers
+        }
+      });
+
       await Promise.all(promises);
-    } catch (error) {
-      // When errorStrategy is "stop", the inner promise throws to stop execution.
-      // We must re-throw here to propagate the error to the caller.
-      // When errorStrategy is "continue", errors are collected but not thrown.
-      if (errorStrategy === "stop") {
-        throw error;
-      }
-    }
 
-    // RACE CONDITION FIX: Remove once handlers after all parallel execution completes
-    // This prevents concurrent array modifications during Promise.all
-    for (const handlerId of onceHandlerIds) {
-      this.removeHandlerById(event, handlerId);
+      // RACE CONDITION FIX: Remove once handlers after all parallel execution completes
+      // This prevents concurrent array modifications during Promise.all
+      for (const handlerId of onceHandlerIds) {
+        this.removeHandlerById(event, handlerId);
+      }
     }
 
     return {

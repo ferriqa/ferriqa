@@ -11,8 +11,8 @@ import type {
   ValidationError as ValidationErrorType,
   ValidationWarning,
   ValidationResult,
-} from "../blueprint/types";
-import { FieldRegistry } from "../fields/registry";
+} from "../blueprint/types.ts";
+import { FieldRegistry } from "../fields/registry.ts";
 
 export class ValidationEngine {
   constructor(private fieldRegistry: FieldRegistry) {}
@@ -62,7 +62,12 @@ export class ValidationEngine {
       );
 
       // Map field errors to include field key
-      errors.push(...fieldErrors.map((e) => ({ ...e, field: field.key })));
+      errors.push(
+        ...fieldErrors.map((e: ValidationErrorType) => ({
+          ...e,
+          field: field.key,
+        })),
+      );
 
       // Sanitize if no errors
       if (fieldErrors.length === 0) {
@@ -71,7 +76,9 @@ export class ValidationEngine {
     }
 
     // Check for unknown fields in content
-    const allowedFields = new Set(blueprint.fields.map((f) => f.key));
+    const allowedFields = new Set(
+      blueprint.fields.map((f: FieldDefinition) => f.key),
+    );
     for (const key of Object.keys(content)) {
       if (!allowedFields.has(key)) {
         warnings.push({
@@ -112,7 +119,7 @@ export class ValidationEngine {
     // Validate slug field exists if configured
     if (blueprint.settings.slugField) {
       const slugField = blueprint.fields.find(
-        (f) => f.key === blueprint.settings.slugField,
+        (f: FieldDefinition) => f.key === blueprint.settings.slugField,
       );
       if (!slugField) {
         errors.push({
@@ -129,7 +136,7 @@ export class ValidationEngine {
 
     // Validate display field exists
     const displayField = blueprint.fields.find(
-      (f) => f.key === blueprint.settings.displayField,
+      (f: FieldDefinition) => f.key === blueprint.settings.displayField,
     );
     if (!displayField) {
       errors.push({
@@ -141,7 +148,7 @@ export class ValidationEngine {
     // Validate sort field if configured
     if (blueprint.settings.sortField) {
       const sortField = blueprint.fields.find(
-        (f) => f.key === blueprint.settings.sortField,
+        (f: FieldDefinition) => f.key === blueprint.settings.sortField,
       );
       if (!sortField) {
         errors.push({
@@ -193,7 +200,7 @@ export class ValidationEngine {
         field.options?.options
       ) {
         const hasEmptyValue = field.options.options.some(
-          (opt) => !opt.value || opt.value.trim() === "",
+          (opt: { value: string }) => !opt.value || opt.value.trim() === "",
         );
         if (hasEmptyValue) {
           errors.push({

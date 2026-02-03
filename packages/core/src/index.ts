@@ -12,7 +12,7 @@ export {
   getRuntimeInfo,
   assertRuntime,
   getRuntimeId,
-} from "./runtime";
+} from "./runtime.ts";
 
 // Runtime capabilities
 export {
@@ -25,7 +25,7 @@ export {
   printCapabilityReport,
   validateRuntime,
   getCapabilitySummary,
-} from "./capabilities";
+} from "./capabilities.ts";
 
 // Error handling system
 export * from "./errors/index.ts"; // .js extension required for ESM bundler resolution
@@ -61,5 +61,5 @@ export * from "./relations/index.ts";
 // This is a valid TypeScript pattern to support both:
 //   - Named imports: import { isBun } from "@ferriqa/core"
 //   - Wildcard imports: import * as runtime from "@ferriqa/core"
-export * from "./runtime";
-export * from "./capabilities";
+export * from "./runtime.ts";
+export * from "./capabilities.ts";

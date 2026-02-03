@@ -4,7 +4,7 @@
  * Main exports for blueprint module
  */
 
-export * from "./types";
-export * from "./validation";
-export { BlueprintService } from "./service";
-export type { BlueprintServiceOptions } from "./service";
+export * from "./types.ts";
+export * from "./validation.ts";
+export { BlueprintService } from "./service.ts";
+export type { BlueprintServiceOptions } from "./service.ts";

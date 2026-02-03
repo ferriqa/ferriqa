@@ -11,8 +11,8 @@ import type {
   CreateBlueprintInput,
   UpdateBlueprintInput,
   BlueprintQuery,
-  PaginatedResult,
 } from "./types.ts";
+import type { PaginatedResult } from "../content/types.ts";
 
 export interface BlueprintServiceOptions {
   db: DatabaseAdapter;

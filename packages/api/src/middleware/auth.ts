@@ -1,7 +1,7 @@
 import type { Context, Next } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { verifyToken } from "../auth/jwt";
-import { userService } from "../auth/user-service";
+import { verifyToken } from "../auth/jwt.ts";
+import { userService } from "../auth/user-service.ts";
 
 export function authMiddleware() {
   return async (c: Context, next: Next) => {

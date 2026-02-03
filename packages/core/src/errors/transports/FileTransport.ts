@@ -254,7 +254,8 @@ export class FileTransport implements ErrorTransport {
 
       if (isBun) {
         // Bun: use Bun.file
-        const file = Bun.file(currentFile);
+        // @ts-ignore - Bun global is available in Bun runtime
+        const file = (globalThis as any).Bun.file(currentFile);
         stats = await file.stat();
       } else if (isDeno) {
         // Deno: use Deno.stat

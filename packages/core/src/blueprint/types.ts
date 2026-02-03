@@ -189,9 +189,6 @@ export interface BlueprintQuery {
   search?: string;
 }
 
-// Re-export PaginatedResult from content to avoid duplication
-export type { PaginatedResult } from "../content/types";
-
 // Default blueprints
 // NOTE: Default blueprints use proper UUIDs to match BlueprintSchema validation
 // Review comment #7: "Schema Validation Mismatch - DEFAULT_BLUEPRINTS used plain string IDs"

@@ -1,7 +1,7 @@
 import type { Context, Next } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { Permission, Role } from "../auth/permissions";
-import { hasPermission } from "../auth/permissions";
+import type { Permission, Role } from "../auth/permissions.ts";
+import { hasPermission } from "../auth/permissions.ts";
 
 export function requirePermission(permission: Permission) {
   return async (c: Context, next: Next) => {

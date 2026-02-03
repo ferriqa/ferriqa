@@ -4,7 +4,7 @@
  * Tests for the hook registry and hook execution.
  */
 
-import { describe, it, expect } from "../../testing/index.ts";
+import { describe, it, expect, runTests } from "../../testing/index.ts";
 import { createHookRegistry, HookExecutionError } from "../../hooks/index.ts";
 
 describe("Hook System", () => {
@@ -156,7 +156,6 @@ describe("Hook System", () => {
           secondCalled = true;
         });
 
-        // When errorStrategy is "stop", emit should throw the error
         let errorThrown = false;
         try {
           await registry.emit("test:stop", {}, { errorStrategy: "stop" });
@@ -373,3 +372,5 @@ describe("Hook System", () => {
     });
   });
 });
+
+runTests();

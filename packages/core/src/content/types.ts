@@ -140,7 +140,7 @@ export interface ChangeSummary {
 }
 
 // Content validation result (extends from blueprint)
-export {
+export type {
   ValidationResult,
   ValidationError,
   ValidationWarning,

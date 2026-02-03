@@ -43,11 +43,21 @@ test("Error Handling - HookValidationError should create error with event name",
 
 test("Error Handling - ConsoleErrorHandler should handle errors without throwing", () => {
   const handler = new ConsoleErrorHandler();
-  const error = new HookExecutionError("test", "handler", new Error("Test"));
 
-  // Should not throw
+  const dummyOriginalError = {
+    name: "Error",
+    message: "Dummy error for testing",
+    stack: undefined as string | undefined,
+  };
+
+  const error = new HookExecutionError(
+    "test:event",
+    "test-handler",
+    dummyOriginalError as Error,
+  );
+
   handler.handle(error, {});
-  assertEquals(true, true); // If we get here, it didn't throw
+  assertEquals(true, true);
 });
 
 test("Error Handling - ErrorAggregator should collect errors", () => {

@@ -52,6 +52,8 @@ export interface HookHandler<T> {
   priority: number;
   once: boolean;
   type: HookType;
+  /** Registration index for stable sorting (maintains insertion order within same priority) */
+  index: number;
 }
 
 /**

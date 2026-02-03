@@ -24,7 +24,7 @@ export class FerriqaError extends Error {
   readonly statusCode: number;
 
   /** Original error that caused this error */
-  readonly cause?: Error;
+  override readonly cause?: Error;
 
   /** Additional error metadata */
   readonly metadata?: Record<string, unknown>;

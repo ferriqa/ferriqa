@@ -4,4 +4,4 @@
  * Main exports for slug module
  */
 
-export * from "./manager";
+export * from "./manager.ts";

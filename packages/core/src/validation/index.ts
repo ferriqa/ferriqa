@@ -4,4 +4,4 @@
  * Main exports for validation module
  */
 
-export * from "./engine";
+export * from "./engine.ts";

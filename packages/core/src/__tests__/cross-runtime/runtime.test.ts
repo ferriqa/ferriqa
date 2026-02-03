@@ -4,7 +4,7 @@
  * Tests that verify functionality across Bun, Node.js, and Deno runtimes.
  */
 
-import { describe, it, expect } from "../../testing/index.ts";
+import { describe, it, expect, runTests } from "../../testing/index.ts";
 import {
   isBun,
   isDeno,
@@ -59,3 +59,6 @@ describe("Cross-Runtime Compatibility", () => {
     });
   });
 });
+
+
+runTests();

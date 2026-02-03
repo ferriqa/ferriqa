@@ -43,6 +43,9 @@
     "packages/core": {
       "name": "@ferriqa/core",
       "version": "0.0.1",
+      "dependencies": {
+        "zod": "^4.3.6",
+      },
     },
   },
   "packages": {
