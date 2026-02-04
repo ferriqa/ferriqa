@@ -305,8 +305,10 @@ export class Cache<V = unknown> implements ICache<string, V> {
 
     // Allow Node.js to exit even if this interval is still active.
     // This is a no-op on Bun/Deno but essential for Node.js test cleanup.
-    if (typeof this.cleanupInterval?.unref === "function") {
-      this.cleanupInterval.unref();
+    // Cast to any to avoid "Property 'unref' does not exist on type 'number'" in Deno.
+    const interval = this.cleanupInterval as any;
+    if (interval && typeof interval.unref === "function") {
+      interval.unref();
     }
   }
 
