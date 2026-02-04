@@ -591,12 +591,7 @@
           "jsr:@cross/test@^0.0.14",
           "jsr:@std/assert@^1.0.18",
           "npm:zod@^4.3.6"
-        ],
-        "packageJson": {
-          "dependencies": [
-            "npm:zod@^4.3.6"
-          ]
-        }
+        ]
       }
     }
   }

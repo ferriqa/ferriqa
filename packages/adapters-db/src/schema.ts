@@ -133,6 +133,28 @@ export const settings = sqliteTable("settings", {
     .default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ========== API KEYS ==========
+export const apiKeys = sqliteTable("api_keys", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  keyHash: text("key_hash").notNull().unique(),
+  keyPrefix: text("key_prefix").notNull(), // First 8 chars of key for display
+  permissions: text("permissions", { mode: "json" }).$type<string[]>(),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  lastUsedAt: integer("last_used_at", { mode: "timestamp" }),
+  expiresAt: integer("expires_at", { mode: "timestamp" }),
+  rateLimitPerMinute: integer("rate_limit_per_minute").notNull().default(60),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});
+
 // ========== MIGRATIONS ==========
 export const migrations = sqliteTable("migrations", {
   id: text("id").primaryKey(),
@@ -167,4 +189,5 @@ export const tables = {
   auditLogs,
   settings,
   migrations,
+  apiKeys,
 };

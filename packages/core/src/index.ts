@@ -48,6 +48,9 @@ export * from "./content/index.ts"; // .js extension required for ESM bundler re
 // Relations System
 export * from "./relations/index.ts";
 
+// Cache System - In-memory caching with TTL and LRU
+export * from "./cache/index.ts";
+
 // Note: Testing utilities are available as a separate import:
 //   import * as testing from "@ferriqa/core/testing"
 // This keeps the main package clean and prevents confusion about what's intended
