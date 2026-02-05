@@ -6,8 +6,6 @@
 
 import { describe, it, expect, createMockFn } from "@ferriqa/core/testing";
 import { Hono } from "hono";
-import type { Context, Next } from "hono";
-import { setupWebhookRoutes } from "../../routes/v1/index.ts";
 import {
     webhookListHandler,
     webhookGetHandler,

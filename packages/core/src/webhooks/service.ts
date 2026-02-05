@@ -324,9 +324,10 @@ export class WebhookService {
       );
     }
 
+    let timeoutId: any;
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(
+      timeoutId = setTimeout(
         () => controller.abort(),
         options.timeout ?? 30000,
       );
@@ -337,8 +338,6 @@ export class WebhookService {
         body: payloadStr,
         signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
 
       const duration = Date.now() - startTime;
       const statusCode = response.status;
@@ -371,6 +370,10 @@ export class WebhookService {
         error: error instanceof Error ? error : new Error(String(error)),
         completedAt: Date.now(),
       };
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     }
   }
 

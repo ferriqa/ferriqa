@@ -5,7 +5,7 @@
  * Based on Task 5.4: Integration Tests
  */
 
-import { describe, it, expect, beforeAll, afterAll, runTests } from "../../testing/index.ts";
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, runTests } from "../../testing/index.ts";
 import { MockDatabaseAdapter } from "../../testing/mocks.ts";
 import { HookRegistry } from "../../hooks/registry.ts";
 import { ValidationEngine } from "../../validation/engine.ts";
@@ -24,11 +24,7 @@ describe("Webhook Integration", () => {
 
     const originalFetch = global.fetch;
 
-    beforeAll(async () => {
-        db = new MockDatabaseAdapter();
-        await db.connect();
-
-        hooks = new HookRegistry();
+    beforeEach(async () => {
         webhookService = new WebhookService({ db, hookRegistry: hooks, queueIntervalMs: 10 });
 
         const validationEngine = new ValidationEngine(globalFieldRegistry);
@@ -51,15 +47,24 @@ describe("Webhook Integration", () => {
         global.fetch = (async () => new Response("OK", { status: 200 })) as unknown as typeof fetch;
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
         webhookService.destroy();
-        await db.close();
         global.fetch = originalFetch;
+    });
+
+    beforeAll(async () => {
+        db = new MockDatabaseAdapter();
+        await db.connect();
+        hooks = new HookRegistry();
+    });
+
+    afterAll(async () => {
+        await db.close();
     });
 
     it("should dispatch webhook when content is created", async () => {
         // 1. Create a blueprint
-        const blueprint = await blueprintService.create({
+        await blueprintService.create({
             id: "page",
             name: "Page",
             slug: "page",
@@ -178,7 +183,7 @@ describe("Webhook Integration", () => {
     });
 
     it("should apply webhook:beforeSend filter to modify payload", async () => {
-        const webhook = await webhookService.create({
+        await webhookService.create({
             name: "Filter Hook",
             url: "https://example.com/on-filter-test",
             events: ["content.created"],
