@@ -11,6 +11,7 @@
     "./slug": "./src/slug/index.ts",
     "./content": "./src/content/index.ts",
     "./hooks": "./src/hooks/index.ts",
+    "./webhooks": "./src/webhooks/index.ts",
     "./testing": "./src/testing/index.ts"
   },
   "scripts": {

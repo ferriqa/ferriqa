@@ -108,6 +108,42 @@ export const webhooks = sqliteTable("webhooks", {
     .default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ========== WEBHOOK DELIVERIES ==========
+/**
+ * Webhook delivery tracking table
+ *
+ * DESIGN NOTE: Each HTTP attempt (including retries) creates a new delivery record
+ * with a unique ID. To trace all retry attempts for a single webhook dispatch:
+ * - Query by (webhook_id, event, created_at) range
+ * - Filter by attempt number to see retry chain
+ *
+ * Example:
+ * - Original delivery: id="abc-123", attempt=1, created_at=T+0s
+ * - First retry: id="def-456", attempt=2, created_at=T+2s
+ * - Second retry: id="ghi-789", attempt=3, created_at=T+6s
+ *
+ * To get all attempts: SELECT * FROM webhook_deliveries
+ *                   WHERE webhook_id=X AND event='content.created'
+ *                   AND created_at >= T AND created_at <= T+60
+ */
+export const webhookDeliveries = sqliteTable("webhook_deliveries", {
+  id: text("id").primaryKey(),
+  webhookId: integer("webhook_id")
+    .notNull()
+    .references(() => webhooks.id, { onDelete: "cascade" }),
+  event: text("event").notNull(),
+  statusCode: integer("status_code"),
+  success: integer("success", { mode: "boolean" }).notNull().default(false),
+  attempt: integer("attempt").notNull().default(1),
+  response: text("response"),
+  duration: integer("duration"),
+  error: text("error"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  completedAt: integer("completed_at", { mode: "timestamp" }),
+});
+
 // ========== AUDIT LOGS ==========
 export const auditLogs = sqliteTable("audit_logs", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -186,6 +222,7 @@ export const tables = {
   relations,
   versions,
   webhooks,
+  webhookDeliveries,
   auditLogs,
   settings,
   migrations,

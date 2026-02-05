@@ -51,6 +51,30 @@ export * from "./relations/index.ts";
 // Cache System - In-memory caching with TTL and LRU
 export * from "./cache/index.ts";
 
+// Webhook System - Async webhook delivery with retry
+export type {
+  Webhook,
+  WebhookDelivery,
+  WebhookDeliveryOptions,
+  WebhookPayload,
+  WebhookEvent,
+  CreateWebhookRequest,
+  UpdateWebhookRequest,
+  QueryOptions,
+  WebhookDeliveryResult,
+  WebhookJob,
+  WebhookJobProcessor,
+} from "./webhooks/types.ts";
+export {
+  WebhookService,
+  type WebhookServiceOptions,
+} from "./webhooks/service.ts";
+export { WebhookDeliveryQueue } from "./webhooks/queue.ts";
+export { WebhookRetryManager } from "./webhooks/retry.ts";
+
+// Re-export webhook PaginatedResult as WebhookPaginatedResult to avoid conflict
+export type { PaginatedResult as WebhookPaginatedResult } from "./webhooks/types.ts";
+
 // Note: Testing utilities are available as a separate import:
 //   import * as testing from "@ferriqa/core/testing"
 // This keeps the main package clean and prevents confusion about what's intended

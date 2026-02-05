@@ -360,49 +360,6 @@ export function mediaDeleteHandler() {
   };
 }
 
-export function webhookListHandler() {
-  return async (c: Context) => {
-    return c.json({
-      data: [],
-      pagination: { page: 1, limit: 25, total: 0, totalPages: 0 },
-    });
-  };
-}
-
-export function webhookCreateHandler() {
-  return async (c: Context) => {
-    return c.json({ data: { id: "mock", name: "Test Webhook" } }, 201);
-  };
-}
-
-export function webhookUpdateHandler() {
-  return async (c: Context) => {
-    const { id } = c.req.param();
-    return c.json({ data: { id, name: "Updated Webhook" } });
-  };
-}
-
-export function webhookDeleteHandler() {
-  return async (c: Context) => {
-    return c.body(null, 204);
-  };
-}
-
-export function webhookTestHandler() {
-  return async (c: Context) => {
-    return c.json({ message: "Test webhook triggered" });
-  };
-}
-
-export function webhookDeliveriesHandler() {
-  return async (c: Context) => {
-    return c.json({
-      data: [],
-      pagination: { page: 1, limit: 25, total: 0, totalPages: 0 },
-    });
-  };
-}
-
 export function userMeHandler() {
   return async (c: Context) => {
     return c.json({ data: { id: "user-1", email: "user@example.com" } });

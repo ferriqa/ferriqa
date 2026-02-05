@@ -10,6 +10,7 @@
  *   - HOOK_* : Hook system errors
  *   - BLUEPRINT_* : Content blueprint errors
  *   - CONTENT_* : Content management errors
+ *   - WEBHOOK_* : Webhook delivery errors
  *   - SYSTEM_* : Internal system errors
  */
 
@@ -157,6 +158,34 @@ export enum ErrorCode {
   /** Version not found */
   CONTENT_VERSION_NOT_FOUND = "CONTENT_VERSION_NOT_FOUND",
 
+  // ========== WEBHOOK ==========
+  /** Webhook not found */
+  WEBHOOK_NOT_FOUND = "WEBHOOK_NOT_FOUND",
+
+  /** Webhook delivery failed */
+  WEBHOOK_DELIVERY_FAILED = "WEBHOOK_DELIVERY_FAILED",
+
+  /** Webhook delivery timeout */
+  WEBHOOK_DELIVERY_TIMEOUT = "WEBHOOK_DELIVERY_TIMEOUT",
+
+  /** Webhook signature verification failed */
+  WEBHOOK_INVALID_SIGNATURE = "WEBHOOK_INVALID_SIGNATURE",
+
+  /** Webhook URL is invalid or unreachable */
+  WEBHOOK_INVALID_URL = "WEBHOOK_INVALID_URL",
+
+  /** Webhook secret is missing or invalid */
+  WEBHOOK_INVALID_SECRET = "WEBHOOK_INVALID_SECRET",
+
+  /** Webhook event type not supported */
+  WEBHOOK_INVALID_EVENT = "WEBHOOK_INVALID_EVENT",
+
+  /** Webhook has been disabled */
+  WEBHOOK_DISABLED = "WEBHOOK_DISABLED",
+
+  /** All webhook delivery retry attempts exhausted */
+  WEBHOOK_MAX_RETRIES_EXCEEDED = "WEBHOOK_MAX_RETRIES_EXCEEDED",
+
   // ========== SYSTEM ==========
   /** System info (non-error) */
   SYSTEM_INFO = "SYSTEM_INFO",
@@ -226,6 +255,11 @@ export function getDefaultStatusCode(code: ErrorCode): number {
       if (code.includes("NOT_FOUND")) return 404;
       if (code.includes("DUPLICATE")) return 409;
       return 400;
+
+    case "WEBHOOK":
+      if (code.includes("NOT_FOUND")) return 404;
+      if (code === ErrorCode.WEBHOOK_INVALID_EVENT) return 400;
+      return 500;
 
     case "SYSTEM":
       if (code === ErrorCode.SYSTEM_INFO) return 200;

@@ -160,6 +160,7 @@ export function setupMediaRoutes(
 
 export function setupWebhookRoutes(
   webhookList: any,
+  webhookGet: any,
   webhookCreate: any,
   webhookUpdate: any,
   webhookDelete: any,
@@ -171,6 +172,12 @@ export function setupWebhookRoutes(
     authMiddleware(),
     requirePermission("webhook:read"),
     webhookList,
+  );
+  v1Routes.get(
+    "/webhooks/:id",
+    authMiddleware(),
+    requirePermission("webhook:read"),
+    webhookGet,
   );
   v1Routes.post(
     "/webhooks",
