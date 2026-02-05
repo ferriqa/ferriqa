@@ -14,7 +14,7 @@ import {
   blueprintCreateHandler,
   blueprintUpdateHandler,
   blueprintDeleteHandler,
-} from "../handlers/blueprints";
+} from "../handlers/blueprints.ts";
 import {
   contentListHandler,
   contentGetHandler,
@@ -26,13 +26,13 @@ import {
   contentUnpublishHandler,
   contentVersionsHandler,
   contentRollbackHandler,
-} from "../handlers/contents";
+} from "../handlers/contents.ts";
 import {
   mediaListHandler,
   mediaUploadHandler,
   mediaGetHandler,
   mediaDeleteHandler,
-} from "../handlers/mocks";
+} from "../handlers/media.ts";
 import {
   webhookListHandler,
   webhookGetHandler,
@@ -41,16 +41,17 @@ import {
   webhookDeleteHandler,
   webhookTestHandler,
   webhookDeliveriesHandler,
-} from "../handlers/webhooks";
-import { webhookService } from "../webhook-service";
-import { blueprintService } from "../blueprint-service";
-import { contentService } from "../content-service";
+} from "../handlers/webhooks.ts";
+import { webhookService } from "../webhook-service.ts";
+import { blueprintService } from "../blueprint-service.ts";
+import { contentService } from "../content-service.ts";
+import { mediaService } from "../media";
 import {
   authLoginHandler,
   authLogoutHandler,
   authRefreshHandler,
   userMeHandler,
-} from "../handlers/auth";
+} from "../handlers/auth.ts";
 
 export function setupRoutes(app: Hono): void {
   app.get("/health", (c: Context) =>
@@ -79,10 +80,10 @@ export function setupRoutes(app: Hono): void {
   );
 
   setupMediaRoutes(
-    mediaListHandler(),
-    mediaUploadHandler(),
-    mediaGetHandler(),
-    mediaDeleteHandler(),
+    mediaListHandler(mediaService),
+    mediaUploadHandler(mediaService),
+    mediaGetHandler(mediaService),
+    mediaDeleteHandler(mediaService),
   );
 
   setupWebhookRoutes(
