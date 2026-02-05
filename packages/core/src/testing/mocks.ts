@@ -183,7 +183,9 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
     // Simple WHERE clause filtering
     if (params && params.length > 0 && sql.toLowerCase().includes("where")) {
       // Count how many parameters are in the WHERE clause versus LIMIT/OFFSET
-      const whereMatch = sql.match(/where\s+(.+?)(?:\s+order\s+by|\s+limit|$)/i);
+      const whereMatch = sql.match(
+        /where\s+(.+?)(?:\s+order\s+by|\s+limit|$)/i,
+      );
       let whereParamCount = params.length;
 
       if (whereMatch) {
@@ -194,7 +196,6 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
       // Only use parameters that belong to the WHERE clause for filtering
       const filterParams = params.slice(0, whereParamCount);
 
-      const initialCount = rows.length;
       rows = rows.filter((row) => {
         const rowObj = row as Record<string, unknown>;
         return filterParams.some((param) =>
@@ -214,7 +215,11 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
             }
 
             // JSON array check (for webhooks/events)
-            if (typeof val === "string" && val.startsWith("[") && val.endsWith("]")) {
+            if (
+              typeof val === "string" &&
+              val.startsWith("[") &&
+              val.endsWith("]")
+            ) {
               try {
                 const parsed = JSON.parse(val);
                 if (Array.isArray(parsed) && parsed.includes(param)) {
@@ -455,7 +460,7 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
  * Mock Transaction for testing
  */
 class MockTransaction implements DatabaseTransaction {
-  constructor(private adapter: MockDatabaseAdapter) { }
+  constructor(private adapter: MockDatabaseAdapter) {}
 
   async query<T = unknown>(
     sql: string,

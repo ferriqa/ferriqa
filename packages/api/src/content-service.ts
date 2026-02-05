@@ -21,8 +21,8 @@ const slugManager = new SlugManager(db);
  * Singleton ContentService instance
  */
 export const contentService = new ContentService({
-    db,
-    validationEngine,
-    slugManager,
-    hookRegistry: hooks,
+  db,
+  validationEngine,
+  slugManager,
+  hookRegistry: hooks,
 });

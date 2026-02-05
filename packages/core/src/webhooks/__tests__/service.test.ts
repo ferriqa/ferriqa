@@ -66,8 +66,8 @@ class MockDatabaseAdapter implements DatabaseAdapter {
     return {
       query: this.query.bind(this),
       execute: this.execute.bind(this),
-      commit: async () => { },
-      rollback: async () => { },
+      commit: async () => {},
+      rollback: async () => {},
     };
   }
 
@@ -222,7 +222,9 @@ class MockDatabaseAdapter implements DatabaseAdapter {
 
     // Match findWebhooksForEvent query with json_each
     if (
-      sql.includes("SELECT id, name, url, events, headers, secret, is_active, created_at") &&
+      sql.includes(
+        "SELECT id, name, url, events, headers, secret, is_active, created_at",
+      ) &&
       sql.includes("FROM webhooks") &&
       sql.includes("is_active = 1")
     ) {
@@ -974,7 +976,7 @@ describe("WebhookService", () => {
 
       // Create service and try to process a job for non-existent webhook
       // This should not throw but log an error
-      const webhook = await service.create({
+      await service.create({
         name: "Test Webhook",
         url: "https://example.com/webhook",
         events: ["content.created"],

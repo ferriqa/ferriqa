@@ -186,9 +186,9 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
              */
             const delayMs = this.retryManager
               ? this.retryManager.calculateDelay(job.attempt + 1, {
-                initialDelayMs: job.initialDelayMs,
-                backoffMultiplier: job.backoffMultiplier,
-              })
+                  initialDelayMs: job.initialDelayMs,
+                  backoffMultiplier: job.backoffMultiplier,
+                })
               : Math.min(1000 * Math.pow(2, job.attempt), 60000);
 
             /**
