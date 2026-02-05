@@ -56,6 +56,12 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
   enqueue(job: WebhookJob): void {
     this.queue.push(job);
     this.sortQueue();
+    // Trigger processing immediately to reduce latency
+    setTimeout(() => {
+      this.process().catch((error) => {
+        console.error("[webhook queue] Immediate process error:", error);
+      });
+    }, 0);
   }
 
   /**
@@ -180,9 +186,9 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
              */
             const delayMs = this.retryManager
               ? this.retryManager.calculateDelay(job.attempt + 1, {
-                  initialDelayMs: job.initialDelayMs,
-                  backoffMultiplier: job.backoffMultiplier,
-                })
+                initialDelayMs: job.initialDelayMs,
+                backoffMultiplier: job.backoffMultiplier,
+              })
               : Math.min(1000 * Math.pow(2, job.attempt), 60000);
 
             /**
