@@ -6,6 +6,7 @@
  */
 
 import type { DatabaseAdapter } from "../../../adapters-db/src/types.ts";
+import type { WebhookService } from "../webhooks/service.ts";
 import type {
   Blueprint,
   CreateBlueprintInput,
@@ -16,6 +17,7 @@ import type { PaginatedResult } from "../content/types.ts";
 
 export interface BlueprintServiceOptions {
   db: DatabaseAdapter;
+  webhookService?: WebhookService;
 }
 
 function parseTimestamp(value: unknown): Date {
@@ -57,7 +59,16 @@ export class BlueprintService {
     );
 
     const blueprintId = String(result.lastInsertId);
-    return this.getById(blueprintId) as Promise<Blueprint>;
+    const blueprint = (await this.getById(blueprintId)) as Blueprint;
+
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      await this.options.webhookService.dispatch("blueprint.created", {
+        blueprint,
+      });
+    }
+
+    return blueprint;
   }
 
   async update(
@@ -90,7 +101,17 @@ export class BlueprintService {
       ],
     );
 
-    return this.getById(blueprintId) as Promise<Blueprint>;
+    const updated = (await this.getById(blueprintId)) as Blueprint;
+
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      await this.options.webhookService.dispatch("blueprint.updated", {
+        blueprint: updated,
+        previousBlueprint: existing,
+      });
+    }
+
+    return updated;
   }
 
   async delete(blueprintId: string): Promise<void> {
@@ -102,6 +123,13 @@ export class BlueprintService {
     await this.options.db.execute("DELETE FROM blueprints WHERE id = ?", [
       blueprintId,
     ]);
+
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      await this.options.webhookService.dispatch("blueprint.deleted", {
+        blueprint: existing,
+      });
+    }
   }
 
   async getById(id: string): Promise<Blueprint | null> {

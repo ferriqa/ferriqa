@@ -11,6 +11,7 @@ import type { ValidationEngine } from "../validation/engine.ts";
 import type { SlugManager } from "../slug/manager.ts";
 import type { IHookRegistry } from "../hooks/types.ts";
 import type { RelationService } from "../relations/service.ts";
+import type { WebhookService } from "../webhooks/service.ts";
 import type {
   Content,
   ContentQuery,
@@ -27,6 +28,7 @@ export interface ContentServiceOptions {
   slugManager: SlugManager;
   hookRegistry: IHookRegistry;
   relationService?: RelationService;
+  webhookService?: WebhookService;
 }
 
 /**
@@ -163,6 +165,15 @@ export class ContentService {
       userId,
     });
 
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      await this.options.webhookService.dispatch("content.created", {
+        content,
+        blueprint,
+        userId,
+      });
+    }
+
     return content;
   }
 
@@ -286,6 +297,17 @@ export class ContentService {
       userId,
     });
 
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      const changes = this.generateChangeSummary(content.data, updated.data);
+      await this.options.webhookService.dispatch("content.updated", {
+        content: updated,
+        blueprint,
+        changes,
+        userId,
+      });
+    }
+
     return updated;
   }
 
@@ -331,6 +353,15 @@ export class ContentService {
       blueprint,
       userId,
     });
+
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      await this.options.webhookService.dispatch("content.deleted", {
+        content,
+        blueprint,
+        userId,
+      });
+    }
   }
 
   /**
@@ -395,6 +426,16 @@ export class ContentService {
       userId,
     });
 
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      const blueprint = await this.getBlueprint(content.blueprintId);
+      await this.options.webhookService.dispatch("content.published", {
+        content: published,
+        blueprint,
+        userId,
+      });
+    }
+
     return published;
   }
 
@@ -437,6 +478,16 @@ export class ContentService {
       content: unpublished,
       userId,
     });
+
+    // Dispatch webhook (async, non-blocking)
+    if (this.options.webhookService) {
+      const blueprint = await this.getBlueprint(content.blueprintId);
+      await this.options.webhookService.dispatch("content.unpublished", {
+        content: unpublished,
+        blueprint,
+        userId,
+      });
+    }
 
     return unpublished;
   }
