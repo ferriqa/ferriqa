@@ -33,6 +33,9 @@ export * from "./errors/index.ts"; // .js extension required for ESM bundler res
 // Blueprint Engine - Content Modeling & Schema
 export * from "./blueprint/index.ts"; // .js extension required for ESM bundler resolution
 
+// Hook System
+export * from "./hooks/index.ts";
+
 // Field Types Registry
 export * from "./fields/index.ts"; // .js extension required for ESM bundler resolution
 
@@ -69,8 +72,13 @@ export {
   WebhookService,
   type WebhookServiceOptions,
 } from "./webhooks/service.ts";
-export { WebhookDeliveryQueue } from "./webhooks/queue.ts";
 export { WebhookRetryManager } from "./webhooks/retry.ts";
+export { WebhookDeliveryQueue } from "./webhooks/queue.ts";
+
+// Plugin System
+export * from "./plugins/types.ts";
+export { PluginManager } from "./plugins/manager.ts";
+export { PluginDiscovery } from "./plugins/discovery.ts";
 
 // Re-export webhook PaginatedResult as WebhookPaginatedResult to avoid conflict
 export type { PaginatedResult as WebhookPaginatedResult } from "./webhooks/types.ts";

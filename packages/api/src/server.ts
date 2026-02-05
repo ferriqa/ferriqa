@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { setupRoutes } from "./routes/index.ts";
+import { initPlugins } from "./plugins/index.ts";
 
 function getEnvVar(name: string): string | undefined {
   try {
@@ -84,7 +85,7 @@ export function securityHeaders() {
   };
 }
 
-export function createServer(): Hono {
+export async function createServer(): Promise<Hono> {
   const app = new Hono();
 
   app.use("*", logger());
@@ -102,6 +103,23 @@ export function createServer(): Hono {
 
   app.use("*", rateLimitMiddleware());
   app.use("*", securityHeaders());
+
+  // Initialize Plugins
+  // In a real app, this config would come from a file or DB
+  const pluginsConfig = ["seo"];
+  try {
+    const result = await initPlugins(pluginsConfig);
+    if (result.failed.length > 0) {
+      console.warn(
+        `[Plugins] Warning: ${result.failed.length} plugins failed to initialize.`,
+      );
+    }
+  } catch (err) {
+    console.error(
+      "[Plugins] Critical failure during plugin initialization:",
+      err,
+    );
+  }
 
   setupRoutes(app);
 

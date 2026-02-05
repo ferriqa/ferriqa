@@ -368,14 +368,30 @@ export class ContentService {
    * Get content by ID
    */
   async getById(id: string): Promise<Content | null> {
-    return this.queryBuilder.getById(id);
+    const content = await this.queryBuilder.getById(id);
+    if (content) {
+      const blueprint = await this.getBlueprint(content.blueprintId);
+      await this.options.hookRegistry.emit("content:afterGet", {
+        content,
+        blueprint,
+      });
+    }
+    return content;
   }
 
   /**
    * Get content by slug within a blueprint
    */
   async getBySlug(blueprintId: string, slug: string): Promise<Content | null> {
-    return this.queryBuilder.getBySlug(blueprintId, slug);
+    const content = await this.queryBuilder.getBySlug(blueprintId, slug);
+    if (content) {
+      const blueprint = await this.getBlueprint(blueprintId);
+      await this.options.hookRegistry.emit("content:afterGet", {
+        content,
+        blueprint,
+      });
+    }
+    return content;
   }
 
   /**

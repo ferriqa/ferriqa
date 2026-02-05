@@ -15,9 +15,8 @@ function getEnvVar(name: string): string | undefined {
   return undefined;
 }
 
-const app = createServer();
-
 async function start() {
+  const app = await createServer();
   const envPort = getEnvVar("PORT");
   const portNumber = envPort ? parseInt(envPort) : undefined;
 

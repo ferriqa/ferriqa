@@ -104,6 +104,7 @@ export interface FieldOptions {
 export interface FieldUIConfig {
   component?: string; // Custom component adı
   width?: "full" | "half"; // Admin UI'de genişlik
+  group?: string; // Field grubu (örn: "SEO")
   hidden?: boolean; // Form'da gizle
   disabled?: boolean; // Read-only
   placeholder?: string;

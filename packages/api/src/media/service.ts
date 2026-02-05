@@ -4,7 +4,7 @@
 
 import { extname } from "node:path";
 import { mediaConfig } from "../config/media.ts";
-import { StorageAdapter } from "./storage.ts";
+import { StorageRegistry } from "./registry.ts";
 
 // Minimal DatabaseAdapter interface to avoid importing from testing
 interface DatabaseAdapter {
@@ -31,10 +31,25 @@ export interface Media {
 export class MediaService {
   constructor(
     private db: DatabaseAdapter,
-    private storage: StorageAdapter,
+    private storageRegistry: StorageRegistry,
   ) {}
 
-  async upload(file: File, userId?: string): Promise<Media> {
+  async upload(
+    file: File,
+    userId?: string,
+    storageType?: string,
+  ): Promise<Media> {
+    // Resolve storage adapter
+    const storage = storageType
+      ? this.storageRegistry.get(storageType)
+      : this.storageRegistry.getDefault();
+
+    if (!storage) {
+      throw new Error(
+        `Storage adapter${storageType ? ` for type "${storageType}"` : ""} not found`,
+      );
+    }
+
     // Validate
     this.validateFile(file);
 
@@ -45,7 +60,7 @@ export class MediaService {
     const path = `${date.getFullYear()}/${date.getMonth() + 1}/${uniqueName}`;
 
     // Upload to storage
-    const uploadResult = await this.storage.upload(file, path);
+    const uploadResult = await storage.upload(file, path);
 
     // Extract metadata (placeholder for future implementation)
     const metadata: Record<string, unknown> = {};
@@ -58,7 +73,7 @@ export class MediaService {
       mime_type: uploadResult.mimeType,
       size: uploadResult.size,
       url: uploadResult.url,
-      storage_type: this.storage.type,
+      storage_type: storage.type,
       metadata: JSON.stringify(metadata),
       created_by: userId,
       created_at: Date.now(),
@@ -98,7 +113,14 @@ export class MediaService {
     const media = result.rows[0];
 
     // Delete from storage
-    await this.storage.delete(media.storage_path);
+    const storage = this.storageRegistry.get(media.storage_type);
+    if (!storage) {
+      throw new Error(
+        `Storage adapter for type "${media.storage_type}" not found. Cannot delete file to ensure consistency.`,
+      );
+    }
+
+    await storage.delete(media.storage_path);
 
     // Delete from database
     await this.db.execute("DELETE FROM media WHERE id = ?", [mediaId]);

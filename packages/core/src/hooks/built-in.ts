@@ -7,6 +7,9 @@
 
 import type { HookType } from "./types.ts";
 
+import type { Blueprint } from "../blueprint/types.ts";
+import type { Content } from "../content/types.ts";
+
 /**
  * Hook definition structure
  */
@@ -20,69 +23,61 @@ export interface BuiltInHookDefinition<T = unknown> {
 /**
  * Content lifecycle hooks
  */
-export interface ContentCreateContext {
-  blueprintId: number;
-  slug: string;
+export interface HookContentCreateContext {
+  blueprint: Blueprint;
   data: Record<string, unknown>;
+  userId?: string;
+  // Metadata can be injected by hooks
   meta?: Record<string, unknown>;
-  status: "draft" | "published";
-  createdBy?: number;
 }
 
-export interface ContentUpdateContext {
-  id: number;
-  blueprintId: number;
-  slug: string;
+export interface HookContentUpdateContext {
+  content: Content;
+  blueprint: Blueprint;
   data: Record<string, unknown>;
-  meta?: Record<string, unknown>;
-  status: "draft" | "published";
-  updatedBy?: number;
+  userId?: string;
 }
 
-export interface ContentDeleteContext {
-  id: number;
-  blueprintId: number;
-  deletedBy?: number;
+export interface HookContentDeleteContext {
+  content: Content;
+  blueprint: Blueprint;
+  userId?: string;
+}
+
+export interface HookContentGetContext {
+  content: Content;
+  blueprint: Blueprint;
+}
+
+export interface HookContentPublishContext {
+  content: Content;
+  userId?: string;
+  blueprint?: Blueprint; // Frequently needed in webhooks/plugins
 }
 
 /**
  * Blueprint lifecycle hooks
  */
-export interface BlueprintCreateContext {
-  id: number;
-  name: string;
-  slug: string;
-  fields: Array<{
-    name: string;
-    type: string;
-    required: boolean;
-    options?: Record<string, unknown>;
-  }>;
-  settings?: Record<string, unknown>;
+export interface HookBlueprintCreateContext {
+  blueprint: Blueprint;
+  userId?: string;
 }
 
-export interface BlueprintUpdateContext {
-  id: number;
-  name: string;
-  slug: string;
-  fields: Array<{
-    name: string;
-    type: string;
-    required: boolean;
-    options?: Record<string, unknown>;
-  }>;
-  settings?: Record<string, unknown>;
+export interface HookBlueprintUpdateContext {
+  blueprint: Blueprint;
+  userId?: string;
 }
 
-export interface BlueprintDeleteContext {
-  id: number;
+export interface HookBlueprintDeleteContext {
+  id: string;
   slug: string;
+  userId?: string;
 }
 
 /**
  * Webhook lifecycle hooks
  */
-export interface WebhookSendContext {
+export interface HookWebhookSendContext {
   webhookId: number;
   webhookName: string;
   url: string;
@@ -101,19 +96,37 @@ export const BUILT_IN_HOOKS: Record<string, BuiltInHookDefinition> = {
     name: "content:afterCreate",
     type: "action",
     description: "Triggered after content is created",
-    contextType: {} as ContentCreateContext,
+    contextType: {} as HookContentCreateContext,
   },
   "content:afterUpdate": {
     name: "content:afterUpdate",
     type: "action",
     description: "Triggered after content is updated",
-    contextType: {} as ContentUpdateContext,
+    contextType: {} as HookContentUpdateContext,
   },
   "content:afterDelete": {
     name: "content:afterDelete",
     type: "action",
     description: "Triggered after content is deleted",
-    contextType: {} as ContentDeleteContext,
+    contextType: {} as HookContentDeleteContext,
+  },
+  "content:afterGet": {
+    name: "content:afterGet",
+    type: "action",
+    description: "Triggered after content is retrieved",
+    contextType: {} as HookContentGetContext,
+  },
+  "content:afterPublish": {
+    name: "content:afterPublish",
+    type: "action",
+    description: "Triggered after content is published",
+    contextType: {} as HookContentPublishContext,
+  },
+  "content:afterUnpublish": {
+    name: "content:afterUnpublish",
+    type: "action",
+    description: "Triggered after content is unpublished",
+    contextType: {} as HookContentPublishContext,
   },
 
   // Content lifecycle hooks - Filters
@@ -121,19 +134,31 @@ export const BUILT_IN_HOOKS: Record<string, BuiltInHookDefinition> = {
     name: "content:beforeCreate",
     type: "filter",
     description: "Filter content data before creation",
-    contextType: {} as ContentCreateContext,
+    contextType: {} as HookContentCreateContext,
   },
   "content:beforeUpdate": {
     name: "content:beforeUpdate",
     type: "filter",
     description: "Filter content data before update",
-    contextType: {} as ContentUpdateContext,
+    contextType: {} as HookContentUpdateContext,
   },
   "content:beforeDelete": {
     name: "content:beforeDelete",
     type: "filter",
     description: "Filter before content deletion",
-    contextType: {} as ContentDeleteContext,
+    contextType: {} as HookContentDeleteContext,
+  },
+  "content:beforePublish": {
+    name: "content:beforePublish",
+    type: "filter",
+    description: "Filter before content is published",
+    contextType: {} as HookContentPublishContext,
+  },
+  "content:beforeUnpublish": {
+    name: "content:beforeUnpublish",
+    type: "filter",
+    description: "Filter before content is unpublished",
+    contextType: {} as HookContentPublishContext,
   },
 
   // Blueprint lifecycle hooks - Actions
@@ -141,19 +166,19 @@ export const BUILT_IN_HOOKS: Record<string, BuiltInHookDefinition> = {
     name: "blueprint:afterCreate",
     type: "action",
     description: "Triggered after blueprint is created",
-    contextType: {} as BlueprintCreateContext,
+    contextType: {} as HookBlueprintCreateContext,
   },
   "blueprint:afterUpdate": {
     name: "blueprint:afterUpdate",
     type: "action",
     description: "Triggered after blueprint is updated",
-    contextType: {} as BlueprintUpdateContext,
+    contextType: {} as HookBlueprintUpdateContext,
   },
   "blueprint:afterDelete": {
     name: "blueprint:afterDelete",
     type: "action",
     description: "Triggered after blueprint is deleted",
-    contextType: {} as BlueprintDeleteContext,
+    contextType: {} as HookBlueprintDeleteContext,
   },
 
   // Blueprint lifecycle hooks - Filters
@@ -161,19 +186,19 @@ export const BUILT_IN_HOOKS: Record<string, BuiltInHookDefinition> = {
     name: "blueprint:beforeCreate",
     type: "filter",
     description: "Filter blueprint data before creation",
-    contextType: {} as BlueprintCreateContext,
+    contextType: {} as HookBlueprintCreateContext,
   },
   "blueprint:beforeUpdate": {
     name: "blueprint:beforeUpdate",
     type: "filter",
     description: "Filter blueprint data before update",
-    contextType: {} as BlueprintUpdateContext,
+    contextType: {} as HookBlueprintUpdateContext,
   },
   "blueprint:beforeDelete": {
     name: "blueprint:beforeDelete",
     type: "filter",
     description: "Filter before blueprint deletion",
-    contextType: {} as BlueprintDeleteContext,
+    contextType: {} as HookBlueprintDeleteContext,
   },
 
   // Webhook lifecycle hooks - Actions
@@ -181,7 +206,7 @@ export const BUILT_IN_HOOKS: Record<string, BuiltInHookDefinition> = {
     name: "webhook:afterSend",
     type: "action",
     description: "Triggered after webhook is sent",
-    contextType: {} as WebhookSendContext,
+    contextType: {} as HookWebhookSendContext,
   },
 
   // Webhook lifecycle hooks - Filters
@@ -189,7 +214,7 @@ export const BUILT_IN_HOOKS: Record<string, BuiltInHookDefinition> = {
     name: "webhook:beforeSend",
     type: "filter",
     description: "Filter webhook payload before sending",
-    contextType: {} as WebhookSendContext,
+    contextType: {} as HookWebhookSendContext,
   },
 };
 

@@ -56,13 +56,15 @@ export { HookRegistry, hooks, createHookRegistry } from "./registry.ts";
 // Built-in hooks
 export type {
   BuiltInHookDefinition,
-  ContentCreateContext,
-  ContentUpdateContext,
-  ContentDeleteContext,
-  BlueprintCreateContext,
-  BlueprintUpdateContext,
-  BlueprintDeleteContext,
-  WebhookSendContext,
+  HookContentCreateContext,
+  HookContentUpdateContext,
+  HookContentDeleteContext,
+  HookContentGetContext,
+  HookContentPublishContext,
+  HookBlueprintCreateContext,
+  HookBlueprintUpdateContext,
+  HookBlueprintDeleteContext,
+  HookWebhookSendContext,
 } from "./built-in.ts";
 
 export {

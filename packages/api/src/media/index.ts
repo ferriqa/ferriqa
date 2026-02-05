@@ -8,24 +8,30 @@ import { LocalStorageAdapter } from "./local-storage.ts";
 import { MediaService } from "./service.ts";
 // import { S3StorageAdapter } from './s3-storage'; // Future
 
-function createMediaService() {
-  const storageType = mediaConfig.defaultStorage;
-  let storage;
+import { globalStorageRegistry } from "./registry.ts";
 
-  if (storageType === "s3") {
-    // storage = new S3StorageAdapter(mediaConfig.s3);
-    throw new Error("S3 storage not implemented yet");
-  } else {
-    storage = new LocalStorageAdapter(
-      mediaConfig.local.path,
-      mediaConfig.local.publicUrl,
+function createMediaService() {
+  // Register local storage by default
+  const localStorage = new LocalStorageAdapter(
+    mediaConfig.local.path,
+    mediaConfig.local.publicUrl,
+  );
+  globalStorageRegistry.register(localStorage);
+  globalStorageRegistry.setDefaultType("local");
+
+  if (mediaConfig.defaultStorage === "s3") {
+    // S3 will be registered via plugin in the future
+    // For now, we keep the default as local
+    console.warn(
+      "S3 storage requested but not yet implemented. Falling back to local.",
     );
   }
 
-  return new MediaService(db, storage);
+  return new MediaService(db, globalStorageRegistry);
 }
 
 export const mediaService = createMediaService();
-export * from "./service";
-export * from "./storage";
-export * from "./local-storage";
+export * from "./service.ts";
+export * from "./storage.ts";
+export * from "./local-storage.ts";
+export * from "./registry.ts";
