@@ -95,9 +95,9 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
   private sortQueue(): void {
     this.queue.sort((a, b) => {
       if (a.priority !== b.priority) {
-        return b.priority - a.priority;
+        return a.priority - b.priority;
       }
-      return a.scheduledFor - b.scheduledFor;
+      return b.scheduledFor - a.scheduledFor;
     });
   }
 
