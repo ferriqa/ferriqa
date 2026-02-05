@@ -105,10 +105,9 @@ export async function createServer(): Promise<Hono> {
   app.use("*", securityHeaders());
 
   // Initialize Plugins
-  // In a real app, this config would come from a file or DB
-  const pluginsConfig = ["seo"];
+  const pluginsConfig: any[] = ["seo"];
   try {
-    const result = await initPlugins(pluginsConfig);
+    const result = await initPlugins(pluginsConfig, { loadConfigFromDB: true });
     if (result.failed.length > 0) {
       console.warn(
         `[Plugins] Warning: ${result.failed.length} plugins failed to initialize.`,

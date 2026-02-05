@@ -79,6 +79,8 @@ export { WebhookDeliveryQueue } from "./webhooks/queue.ts";
 export * from "./plugins/types.ts";
 export { PluginManager } from "./plugins/manager.ts";
 export { PluginDiscovery } from "./plugins/discovery.ts";
+export { PluginConfigService } from "./plugins/config-service.ts";
+export { buildConfigUI, type ConfigFieldUI } from "./plugins/config-ui.ts";
 
 // Re-export webhook PaginatedResult as WebhookPaginatedResult to avoid conflict
 export type { PaginatedResult as WebhookPaginatedResult } from "./webhooks/types.ts";

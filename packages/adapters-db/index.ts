@@ -49,7 +49,7 @@ export {
   type FieldDefinition,
 } from "./src/schema.ts";
 
-// Migrations
+// Migrations - use the index.ts for all migration exports
 export type {
   Migration,
   MigrationRecord,
@@ -58,9 +58,14 @@ export type {
   RollbackResult,
   MigrationRunnerOptions,
   MigrationDirection,
-} from "./src/migrations/types.ts";
+} from "./src/migrations/index.ts";
 
 export {
   MigrationRunner,
   createMigrationRunner,
-} from "./src/migrations/runner.ts";
+  allMigrations,
+  addPublishColumns,
+  createRelationsTable,
+  addWebhookDeliveries,
+  CreatePluginConfigsMigration,
+} from "./src/migrations/index.ts";

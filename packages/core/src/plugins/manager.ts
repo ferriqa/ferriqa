@@ -14,19 +14,19 @@ import type { IHookRegistry } from "../hooks/types.ts";
 import type { FieldRegistry } from "../fields/registry.ts";
 
 export class PluginManager {
-  private plugins = new Map<string, PluginInstance>();
+  private plugins = new Map<string, PluginInstance<any>>();
 
   constructor(
     private hooks: IHookRegistry,
     private fields: FieldRegistry,
     private registries: Record<string, any> = {},
-  ) {}
+  ) { }
 
   /**
    * Load and initialize a plugin
    */
-  async load(
-    plugin: FerriqaPlugin,
+  async load<TConfig extends Record<string, unknown> = any>(
+    plugin: FerriqaPlugin<TConfig>,
     config: Record<string, unknown> = {},
   ): Promise<void> {
     const { manifest } = plugin;
@@ -44,20 +44,42 @@ export class PluginManager {
       throw new Error(`Plugin with ID "${manifest.id}" is already loaded.`);
     }
 
-    // 3. Validate Configuration
+    let finalConfig = { ...config };
+
+    // 3. Handle Migrations
+    const savedVersion = finalConfig.__version as string | undefined;
+    if (savedVersion && manifest.migrations && savedVersion !== manifest.version) {
+      const logger = this.createLogger(manifest.id);
+      logger.info(`Migrating configuration from ${savedVersion} to ${manifest.version}...`);
+
+      for (const migration of manifest.migrations) {
+        // Simple linear migration for now
+        // TODO: Implement proper version range matching if needed
+        if (migration.from === savedVersion) {
+          finalConfig = { ...migration.migrate(finalConfig) };
+          logger.debug(`Applied migration from ${migration.from} to ${migration.to}`);
+        }
+      }
+    }
+
+    // Set current version in config if not present or changed
+    finalConfig.__version = manifest.version;
+
+    // 4. Validate Configuration
     if (manifest.configSchema) {
-      const configResult = manifest.configSchema.safeParse(config);
+      const configResult = manifest.configSchema.safeParse(finalConfig);
       if (!configResult.success) {
         throw new Error(
           `Invalid configuration for plugin "${manifest.id}": ${configResult.error.message}`,
         );
       }
+      finalConfig = configResult.data as any;
     }
 
-    // 4. Create Context
-    const context: PluginContext = {
+    // 5. Create Context
+    const context: PluginContext<TConfig> = {
       manifest,
-      config,
+      config: finalConfig as TConfig,
       hooks: this.hooks,
       registries: {
         fields: this.fields,
@@ -66,7 +88,7 @@ export class PluginManager {
       logger: this.createLogger(manifest.id),
     };
 
-    const instance: PluginInstance = {
+    const instance: PluginInstance<TConfig> = {
       plugin,
       context,
       state: "loading",
@@ -76,13 +98,13 @@ export class PluginManager {
     this.plugins.set(manifest.id, instance);
 
     try {
-      // 5. Initialize
+      // 6. Initialize
       if (plugin.init) {
         instance.state = "initializing";
         await plugin.init(context);
       }
 
-      // 6. Enable
+      // 7. Enable
       if (plugin.enable) {
         await plugin.enable(context);
       }
@@ -100,6 +122,45 @@ export class PluginManager {
       );
       throw error;
     }
+  }
+
+  /**
+   * Update plugin configuration dynamically
+   */
+  async reconfigure(
+    pluginId: string,
+    newConfig: Record<string, unknown>,
+  ): Promise<void> {
+    const instance = this.plugins.get(pluginId);
+    if (!instance) {
+      throw new Error(`Plugin "${pluginId}" not found.`);
+    }
+
+    // 1. Validate New Configuration
+    const mergedConfig = { ...instance.context.config, ...newConfig };
+    if (instance.plugin.manifest.configSchema) {
+      const configResult =
+        instance.plugin.manifest.configSchema.safeParse(mergedConfig);
+      if (!configResult.success) {
+        throw new Error(
+          `Invalid configuration for reconfiguration of "${pluginId}": ${configResult.error.message}`,
+        );
+      }
+      instance.context.config = configResult.data;
+    } else {
+      instance.context.config = mergedConfig;
+    }
+
+    // 2. Call lifecycle hook
+    if (instance.plugin.reconfigure) {
+      await instance.plugin.reconfigure(instance.context);
+    }
+
+    // 3. Notify via hooks
+    await this.hooks.emit("plugin:reconfigured", {
+      pluginId,
+      config: instance.context.config,
+    });
   }
 
   /**
@@ -139,16 +200,16 @@ export class PluginManager {
   registerRegistry(name: string, registry: any): void {
     this.registries[name] = registry;
     // Update all existing plugin contexts
-    for (const instance of this.plugins.values()) {
+    for (const instance of Array.from(this.plugins.values())) {
       instance.context.registries[name] = registry;
     }
   }
 
-  getPlugin(pluginId: string): PluginInstance | undefined {
+  getPlugin(pluginId: string): PluginInstance<any> | undefined {
     return this.plugins.get(pluginId);
   }
 
-  listPlugins(): PluginInstance[] {
+  listPlugins(): PluginInstance<any>[] {
     return Array.from(this.plugins.values());
   }
 

@@ -7,6 +7,15 @@ import type { IHookRegistry } from "../hooks/types.ts";
 import type { FieldRegistry } from "../fields/registry.ts";
 
 /**
+ * Plugin Migration definition
+ */
+export interface PluginMigration<TConfig = any> {
+  from: string;
+  to: string;
+  migrate: (oldConfig: any) => TConfig;
+}
+
+/**
  * Plugin Manifest - Defines plugin metadata and requirements
  */
 export const PluginManifestSchema = z.object({
@@ -46,7 +55,11 @@ export const PluginManifestSchema = z.object({
     .describe("Zod schema for plugin configuration"),
 });
 
-export type PluginManifest = z.infer<typeof PluginManifestSchema>;
+export interface PluginManifest<TConfig = any>
+  extends z.infer<typeof PluginManifestSchema> {
+  configSchema?: z.ZodType<TConfig>;
+  migrations?: PluginMigration<TConfig>[];
+}
 
 /**
  * Plugin Lifecycle States
@@ -62,9 +75,11 @@ export type PluginState =
 /**
  * Plugin Context - APIs available to plugins during lifecycle
  */
-export interface PluginContext {
-  manifest: PluginManifest;
-  config: Record<string, unknown>;
+export interface PluginContext<
+  TConfig = Record<string, unknown>,
+> {
+  manifest: PluginManifest<TConfig>;
+  config: TConfig;
   hooks: IHookRegistry;
   registries: {
     fields: FieldRegistry;
@@ -82,36 +97,45 @@ export interface PluginContext {
 /**
  * Ferriqa Plugin Interface
  */
-export interface FerriqaPlugin {
-  manifest: PluginManifest;
+export interface FerriqaPlugin<
+  TConfig = Record<string, unknown>,
+> {
+  manifest: PluginManifest<TConfig>;
 
   /**
    * Called when plugin is first loaded. Use for registration and setup.
    */
-  init?(context: PluginContext): Promise<void> | void;
+  init?(context: PluginContext<TConfig>): Promise<void> | void;
 
   /**
    * Called when plugin is enabled.
    */
-  enable?(context: PluginContext): Promise<void> | void;
+  enable?(context: PluginContext<TConfig>): Promise<void> | void;
+
+  /**
+   * Called when plugin configuration is updated.
+   */
+  reconfigure?(context: PluginContext<TConfig>): Promise<void> | void;
 
   /**
    * Called when plugin is disabled.
    */
-  disable?(context: PluginContext): Promise<void> | void;
+  disable?(context: PluginContext<TConfig>): Promise<void> | void;
 
   /**
    * Called when plugin is being removed.
    */
-  destroy?(context: PluginContext): Promise<void> | void;
+  destroy?(context: PluginContext<TConfig>): Promise<void> | void;
 }
 
 /**
  * Internal Plugin Instance
  */
-export interface PluginInstance {
-  plugin: FerriqaPlugin;
-  context: PluginContext;
+export interface PluginInstance<
+  TConfig = Record<string, unknown>,
+> {
+  plugin: FerriqaPlugin<TConfig>;
+  context: PluginContext<TConfig>;
   state: PluginState;
   error?: Error;
   startedAt: number;
