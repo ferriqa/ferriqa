@@ -49,6 +49,7 @@ import { generateUUID } from "./utils.ts";
 export interface WebhookServiceOptions {
   db: DatabaseAdapter;
   hookRegistry: IHookRegistry;
+  queueIntervalMs?: number;
 }
 
 export class WebhookService {
@@ -67,6 +68,7 @@ export class WebhookService {
      * escape processJob's internal error handling
      */
     this.queue = new WebhookDeliveryQueue({
+      processIntervalMs: options.queueIntervalMs,
       retryManager: this.retryManager,
       onDeliveryLogged: async (
         webhookId: number,

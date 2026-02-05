@@ -182,13 +182,25 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
 
     // Simple WHERE clause filtering
     if (params && params.length > 0 && sql.toLowerCase().includes("where")) {
-      // Very basic filtering for testing
-      // Supports loose equality to handle type differences (e.g., string "1" vs number 1)
+      // Count how many parameters are in the WHERE clause versus LIMIT/OFFSET
+      const whereMatch = sql.match(/where\s+(.+?)(?:\s+order\s+by|\s+limit|$)/i);
+      let whereParamCount = params.length;
+
+      if (whereMatch) {
+        const whereClause = whereMatch[1];
+        whereParamCount = (whereClause.match(/\?/g) || []).length;
+      }
+
+      // Only use parameters that belong to the WHERE clause for filtering
+      const filterParams = params.slice(0, whereParamCount);
+
+      const initialCount = rows.length;
       rows = rows.filter((row) => {
         const rowObj = row as Record<string, unknown>;
-        return params.some((param) =>
-          Object.values(rowObj).some(
-            (val) =>
+        return filterParams.some((param) =>
+          Object.values(rowObj).some((val) => {
+            // Standard equality
+            if (
               val === param ||
               String(val) === String(param) ||
               (typeof val === "number" &&
@@ -196,8 +208,25 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
                 val === Number(param)) ||
               (typeof val === "string" &&
                 typeof param === "number" &&
-                Number(val) === param),
-          ),
+                Number(val) === param)
+            ) {
+              return true;
+            }
+
+            // JSON array check (for webhooks/events)
+            if (typeof val === "string" && val.startsWith("[") && val.endsWith("]")) {
+              try {
+                const parsed = JSON.parse(val);
+                if (Array.isArray(parsed) && parsed.includes(param)) {
+                  return true;
+                }
+              } catch {
+                // Not valid JSON, ignore
+              }
+            }
+
+            return false;
+          }),
         );
       });
     }
@@ -426,7 +455,7 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
  * Mock Transaction for testing
  */
 class MockTransaction implements DatabaseTransaction {
-  constructor(private adapter: MockDatabaseAdapter) {}
+  constructor(private adapter: MockDatabaseAdapter) { }
 
   async query<T = unknown>(
     sql: string,
