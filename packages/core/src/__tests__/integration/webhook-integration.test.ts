@@ -239,6 +239,101 @@ describe("Webhook Integration", () => {
 
         expect(actionReceived).toBe(true);
     });
+
+    it("should dispatch webhook when blueprint is updated", async () => {
+        const webhook = await webhookService.create({
+            name: "BP Update Hook",
+            url: "https://example.com/on-bp-update",
+            events: ["blueprint.updated"],
+            isActive: true
+        });
+
+        const blueprint = await blueprintService.create({
+            id: "bp-to-update",
+            name: "Original Name",
+            slug: "original-slug",
+            fields: [],
+            settings: { displayField: "id", defaultStatus: "draft", draftMode: true, versioning: false, apiAccess: "public", cacheEnabled: false }
+        });
+
+        await blueprintService.update(blueprint.id, {
+            name: "Updated Name"
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        const deliveries = await webhookService.getDeliveries(webhook.id);
+        expect(deliveries.data.length).toBe(1);
+        expect(deliveries.data[0].event).toBe("blueprint.updated");
+    });
+
+    it("should dispatch webhook when blueprint is deleted", async () => {
+        const webhook = await webhookService.create({
+            name: "BP Delete Hook",
+            url: "https://example.com/on-bp-delete",
+            events: ["blueprint.deleted"],
+            isActive: true
+        });
+
+        const blueprint = await blueprintService.create({
+            id: "bp-to-delete",
+            name: "To Be Deleted",
+            slug: "to-be-deleted",
+            fields: [],
+            settings: { displayField: "id", defaultStatus: "draft", draftMode: true, versioning: false, apiAccess: "public", cacheEnabled: false }
+        });
+
+        await blueprintService.delete(blueprint.id);
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        const deliveries = await webhookService.getDeliveries(webhook.id);
+        expect(deliveries.data.length).toBe(1);
+        expect(deliveries.data[0].event).toBe("blueprint.deleted");
+    });
+
+    it("should dispatch webhook when content is published", async () => {
+        const webhook = await webhookService.create({
+            name: "Publish Hook",
+            url: "https://example.com/on-publish",
+            events: ["content.published"],
+            isActive: true
+        });
+
+        const content = await contentService.create("page", {
+            data: { title: "Draft Content" }
+        });
+
+        await contentService.publish(content.id);
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        const deliveries = await webhookService.getDeliveries(webhook.id);
+        expect(deliveries.data.length).toBe(1);
+        expect(deliveries.data[0].event).toBe("content.published");
+    });
+
+    it("should dispatch webhook when content is unpublished", async () => {
+        const webhook = await webhookService.create({
+            name: "Unpublish Hook",
+            url: "https://example.com/on-unpublish",
+            events: ["content.unpublished"],
+            isActive: true
+        });
+
+        const content = await contentService.create("page", {
+            data: { title: "Published Content" }
+        });
+
+        await contentService.publish(content.id);
+        await contentService.unpublish(content.id);
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const deliveries = await webhookService.getDeliveries(webhook.id);
+        expect(deliveries.data.length).toBe(1);
+        expect(deliveries.data[0].event).toBe("content.unpublished");
+    });
 });
 
 runTests();
