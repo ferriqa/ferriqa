@@ -1,0 +1,41 @@
+{
+  "name": "@ferriqa/sdk",
+  "version": "1.0.0",
+  "description": "Ferriqa SDK - Type-safe API client for Ferriqa Headless CMS",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir ./dist --target node",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src/",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@ferriqa/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0",
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "cms",
+    "headless",
+    "sdk",
+    "api-client",
+    "ferriqa"
+  ],
+  "license": "MIT",
+  "author": "Ferriqa Team"
+}
