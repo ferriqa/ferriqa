@@ -20,7 +20,7 @@ export class PluginManager {
     private hooks: IHookRegistry,
     private fields: FieldRegistry,
     private registries: Record<string, any> = {},
-  ) { }
+  ) {}
 
   /**
    * Load and initialize a plugin
@@ -48,16 +48,24 @@ export class PluginManager {
 
     // 3. Handle Migrations
     const savedVersion = finalConfig.__version as string | undefined;
-    if (savedVersion && manifest.migrations && savedVersion !== manifest.version) {
+    if (
+      savedVersion &&
+      manifest.migrations &&
+      savedVersion !== manifest.version
+    ) {
       const logger = this.createLogger(manifest.id);
-      logger.info(`Migrating configuration from ${savedVersion} to ${manifest.version}...`);
+      logger.info(
+        `Migrating configuration from ${savedVersion} to ${manifest.version}...`,
+      );
 
       for (const migration of manifest.migrations) {
         // Simple linear migration for now
         // TODO: Implement proper version range matching if needed
         if (migration.from === savedVersion) {
           finalConfig = { ...migration.migrate(finalConfig) };
-          logger.debug(`Applied migration from ${migration.from} to ${migration.to}`);
+          logger.debug(
+            `Applied migration from ${migration.from} to ${migration.to}`,
+          );
         }
       }
     }

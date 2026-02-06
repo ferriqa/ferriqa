@@ -26,10 +26,7 @@ export const allMigrations: Migration[] = [
 
 // Re-export types
 export type { Migration } from "./types.ts";
-export {
-  MigrationRunner,
-  createMigrationRunner,
-} from "./runner.ts";
+export { MigrationRunner, createMigrationRunner } from "./runner.ts";
 export type {
   MigrationRecord,
   MigrationStatus,

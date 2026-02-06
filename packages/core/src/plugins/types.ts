@@ -55,8 +55,9 @@ export const PluginManifestSchema = z.object({
     .describe("Zod schema for plugin configuration"),
 });
 
-export interface PluginManifest<TConfig = any>
-  extends z.infer<typeof PluginManifestSchema> {
+export interface PluginManifest<TConfig = any> extends z.infer<
+  typeof PluginManifestSchema
+> {
   configSchema?: z.ZodType<TConfig>;
   migrations?: PluginMigration<TConfig>[];
 }
@@ -75,9 +76,7 @@ export type PluginState =
 /**
  * Plugin Context - APIs available to plugins during lifecycle
  */
-export interface PluginContext<
-  TConfig = Record<string, unknown>,
-> {
+export interface PluginContext<TConfig = Record<string, unknown>> {
   manifest: PluginManifest<TConfig>;
   config: TConfig;
   hooks: IHookRegistry;
@@ -97,9 +96,7 @@ export interface PluginContext<
 /**
  * Ferriqa Plugin Interface
  */
-export interface FerriqaPlugin<
-  TConfig = Record<string, unknown>,
-> {
+export interface FerriqaPlugin<TConfig = Record<string, unknown>> {
   manifest: PluginManifest<TConfig>;
 
   /**
@@ -131,9 +128,7 @@ export interface FerriqaPlugin<
 /**
  * Internal Plugin Instance
  */
-export interface PluginInstance<
-  TConfig = Record<string, unknown>,
-> {
+export interface PluginInstance<TConfig = Record<string, unknown>> {
   plugin: FerriqaPlugin<TConfig>;
   context: PluginContext<TConfig>;
   state: PluginState;

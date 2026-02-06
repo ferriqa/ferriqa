@@ -29,15 +29,15 @@ export interface PluginInitResult {
 export type PluginConfiguration =
   | string
   | {
-    id: string;
-    path?: string;
-    config?: Record<string, unknown>;
-    environments?: {
-      development?: Record<string, unknown>;
-      production?: Record<string, unknown>;
-      test?: Record<string, unknown>;
+      id: string;
+      path?: string;
+      config?: Record<string, unknown>;
+      environments?: {
+        development?: Record<string, unknown>;
+        production?: Record<string, unknown>;
+        test?: Record<string, unknown>;
+      };
     };
-  };
 
 function getCurrentEnvironment(): string {
   if (typeof process !== "undefined" && process.env) {

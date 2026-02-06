@@ -1,0 +1,45 @@
+{
+  "name": "@ferriqa/cli",
+  "version": "1.0.0",
+  "description": "Ferriqa Headless CMS CLI - Developer tooling and project scaffolding",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./commands": "./src/commands/index.ts"
+  },
+  "bin": {
+    "ferriqa": "./bin/ferriqa.js"
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir=dist --target=node",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src/",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@clack/core": "^0.3.4",
+    "@clack/prompts": "^0.8.2",
+    "picocolors": "^1.1.1",
+    "@ferriqa/core": "workspace:*",
+    "@ferriqa/api": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0",
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "cms",
+    "headless",
+    "cli",
+    "scaffolding",
+    "ferriqa"
+  ],
+  "license": "MIT",
+  "author": "Ferriqa Team"
+}
