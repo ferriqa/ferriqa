@@ -1,9 +1,9 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  
+
   "app_name": "Ferriqa",
   "app_description": "Headless CMS Admin Panel",
-  
+
   "nav_dashboard": "Dashboard",
   "nav_content": "Content",
   "nav_blueprints": "Blueprints",
@@ -12,7 +12,7 @@
   "nav_webhooks": "Webhooks",
   "nav_plugins": "Plugins",
   "nav_settings": "Settings",
-  
+
   "common_search": "Search",
   "common_filter": "Filter",
   "common_create": "Create",
@@ -40,7 +40,7 @@
   "common_type": "Type",
   "common_date": "Date",
   "common_settings": "Settings",
-  
+
   "auth_login": "Login",
   "auth_logout": "Logout",
   "auth_email": "Email",
@@ -49,7 +49,7 @@
   "auth_forgot_password": "Forgot password?",
   "auth_login_error": "Invalid email or password",
   "auth_welcome_back": "Welcome back",
-  
+
   "dashboard_title": "Dashboard",
   "dashboard_welcome": "Welcome to Ferriqa",
   "dashboard_stats_content": "Content Items",
@@ -58,7 +58,7 @@
   "dashboard_stats_users": "Users",
   "dashboard_recent_activity": "Recent Activity",
   "dashboard_quick_actions": "Quick Actions",
-  
+
   "content_title": "Content",
   "content_create": "Create Content",
   "content_edit": "Edit Content",
@@ -74,7 +74,7 @@
   "content_updated_at": "Updated at",
   "content_created_at": "Created at",
   "content_by": "by",
-  
+
   "blueprints_title": "Blueprints",
   "blueprints_create": "Create Blueprint",
   "blueprints_edit": "Edit Blueprint",
@@ -86,7 +86,7 @@
   "blueprints_field_name": "Field Name",
   "blueprints_field_type": "Field Type",
   "blueprints_field_required": "Required",
-  
+
   "media_title": "Media Library",
   "media_upload": "Upload",
   "media_upload_drag": "Drag and drop files here, or click to browse",
@@ -100,7 +100,7 @@
   "media_file_size": "Size",
   "media_file_type": "Type",
   "media_uploaded_at": "Uploaded",
-  
+
   "users_title": "Users",
   "users_create": "Create User",
   "users_edit": "Edit User",
@@ -110,7 +110,7 @@
   "users_role_admin": "Administrator",
   "users_role_editor": "Editor",
   "users_role_viewer": "Viewer",
-  
+
   "webhooks_title": "Webhooks",
   "webhooks_create": "Create Webhook",
   "webhooks_edit": "Edit Webhook",
@@ -121,7 +121,7 @@
   "webhooks_events": "Events",
   "webhooks_status_active": "Active",
   "webhooks_status_inactive": "Inactive",
-  
+
   "plugins_title": "Plugins",
   "plugins_installed": "Installed Plugins",
   "plugins_available": "Available Plugins",
@@ -129,7 +129,7 @@
   "plugins_uninstall": "Uninstall",
   "plugins_configure": "Configure",
   "plugins_no_items": "No plugins installed",
-  
+
   "settings_title": "Settings",
   "settings_general": "General",
   "settings_api": "API Settings",
@@ -137,7 +137,7 @@
   "settings_cache": "Cache",
   "settings_save_success": "Settings saved successfully",
   "settings_save_error": "Failed to save settings",
-  
+
   "field_text": "Text",
   "field_textarea": "Textarea",
   "field_number": "Number",
@@ -151,7 +151,7 @@
   "field_richtext": "Rich Text",
   "field_slug": "Slug",
   "field_json": "JSON",
-  
+
   "error_404_title": "Page Not Found",
   "error_404_message": "The page you are looking for does not exist.",
   "error_500_title": "Server Error",

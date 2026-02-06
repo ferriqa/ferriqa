@@ -1,9 +1,9 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  
+
   "app_name": "Ferriqa",
   "app_description": "Headless CMS Yönetim Paneli",
-  
+
   "nav_dashboard": "Panel",
   "nav_content": "İçerik",
   "nav_blueprints": "Şablonlar",
@@ -12,7 +12,7 @@
   "nav_webhooks": "Webhook'lar",
   "nav_plugins": "Eklentiler",
   "nav_settings": "Ayarlar",
-  
+
   "common_search": "Ara",
   "common_filter": "Filtrele",
   "common_create": "Oluştur",
@@ -40,7 +40,7 @@
   "common_type": "Tip",
   "common_date": "Tarih",
   "common_settings": "Ayarlar",
-  
+
   "auth_login": "Giriş Yap",
   "auth_logout": "Çıkış Yap",
   "auth_email": "E-posta",
@@ -49,7 +49,7 @@
   "auth_forgot_password": "Şifremi unuttum?",
   "auth_login_error": "Geçersiz e-posta veya şifre",
   "auth_welcome_back": "Tekrar hoşgeldiniz",
-  
+
   "dashboard_title": "Panel",
   "dashboard_welcome": "Ferriqa'ya hoşgeldiniz",
   "dashboard_stats_content": "İçerik Öğeleri",
@@ -58,7 +58,7 @@
   "dashboard_stats_users": "Kullanıcılar",
   "dashboard_recent_activity": "Son Aktiviteler",
   "dashboard_quick_actions": "Hızlı İşlemler",
-  
+
   "content_title": "İçerik",
   "content_create": "İçerik Oluştur",
   "content_edit": "İçerik Düzenle",
@@ -74,7 +74,7 @@
   "content_updated_at": "Güncellenme",
   "content_created_at": "Oluşturulma",
   "content_by": "tarafından",
-  
+
   "blueprints_title": "Şablonlar",
   "blueprints_create": "Şablon Oluştur",
   "blueprints_edit": "Şablon Düzenle",
@@ -86,7 +86,7 @@
   "blueprints_field_name": "Alan Adı",
   "blueprints_field_type": "Alan Tipi",
   "blueprints_field_required": "Zorunlu",
-  
+
   "media_title": "Medya Kütüphanesi",
   "media_upload": "Yükle",
   "media_upload_drag": "Dosyaları buraya sürükleyin veya göz atmak için tıklayın",
@@ -100,7 +100,7 @@
   "media_file_size": "Boyut",
   "media_file_type": "Tip",
   "media_uploaded_at": "Yüklenme",
-  
+
   "users_title": "Kullanıcılar",
   "users_create": "Kullanıcı Oluştur",
   "users_edit": "Kullanıcı Düzenle",
@@ -110,7 +110,7 @@
   "users_role_admin": "Yönetici",
   "users_role_editor": "Editör",
   "users_role_viewer": "Görüntüleyici",
-  
+
   "webhooks_title": "Webhook'lar",
   "webhooks_create": "Webhook Oluştur",
   "webhooks_edit": "Webhook Düzenle",
@@ -121,7 +121,7 @@
   "webhooks_events": "Olaylar",
   "webhooks_status_active": "Aktif",
   "webhooks_status_inactive": "Pasif",
-  
+
   "plugins_title": "Eklentiler",
   "plugins_installed": "Yüklü Eklentiler",
   "plugins_available": "Mevcut Eklentiler",
@@ -129,7 +129,7 @@
   "plugins_uninstall": "Kaldır",
   "plugins_configure": "Yapılandır",
   "plugins_no_items": "Yüklü eklenti bulunmamaktadır",
-  
+
   "settings_title": "Ayarlar",
   "settings_general": "Genel",
   "settings_api": "API Ayarları",
@@ -137,7 +137,7 @@
   "settings_cache": "Önbellek",
   "settings_save_success": "Ayarlar başarıyla kaydedildi",
   "settings_save_error": "Ayarlar kaydedilemedi",
-  
+
   "field_text": "Metin",
   "field_textarea": "Uzun Metin",
   "field_number": "Sayı",
@@ -151,7 +151,7 @@
   "field_richtext": "Zengin Metin",
   "field_slug": "URL Uzantısı",
   "field_json": "JSON",
-  
+
   "error_404_title": "Sayfa Bulunamadı",
   "error_404_message": "Aradığınız sayfa mevcut değil.",
   "error_500_title": "Sunucu Hatası",
