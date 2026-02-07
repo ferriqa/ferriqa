@@ -12,6 +12,7 @@ import { devCommand } from "./commands/dev.ts";
 import { dbCommand } from "./commands/db.ts";
 import { blueprintCommand } from "./commands/blueprint.ts";
 import { pluginCommand } from "./commands/plugin.ts";
+import { completionCommand } from "./commands/completion.ts";
 
 export interface CLIContext {
   cwd: string;
@@ -44,6 +45,11 @@ const COMMANDS = {
     name: "plugin",
     description: "Plugin management",
     handler: pluginCommand,
+  },
+  completion: {
+    name: "completion",
+    description: "Setup shell auto-completion",
+    handler: completionCommand,
   },
 };
 
@@ -115,7 +121,8 @@ ${pc.bold("Commands:")}
   dev                     Start development server
   db <subcommand>         Database operations (migrate, rollback, seed)
   blueprint <subcommand>  Blueprint management (list, create, delete)
-  plugin <subcommand>     Plugin management (list, add, remove)
+  plugin <subcommand>     Plugin management (list, add, remove, market)
+  completion <shell>      Setup shell auto-completion
 
 ${pc.bold("Global Options:")}
   -h, --help              Show help
@@ -127,7 +134,8 @@ ${pc.bold("Examples:")}
   ferriqa init my-blog
   ferriqa dev
   ferriqa db migrate
-  ferriqa blueprint list
+  ferriqa plugin market search analytics
+  ferriqa completion detect
 
 ${pc.dim("For more information: https://ferriqa.dev/docs/cli")}
 `);

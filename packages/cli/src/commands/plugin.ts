@@ -1,12 +1,18 @@
 /**
  * @ferriqa/cli - Plugin Command
  *
- * Plugin management: list, add, remove
+ * Plugin management: list, add, remove, marketplace
  */
 
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import type { CLIContext } from "../index.ts";
+import {
+  PluginMarketplace,
+  BUILTIN_PLUGINS,
+  formatPluginInfo,
+  searchPlugins,
+} from "../marketplace.ts";
 
 interface PluginInfo {
   id: string;
@@ -80,6 +86,13 @@ export async function pluginCommand(
       break;
     case "create":
       await createCommand(args.slice(1), context);
+      break;
+    case "market":
+    case "marketplace":
+      await marketCommand(args.slice(1), context);
+      break;
+    case "search":
+      await searchCommand(args.slice(1), context);
       break;
     default:
       p.log.error(pc.red(`Unknown plugin subcommand: ${subcommand}`));
@@ -358,20 +371,155 @@ ${pc.bold("Plugin Commands:")}
   ferriqa plugin add <id>          Install a plugin
   ferriqa plugin remove <id>       Uninstall a plugin
   ferriqa plugin create <name>     Create custom plugin scaffold
+  ferriqa plugin market            Browse plugin marketplace
+  ferriqa plugin search <query>    Search plugins
 
-${pc.bold("Available Plugins:")}
-  seo              SEO optimization
-  localization     Multi-language support
-  analytics        Page view tracking
-  search           Full-text search
-  backup           Automated backups
+${pc.bold("Plugin Marketplace:")}
+
+  ferriqa plugin market search     Search marketplace
+  ferriqa plugin market featured   Show featured plugins
+  ferriqa plugin market tags       List available tags
 
 ${pc.bold("Examples:")}
   ferriqa plugin add seo
   ferriqa plugin create "My Plugin"
+  ferriqa plugin market search analytics
 `);
 }
 
 function simulateDelay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Marketplace command - Browse and search plugins
+ */
+async function marketCommand(
+  args: string[],
+  _context: CLIContext,
+): Promise<void> {
+  const action = args[0];
+
+  const marketplace = new PluginMarketplace();
+
+  switch (action) {
+    case "search":
+      await searchPlugins(args[1] || "", marketplace);
+      break;
+    case "featured":
+      await featuredCommand(marketplace);
+      break;
+    case "tags":
+      await tagsCommand(marketplace);
+      break;
+    default:
+      showMarketHelp();
+  }
+}
+
+/**
+ * Search command - Quick search for plugins
+ */
+async function searchCommand(
+  args: string[],
+  _context: CLIContext,
+): Promise<void> {
+  const query = args[0];
+
+  if (!query) {
+    p.log.error(pc.red("Please provide a search query"));
+    p.log.info(pc.dim("Usage: ferriqa plugin search <query>"));
+    return;
+  }
+
+  const marketplace = new PluginMarketplace();
+  await searchPlugins(query, marketplace);
+}
+
+/**
+ * Featured plugins command
+ */
+async function featuredCommand(marketplace: PluginMarketplace): Promise<void> {
+  const spinner = p.spinner();
+
+  spinner.start(pc.dim("Loading featured plugins..."));
+
+  try {
+    const plugins = await marketplace.getFeatured();
+
+    spinner.stop(pc.green(`✓ Found ${plugins.length} featured plugins`));
+
+    if (plugins.length === 0) {
+      // Fallback to builtin
+      p.log.info(pc.cyan("\nFeatured Plugins:"));
+      for (const plugin of BUILTIN_PLUGINS.slice(0, 5)) {
+        p.log.info(formatPluginInfo(plugin));
+      }
+    } else {
+      p.log.info("");
+      for (const plugin of plugins) {
+        p.log.info(formatPluginInfo(plugin));
+      }
+    }
+  } catch {
+    spinner.stop(pc.red("✗ Failed to load featured plugins"));
+  }
+}
+
+/**
+ * Tags command - List available tags
+ */
+async function tagsCommand(marketplace: PluginMarketplace): Promise<void> {
+  const spinner = p.spinner();
+
+  spinner.start(pc.dim("Loading tags..."));
+
+  try {
+    const tags = await marketplace.getTags();
+
+    spinner.stop(pc.green(`✓ Found ${tags.length} tags`));
+
+    if (tags.length === 0) {
+      // Fallback to builtin tags
+      const builtinTags = [
+        "seo",
+        "analytics",
+        "search",
+        "i18n",
+        "media",
+        "backup",
+        "webhooks",
+        "authentication",
+        "caching",
+      ];
+      p.log.info(pc.cyan("\nAvailable Tags:"));
+      p.log.info(builtinTags.map((t) => pc.cyan(`#${t}`)).join("  "));
+    } else {
+      p.log.info(pc.cyan("\nAvailable Tags:"));
+      p.log.info(tags.map((t) => pc.cyan(`#${t}`)).join("  "));
+    }
+
+    p.log.info(pc.dim("\nSearch by tag: ferriqa plugin market search <tag>"));
+  } catch {
+    spinner.stop(pc.red("✗ Failed to load tags"));
+  }
+}
+
+/**
+ * Show marketplace help
+ */
+function showMarketHelp(): void {
+  console.log(`
+${pc.bold("Plugin Marketplace Commands:")}
+
+  ferriqa plugin market search <query>    Search plugins by name or keyword
+  ferriqa plugin market featured          Show featured plugins
+  ferriqa plugin market tags              List available tags
+  ferriqa plugin search <query>           Quick search alias
+
+${pc.bold("Examples:")}
+  ferriqa plugin market search seo
+  ferriqa plugin market featured
+  ferriqa plugin search analytics
+`);
 }

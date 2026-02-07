@@ -91,6 +91,31 @@ export type { PaginatedResult as WebhookPaginatedResult } from "./webhooks/types
 // for production use vs testing. Testing utilities are NOT exported from the main
 // package to reduce bundle size and maintain clear separation of concerns.
 
+// Configuration System
+export {
+  defineConfig,
+  validateConfig,
+  loadConfig,
+  mergeConfigs,
+  FerriqaConfigSchema,
+  ServerConfigSchema,
+  DatabaseConfigSchema,
+  AuthConfigSchema,
+  MediaConfigSchema,
+  FeaturesConfigSchema,
+  LogConfigSchema,
+  PluginReferenceSchema,
+  type FerriqaConfig,
+  type ServerConfig,
+  type DatabaseConfig,
+  type AuthConfig,
+  type MediaConfig,
+  type FeaturesConfig,
+  type LogConfig,
+  type PluginReference,
+  type ConfigValidationResult,
+} from "./config/index.ts";
+
 // Re-export everything from runtime for convenience
 // NOTE: These are NOT redundant with lines 8-28 above.
 // Lines 8-15 and 18-28 export specific named exports (types and functions)

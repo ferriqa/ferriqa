@@ -1,0 +1,118 @@
+#compdef ferriqa
+
+# ferriqa zsh completion
+
+_ferriqa() {
+    local -a commands
+    commands=(
+        'init:Create a new Ferriqa project'
+        'dev:Start development server'
+        'db:Database operations'
+        'blueprint:Blueprint management'
+        'plugin:Plugin management'
+        'help:Show help'
+        'version:Show version'
+    )
+
+    local -a plugin_commands
+    plugin_commands=(
+        'list:List installed plugins'
+        'add:Install a plugin'
+        'remove:Uninstall a plugin'
+        'create:Create custom plugin'
+        'market:Browse marketplace'
+        'search:Search plugins'
+    )
+
+    local -a db_commands
+    db_commands=(
+        'migrate:Run migrations'
+        'rollback:Rollback migrations'
+        'seed:Seed database'
+    )
+
+    local -a blueprint_commands
+    blueprint_commands=(
+        'list:List blueprints'
+        'create:Create blueprint'
+        'delete:Delete blueprint'
+        'export:Export blueprints'
+        'import:Import blueprints'
+    )
+
+    local -a market_commands
+    market_commands=(
+        'search:Search marketplace'
+        'featured:Show featured'
+        'tags:List tags'
+    )
+
+    local -a plugins
+    plugins=(
+        'seo:SEO optimization'
+        'localization:Multi-language support'
+        'analytics:Analytics tracking'
+        'search:Full-text search'
+        'backup:Backup automation'
+        'webp-converter:Image optimization'
+        'webhook-notifier:Webhook notifications'
+    )
+
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '(-v --verbose)'{-v,--verbose}'[Enable verbose logging]' \
+        '(-V --version)'{-V,--version}'[Show version]' \
+        '(-c --config)'{-c,--config}'[Config file path]:file:_files' \
+        '1: :->command' \
+        '*:: :->args'
+
+    case $state in
+        command)
+            _describe 'command' commands
+            ;;
+        args)
+            case ${words[2]} in
+                init)
+                    _arguments \
+                        '--help[Show help]'
+                    ;;
+                dev)
+                    _arguments \
+                        '--port[Server port]' \
+                        '--host[Server host]' \
+                        '--help[Show help]'
+                    ;;
+                db)
+                    _describe 'db command' db_commands
+                    case ${words[3]} in
+                        migrate|rollback|seed)
+                            _arguments '--help[Show help]'
+                            ;;
+                    esac
+                    ;;
+                blueprint)
+                    _describe 'blueprint command' blueprint_commands
+                    ;;
+                plugin)
+                    _describe 'plugin command' plugin_commands
+                    case ${words[3]} in
+                        add|remove)
+                            _describe 'plugin' plugins
+                            ;;
+                        market|marketplace)
+                            _describe 'market command' market_commands
+                            ;;
+                        search)
+                            # No completion for search
+                            ;;
+                    esac
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_ferriqa "$@"
