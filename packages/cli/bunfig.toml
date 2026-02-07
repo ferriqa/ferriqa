@@ -1,0 +1,16 @@
+[test]
+# Test configuration for Bun
+preload = ["./tests/setup.ts"]
+
+# Test pattern
+include = ["tests/**/*.test.ts"]
+
+# Coverage configuration
+coverage = true
+coverageThreshold = 0.8
+
+# Test timeout (milliseconds)
+timeout = 30000
+
+# Verbose output
+verbose = true
