@@ -5,7 +5,10 @@
     <meta charset="utf-8" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="@/preline/dist/preline.js"></script>
+    <!-- REVIEW NOTE: CDN used temporarily. TODO: Replace with local bundle from node_modules/preline 
+         for production to avoid CSP issues and network dependency.
+         Current: CDN provides faster dev setup but introduces external dependency -->
+    <script src="https://cdn.jsdelivr.net/npm/preline@4.0.1/dist/preline.min.js"></script>
     %sveltekit.head%
   </head>
 
