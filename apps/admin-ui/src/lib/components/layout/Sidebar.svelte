@@ -9,7 +9,7 @@
     icon: string;
   }
 
-  const currentLang = $derived(page.params.lang ?? 'en');
+  const currentLang = $derived((page.params as Record<string, string>).lang ?? 'en');
 
   function localizePath(path: string): string {
     return i18n.resolveRoute(path, currentLang);

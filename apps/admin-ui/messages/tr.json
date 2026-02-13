@@ -92,6 +92,18 @@
   "content_select_blueprint": "Şablon Seç",
   "content_tab_content": "İçerik",
   "content_tab_settings": "Ayarlar",
+  "content_tab_versions": "Sürümler",
+
+  "versionHistory_title": "Sürüm Geçmişi",
+  "versionHistory_noVersions": "Sürüm bulunamadı",
+  "versionHistory_version": "Sürüm",
+  "versionHistory_current": "Güncel",
+  "versionHistory_rollback": "Geri Al",
+  "versionHistory_confirmRollback": "Geri Almayı Onayla",
+  "versionHistory_confirmRollbackMessage": "{versionNumber}. sürüme geri dönmek istediğinize emin misiniz? Mevcut durumu korumak için yeni bir sürüm oluşturulacaktır.",
+  "versionHistory_rollbackSuccess": "İçerik başarıyla geri alındı",
+  "versionHistory_rollbackError": "İçerik geri alınamadı",
+
   "common_clear": "Temizle",
   "common_error": "Hata",
   "common_retry": "Tekrar dene",

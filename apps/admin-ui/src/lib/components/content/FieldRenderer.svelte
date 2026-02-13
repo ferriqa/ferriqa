@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { FieldDefinition } from "../blueprint/types";
-  import type { Component } from "svelte";
   import TextField from "./TextField.svelte";
   import TextAreaField from "./TextAreaField.svelte";
   import NumberField from "./NumberField.svelte";
@@ -23,8 +22,9 @@
     onchange 
   }: Props = $props();
 
-  // Field component mapping
-  const fieldComponents: Record<string, Component> = {
+  // Field component mapping - using type assertion to avoid complex generic issues
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fieldComponents: Record<string, any> = {
     text: TextField,
     textarea: TextAreaField,
     email: TextField,

@@ -70,10 +70,18 @@ export interface ContentListResponse {
   meta?: PaginationMeta;
 }
 
+// REVIEW NOTE (2026-02-13): ContentVersion type verified against backend API
+// Backend (packages/core/src/content/service.ts:624-631) returns:
+// - id: string (UUID)
+// - versionNumber: number
+// - createdBy?: string
+// - changeSummary?: string
+// - createdAt: Date (serialized as string in API response)
 export interface ContentVersion {
-  id: number;
-  contentId: string;
-  data: Record<string, unknown>;
+  id: string;
+  versionNumber: number;
+  contentId?: string;
+  data?: Record<string, unknown>;
   createdAt: string;
   createdBy?: string;
   changeSummary?: string;
@@ -81,6 +89,12 @@ export interface ContentVersion {
 
 export interface ContentVersionResponse {
   success: boolean;
-  data?: ContentVersion[];
+  data?: Array<{
+    id: string;
+    versionNumber: number;
+    createdBy?: string;
+    changeSummary?: string;
+    createdAt: string;
+  }>;
   error?: string;
 }

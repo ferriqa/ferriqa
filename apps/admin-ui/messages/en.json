@@ -92,6 +92,18 @@
   "content_select_blueprint": "Select Blueprint",
   "content_tab_content": "Content",
   "content_tab_settings": "Settings",
+  "content_tab_versions": "Versions",
+
+  "versionHistory_title": "Version History",
+  "versionHistory_noVersions": "No versions found",
+  "versionHistory_version": "Version",
+  "versionHistory_current": "Current",
+  "versionHistory_rollback": "Rollback",
+  "versionHistory_confirmRollback": "Confirm Rollback",
+  "versionHistory_confirmRollbackMessage": "Are you sure you want to rollback to version {versionNumber}? A new version will be created to preserve the current state.",
+  "versionHistory_rollbackSuccess": "Content rolled back successfully",
+  "versionHistory_rollbackError": "Failed to rollback content",
+
   "common_clear": "Clear",
   "common_error": "Error",
   "common_retry": "Try again",

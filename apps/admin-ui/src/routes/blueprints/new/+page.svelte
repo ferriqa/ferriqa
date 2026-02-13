@@ -1,9 +1,7 @@
 <script lang="ts">
   import { BlueprintBuilder } from '$lib/components/blueprint/index.js';
 
-  import type { Blueprint } from '$lib/types.js';
-
-  async function handleSave(blueprint: Blueprint) {
+  async function handleSave(blueprint: import('$lib/components/blueprint/types.js').Blueprint) {
     // TODO: Save blueprint to API
     console.log('Saving blueprint:', blueprint);
     alert('Blueprint saved! (Check console)');

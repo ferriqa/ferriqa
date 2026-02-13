@@ -3,7 +3,7 @@
   import { page } from '$app/state';
   import * as m from '$lib/paraglide/messages.js';
 
-  let currentLang = $derived(page.params.lang ?? 'en');
+  let currentLang = $derived((page.params as Record<string, string>).lang ?? 'en');
 
   function switchLanguage(lang: string) {
     const canonicalPath = i18n.route(page.url.pathname);

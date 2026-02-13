@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { X, Upload, Loader2, File } from 'lucide-svelte';
+  import { X, Upload, Loader2, File as FileIcon } from 'lucide-svelte';
   import * as m from '$lib/paraglide/messages.js';
   import UploadDropZone from './UploadDropZone.svelte';
   import { uploadMultipleMedia, formatFileSize } from '$lib/services/mediaApi';
@@ -139,7 +139,7 @@
                         class="w-full h-full object-cover rounded-lg"
                       />
                     {:else}
-                      <File class="w-5 h-5 text-primary" />
+                      <FileIcon class="w-5 h-5 text-primary" />
                     {/if}
                   </div>
                   

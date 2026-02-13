@@ -317,16 +317,15 @@ export async function getContentVersions(
  */
 export async function rollbackContent(
   id: string,
-  versionId: number,
+  versionId: string,
 ): Promise<ContentApiResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/contents/${id}/rollback`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${API_BASE_URL}/contents/${id}/rollback/${versionId}`,
+      {
+        method: "POST",
       },
-      body: JSON.stringify({ versionId }),
-    });
+    );
 
     if (!response.ok) {
       const error = await response.json();

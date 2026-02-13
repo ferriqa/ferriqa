@@ -6,7 +6,7 @@
   import { getUser, updateUser } from "$lib/services/userApi";
   import type { User } from "$lib/types";
 
-  const userId = page.params.id;
+  const userId = (page.params as Record<string, string>).id;
 
   let user = $state<User | null>(null);
   let loading = $state(true);

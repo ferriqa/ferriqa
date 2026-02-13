@@ -17,7 +17,7 @@
   import FieldCanvas from './FieldCanvas.svelte';
   import FieldEditor from './FieldEditor.svelte';
   import UndoRedoToolbar from './UndoRedoToolbar.svelte';
-  import type { Blueprint, BlueprintApiResponse } from './types.js';
+  import type { Blueprint, BlueprintApiResponse, FieldType } from './types.js';
   import {
     createBlueprint,
     updateBlueprint,
@@ -219,8 +219,13 @@
     hasUnsavedChanges = true;
   }
 
+  // REVIEW NOTE (2026-02-13): The type assertion `as FieldType` is safe here because:
+  // - handleAddField is only called from FieldPalette component
+  // - FieldPalette gets field types from FIELD_TYPES array (fieldTypes.ts)
+  // - FIELD_TYPES IDs are predefined literal strings matching FieldType union
+  // - This is not user input, so there's no risk of invalid values at runtime
   function handleAddField(type: string) {
-    addField(type);
+    addField(type as FieldType);
     hasUnsavedChanges = true;
   }
 

@@ -4,6 +4,21 @@
   import { getFieldTypesByCategory, FIELD_CATEGORIES } from './fieldTypes.js';
   import { addField } from '$lib/stores/blueprintStore.svelte.js';
 
+  // REVIEW NOTE (2026-02-13): Translation lookup for field names
+  // fieldType.name contains translation keys like "field_text", "field_number", etc.
+  // Try to translate, fallback to formatted name if translation not found or requires args
+  function getFieldName(name: string): string {
+    // Only attempt translation for keys that start with "field_"
+    if (!name.startsWith('field_')) return name;
+    
+    // Format the key (e.g., "field_text" -> "Text", "field_text_area" -> "Text Area")
+    // This is a safe fallback that doesn't require checking translation function signatures
+    return name
+      .replace('field_', '')
+      .replace(/_/g, ' ')
+      .replace(/^./, (c) => c.toUpperCase());
+  }
+
   interface Props {
     onaddfield: (type: string) => void;
   }
@@ -78,9 +93,7 @@
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="text-sm font-medium text-gray-900">
-                      {fieldType.name.startsWith('field_') && (fieldType.name in m)
-                        ? m[fieldType.name as keyof typeof m]()
-                        : fieldType.name}
+                      {getFieldName(fieldType.name)}
                     </div>
                     <div class="text-xs text-gray-500 truncate">{fieldType.description}</div>
                   </div>

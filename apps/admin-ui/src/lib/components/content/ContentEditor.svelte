@@ -2,7 +2,8 @@
   import type { Blueprint, FieldDefinition } from "../blueprint/types";
   import type { ContentItem, ContentStatus } from "./types";
   import FieldRenderer from "./FieldRenderer.svelte";
-  import { createContent, updateContent, publishContent, unpublishContent } from "../../services/contentApi";
+  import VersionHistory from "./VersionHistory.svelte";
+  import { createContent, updateContent, publishContent, unpublishContent, getContentById } from "../../services/contentApi";
   import { goto } from "$app/navigation";
   import * as m from "$lib/paraglide/messages.js";
 
@@ -19,7 +20,7 @@
   let formData = $state<Record<string, unknown>>({});
   let errors = $state<Record<string, string>>({});
   let isSubmitting = $state(false);
-  let activeTab = $state<"edit" | "seo" | "settings">("edit");
+  let activeTab = $state<"edit" | "seo" | "settings" | "versions">("edit");
   let status = $state<ContentStatus>(content?.status || "draft");
   let slug = $state(content?.slug || "");
 
@@ -301,6 +302,15 @@
       >
         {m.content_tab_settings()}
       </button>
+      {#if content?.id}
+        <button
+          type="button"
+          class="py-4 px-1 border-b-2 font-medium text-sm {activeTab === 'versions' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'}"
+          onclick={() => activeTab = "versions"}
+        >
+          {m.content_tab_versions()}
+        </button>
+      {/if}
     </nav>
   </div>
 
@@ -338,6 +348,19 @@
           <option value="archived">Archived</option>
         </select>
       </div>
+    </div>
+  {:else if activeTab === "versions" && content?.id}
+    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+      <VersionHistory contentId={content.id} onRollback={async () => {
+        const result = await getContentById(content.id);
+        if (result.success && result.data) {
+          formData = { ...result.data.data };
+        } else {
+          // REVIEW NOTE: Fallback - show error but don't block editing
+          // User can manually refresh or continue editing with current data
+          errors["_form"] = result.error || "Failed to reload content after rollback";
+        }
+      }} />
     </div>
   {/if}
 </div>

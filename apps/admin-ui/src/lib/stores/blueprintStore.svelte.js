@@ -217,7 +217,9 @@ export function reorderFields(fields) {
  */
 export function setSetting(key, value) {
   travels.setState((draft) => {
-    draft.settings[key] = value;
+    /** @type {Record<string, unknown>} */
+    const settings = draft.settings;
+    settings[key] = value;
   });
   archive();
 }
@@ -242,10 +244,23 @@ export function loadBlueprint(blueprint) {
     draft.slug = blueprint.slug || "";
     draft.description = blueprint.description || "";
     draft.fields = blueprint.fields || [];
-    draft.settings = {
-      ...draft.settings,
-      ...blueprint.settings,
-    };
+    // Merge settings while preserving types
+    if (blueprint.settings) {
+      if (blueprint.settings.draftMode !== undefined) {
+        draft.settings.draftMode = blueprint.settings.draftMode;
+      }
+      if (blueprint.settings.versioning !== undefined) {
+        draft.settings.versioning = blueprint.settings.versioning;
+      }
+      if (
+        blueprint.settings.defaultStatus === "draft" ||
+        blueprint.settings.defaultStatus === "published"
+      ) {
+        // TypeScript doesn't like the type widening, so we just assign with validation
+        // @ts-ignore - typescript incorrectly widens the type here
+        draft.settings.defaultStatus = blueprint.settings.defaultStatus;
+      }
+    }
     draft.selectedFieldId = null;
   });
   isSlugManuallyEdited = true;
