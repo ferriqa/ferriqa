@@ -78,6 +78,7 @@ export interface FieldUIOptions {
   defaultValue?: unknown;
   width?: "half" | "full";
   group?: string;
+  rows?: number;
 }
 
 export interface FieldValidation {
