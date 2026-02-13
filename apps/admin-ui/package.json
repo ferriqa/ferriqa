@@ -21,6 +21,14 @@
     "test:e2e:webkit": "playwright test --project=webkit"
   },
   "dependencies": {
+    "@tiptap/core": "^3.19.0",
+    "@tiptap/extension-image": "^3.19.0",
+    "@tiptap/extension-link": "^3.19.0",
+    "@tiptap/extension-placeholder": "^3.19.0",
+    "@tiptap/extension-text-align": "^3.19.0",
+    "@tiptap/extension-underline": "^3.19.0",
+    "@tiptap/pm": "^3.19.0",
+    "@tiptap/starter-kit": "^3.19.0",
     "lucide-svelte": "^0.563.0",
     "mutative": "^1.0.0",
     "travels": "^1.0.0"

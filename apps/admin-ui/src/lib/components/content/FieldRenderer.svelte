@@ -7,6 +7,7 @@
   import DateField from "./DateField.svelte";
   import SelectField from "./SelectField.svelte";
   import MultiSelectField from "./MultiSelectField.svelte";
+  import RichTextField from "./RichTextField.svelte";
 
   interface Props {
     field: FieldDefinition;
@@ -36,6 +37,7 @@
     datetime: DateField,
     select: SelectField,
     multiselect: MultiSelectField,
+    richtext: RichTextField,
   };
 
   // Get the appropriate component for this field type
@@ -64,6 +66,8 @@
         return 0;
       case "multiselect":
         return [];
+      case "richtext":
+        return "";
       default:
         return "";
     }
