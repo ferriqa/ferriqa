@@ -9,7 +9,11 @@ test.describe("Dynamic Form Generator", () => {
   test("should render page with form elements", async ({ page }) => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for form elements to appear
+    await page.waitForSelector("input, textarea, select, button", {
+      timeout: 5000,
+    });
 
     // Check for any form elements - with mocks, form should render
     const hasFormElements = await page
@@ -23,33 +27,21 @@ test.describe("Dynamic Form Generator", () => {
   test("should have interactive elements", async ({ page }) => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for buttons to appear
+    await page.waitForSelector("button", { timeout: 5000 });
 
     // Check for buttons - save, cancel, publish, etc.
     const buttonCount = await page.locator("button").count();
     expect(buttonCount).toBeGreaterThan(0);
-
-    // Check for specific action buttons
-    const hasSaveOrCreate = await page
-      .getByRole("button", { name: /Save|Create|Publish/i })
-      .first()
-      .isVisible()
-      .catch(() => false);
-
-    const hasCancel = await page
-      .getByRole("button", { name: /Cancel/i })
-      .first()
-      .isVisible()
-      .catch(() => false);
-
-    // Just check that we have buttons, don't require specific ones
-    expect(buttonCount > 0 || hasSaveOrCreate || hasCancel).toBeTruthy();
   });
 
   test("should have proper page structure", async ({ page }) => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for content to load
+    await page.waitForSelector("h1, button, input", { timeout: 5000 });
 
     // Page should have loaded (no 404)
     const notFound = await page
@@ -75,7 +67,9 @@ test.describe("Dynamic Form Generator", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for content
+    await page.waitForSelector("button, input, textarea", { timeout: 5000 });
 
     // Page should load without errors
     const hasError = await page
@@ -103,7 +97,9 @@ test.describe("Dynamic Form Generator", () => {
   test("should show form with all field types", async ({ page }) => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for form inputs
+    await page.waitForSelector("input, textarea, select", { timeout: 5000 });
 
     // Verify form is present
     const formContainer = await page
@@ -121,7 +117,9 @@ test.describe("Dynamic Form Generator", () => {
   test("should validate required fields", async ({ page }) => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for save button
+    await page.waitForSelector("button", { timeout: 5000 });
 
     // Try to save without filling required fields
     const saveButton = page
@@ -141,7 +139,11 @@ test.describe("Dynamic Form Generator", () => {
   test("should allow entering data in form fields", async ({ page }) => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000);
+
+    // Wait for form inputs
+    await page.waitForSelector('input[type="text"], textarea', {
+      timeout: 5000,
+    });
 
     // Find and fill text input (Title field)
     const titleInput = page.locator('input[type="text"]').first();

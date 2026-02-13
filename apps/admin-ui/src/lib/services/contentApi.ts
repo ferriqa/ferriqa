@@ -60,16 +60,11 @@ export async function getContents(
       };
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
     return {
       success: true,
-      data: data.items || data,
-      meta: data.meta || {
-        total: data.length,
-        page,
-        limit,
-        totalPages: Math.ceil(data.length / limit),
-      },
+      data: responseData.data,
+      meta: responseData.meta,
     };
   } catch (error) {
     return {
@@ -95,10 +90,10 @@ export async function getContentById(id: string): Promise<ContentApiResponse> {
       };
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
     return {
       success: true,
-      data,
+      data: responseData.data,
     };
   } catch (error) {
     return {
@@ -132,10 +127,10 @@ export async function createContent(
       };
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
     return {
       success: true,
-      data,
+      data: responseData.data,
     };
   } catch (error) {
     return {
@@ -171,10 +166,10 @@ export async function updateContent(
       };
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
     return {
       success: true,
-      data,
+      data: responseData.data,
     };
   } catch (error) {
     return {

@@ -98,10 +98,10 @@ export async function getBlueprint(id: string): Promise<BlueprintApiResponse> {
       };
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
     return {
       success: true,
-      data,
+      data: responseData.data,
     };
   } catch (error) {
     return {
@@ -132,11 +132,11 @@ export async function getBlueprints(
       };
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
     return {
       success: true,
-      data: data.items || data,
-      meta: data.meta,
+      data: responseData.data,
+      meta: responseData.meta,
     };
   } catch (error) {
     return {

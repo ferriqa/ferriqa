@@ -8,6 +8,7 @@ import { HTTPClient } from "./http.ts";
 import { ContentClient } from "./content.ts";
 import { BlueprintClient } from "./blueprint.ts";
 import { MediaClient } from "./media.ts";
+import { UserClient } from "./user.ts";
 import { AuthClient } from "../auth/index.ts";
 import type { SDKConfig, AuthTokens } from "../types/index.ts";
 
@@ -16,6 +17,7 @@ export class FerriqaClient {
   public auth: AuthClient;
   public blueprints: BlueprintClient;
   public media: MediaClient;
+  public users: UserClient;
   private contentClients: Map<string, ContentClient> = new Map();
 
   constructor(config: SDKConfig) {
@@ -23,6 +25,7 @@ export class FerriqaClient {
     this.auth = new AuthClient(this.http);
     this.blueprints = new BlueprintClient(this.http);
     this.media = new MediaClient(this.http);
+    this.users = new UserClient(this.http);
   }
 
   /**
@@ -85,6 +88,7 @@ export { AuthClient } from "../auth/index.ts";
 export { ContentClient } from "./content.ts";
 export { BlueprintClient } from "./blueprint.ts";
 export { MediaClient } from "./media.ts";
+export { UserClient } from "./user.ts";
 
 // Default export
 export default FerriqaClient;

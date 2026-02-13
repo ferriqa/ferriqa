@@ -11,8 +11,10 @@ test.describe("Content Editor", () => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
 
-    // Wait for the page to fully load with longer timeout
-    await page.waitForTimeout(2000);
+    // Wait for form to render with visible elements
+    await page.waitForSelector("button, input, textarea, select, h1", {
+      timeout: 5000,
+    });
 
     // Check for basic page structure - form should exist now with mocks
     const headingExists = await page
@@ -38,8 +40,10 @@ test.describe("Content Editor", () => {
     await page.goto("/content/content-1/edit");
     await page.waitForLoadState("networkidle");
 
-    // Wait for the page to fully load
-    await page.waitForTimeout(2000);
+    // Wait for form to render with visible elements
+    await page.waitForSelector("button, input, textarea, select, h1", {
+      timeout: 5000,
+    });
 
     // Check for basic page structure
     const headingExists = await page
@@ -65,7 +69,9 @@ test.describe("Content Editor", () => {
     await page.waitForLoadState("networkidle");
 
     // Wait for form to load
-    await page.waitForTimeout(2000);
+    await page.waitForSelector("button, input, textarea, select", {
+      timeout: 5000,
+    });
 
     // Look for common UI elements (tabs, buttons, forms)
     const hasTabs = await page
@@ -89,7 +95,9 @@ test.describe("Content Editor", () => {
     await page.waitForLoadState("networkidle");
 
     // Wait for the page to fully load
-    await page.waitForTimeout(2000);
+    await page.waitForSelector("button, input, textarea, select", {
+      timeout: 5000,
+    });
 
     // Look for cancel/back button - use first() to avoid strict mode issues
     const cancelButton = page
@@ -109,8 +117,8 @@ test.describe("Content Editor", () => {
     await page.goto("/content/new?blueprint=test-blueprint");
     await page.waitForLoadState("networkidle");
 
-    // Wait longer for form to load with mocked data
-    await page.waitForTimeout(2000);
+    // Wait for form inputs to be visible
+    await page.waitForSelector("input, textarea, select", { timeout: 5000 });
 
     // Check for form inputs - the blueprint has text, textarea, number, select, etc.
     const hasInputs = await page
@@ -132,7 +140,7 @@ test.describe("Content Editor", () => {
     await page.waitForLoadState("networkidle");
 
     // Wait for form to render
-    await page.waitForTimeout(2000);
+    await page.waitForSelector("input, textarea, select", { timeout: 5000 });
 
     // Check for specific field types based on test blueprint
     const textInput = page.locator('input[type="text"]').first();

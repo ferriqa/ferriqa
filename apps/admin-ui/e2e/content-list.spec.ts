@@ -6,7 +6,11 @@ test.describe("Content List View", () => {
     await setupApiMocks(page);
     await page.goto("/content");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
+
+    // Wait for content to load
+    await page.waitForSelector("button, select, table, [role='heading']", {
+      timeout: 5000,
+    });
   });
 
   test("should display content list page", async ({ page }) => {
@@ -77,7 +81,11 @@ test.describe("Content List View", () => {
 
     // Wait for navigation
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
+
+    // Wait for any content to load
+    await page.waitForSelector("button, h1, .modal, [role='dialog']", {
+      timeout: 5000,
+    });
 
     // Should be on create page or see blueprint selector modal
     const currentUrl = page.url();
@@ -113,7 +121,9 @@ test.describe("Content List View", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.reload();
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000);
+
+    // Wait for content
+    await page.waitForSelector("button, [role='heading']", { timeout: 5000 });
 
     // Page should still load - use first() to avoid strict mode issues
     const heading = page.getByRole("heading", { name: "Content" }).first();
@@ -129,6 +139,9 @@ test.describe("Content List View", () => {
 
   test("should display content items from mock data", async ({ page }) => {
     // With mocks, we should see our test content items
+    // Wait a bit for data to load
+    await page.waitForTimeout(1000);
+
     const pageText = await page.locator("body").innerText();
 
     // Check if at least one of our test items is visible

@@ -30,3 +30,14 @@ export interface BlueprintSummary {
 export interface PageData {
   blueprints: BlueprintSummary[];
 }
+
+// User types
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: "admin" | "editor" | "viewer";
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
