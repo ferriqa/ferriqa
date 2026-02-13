@@ -8,6 +8,7 @@
   import SelectField from "./SelectField.svelte";
   import MultiSelectField from "./MultiSelectField.svelte";
   import RichTextField from "./RichTextField.svelte";
+  import RelationField from "./RelationField.svelte";
 
   interface Props {
     field: FieldDefinition;
@@ -38,6 +39,7 @@
     select: SelectField,
     multiselect: MultiSelectField,
     richtext: RichTextField,
+    relation: RelationField,
   };
 
   // Get the appropriate component for this field type
@@ -68,6 +70,8 @@
         return [];
       case "richtext":
         return "";
+      case "relation":
+        return null;
       default:
         return "";
     }

@@ -41,3 +41,64 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+// Webhook types
+export interface Webhook {
+  id: number;
+  name: string;
+  url: string;
+  events: string[];
+  headers?: Record<string, string>;
+  secret?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface WebhookDelivery {
+  id: string;
+  webhookId: number;
+  event: string;
+  statusCode?: number;
+  success: boolean;
+  attempt: number;
+  response?: string;
+  duration?: number;
+  error?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface CreateWebhookRequest {
+  name: string;
+  url: string;
+  events: string[];
+  headers?: Record<string, string>;
+  secret?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateWebhookRequest {
+  name?: string;
+  url?: string;
+  events?: string[];
+  headers?: Record<string, string>;
+  secret?: string | null;
+  isActive?: boolean;
+}
+
+// Available webhook events
+export const WEBHOOK_EVENTS = [
+  "content.created",
+  "content.updated",
+  "content.deleted",
+  "content.published",
+  "content.unpublished",
+  "blueprint.created",
+  "blueprint.updated",
+  "blueprint.deleted",
+  "media.uploaded",
+  "media.deleted",
+] as const;
+
+export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number];
