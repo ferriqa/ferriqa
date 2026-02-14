@@ -3,7 +3,7 @@
   import type { BlueprintSummary, PageData } from '$lib/types.js';
 
   let { data }: { data: PageData } = $props();
-  let blueprints = $state<BlueprintSummary[]>(data.blueprints || []);
+  let blueprints = $derived<BlueprintSummary[]>(data.blueprints || []);
 
   let searchQuery = $state('');
   let sortBy = $state<'name' | 'updated' | 'content'>('updated');

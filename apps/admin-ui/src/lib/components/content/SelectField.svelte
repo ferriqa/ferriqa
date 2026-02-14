@@ -15,7 +15,7 @@
     onchange 
   }: Props = $props();
 
-  const choices = field.options?.choices || [];
+  const choices = $derived(field.options?.choices || []);
 </script>
 
 <div class="space-y-2">

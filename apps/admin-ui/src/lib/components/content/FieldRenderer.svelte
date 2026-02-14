@@ -43,7 +43,7 @@
   };
 
   // Get the appropriate component for this field type
-  const FieldComponent = fieldComponents[field.type];
+  const FieldComponent = $derived(fieldComponents[field.type]);
 
   // Handle field value changes
   function handleChange(newValue: unknown) {

@@ -15,8 +15,8 @@
 
   let { field, value = null, error, onchange }: Props = $props();
 
-  const relation = field.options?.relation;
-  const isMulti = relation?.type === 'one-to-many' || relation?.type === 'many-to-many';
+  const relation = $derived(field.options?.relation);
+  const isMulti = $derived(relation?.type === 'one-to-many' || relation?.type === 'many-to-many');
 
   let pickerOpen = $state(false);
   let selectedItems = $state<ContentItem[]>([]);
@@ -85,7 +85,7 @@
 </script>
 
 <div class="space-y-3">
-  <label class="block text-sm font-medium text-foreground">
+  <span class="block text-sm font-medium text-foreground">
     {field.name}
     {#if field.required}
       <span class="text-red-500">*</span>
@@ -95,7 +95,7 @@
         {field.description}
       </span>
     {/if}
-  </label>
+  </span>
 
   <!-- Selected Items Preview -->
   <div class="border border-card-line rounded-xl p-4 space-y-3 bg-card">
@@ -168,10 +168,12 @@
     aria-modal="true"
   >
     <!-- Backdrop -->
-    <div
-      class="fixed inset-0 bg-gray-900/50 transition-opacity"
+    <button
+      type="button"
+      class="fixed inset-0 bg-gray-900/50 transition-opacity cursor-default"
       onclick={() => pickerOpen = false}
-    ></div>
+      aria-label="Close modal"
+    ></button>
 
     <!-- Modal -->
     <div class="flex min-h-full items-center justify-center p-4">

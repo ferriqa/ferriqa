@@ -188,7 +188,12 @@
 {#if showCreateModal}
   <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
     <div class="flex min-h-full items-center justify-center p-4">
-      <div class="fixed inset-0 bg-gray-900/50 transition-opacity" onclick={() => showCreateModal = false}></div>
+      <button
+        type="button"
+        class="fixed inset-0 bg-gray-900/50 transition-opacity cursor-default"
+        onclick={() => showCreateModal = false}
+        aria-label="Close modal"
+      ></button>
       <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           {m.content_select_blueprint()}

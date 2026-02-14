@@ -15,9 +15,9 @@
     onchange 
   }: Props = $props();
 
-  const minDate = field.options?.minDate;
-  const maxDate = field.options?.maxDate;
-  const isDateTime = field.type === "datetime";
+  const minDate = $derived(field.options?.minDate);
+  const maxDate = $derived(field.options?.maxDate);
+  const isDateTime = $derived(field.type === "datetime");
 </script>
 
 <div class="space-y-2">

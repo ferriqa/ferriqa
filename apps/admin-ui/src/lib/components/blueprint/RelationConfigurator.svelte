@@ -12,11 +12,11 @@
 
   // Local state for relation configuration
   let relationConfig = $state<RelationConfig>({
-    blueprintId: field.options?.relation?.blueprintId || '',
-    type: field.options?.relation?.type || 'one-to-many',
-    displayField: field.options?.relation?.displayField || '',
-    filter: field.options?.relation?.filter || {},
-    sort: field.options?.relation?.sort || { field: '', direction: 'asc' },
+    blueprintId: '',
+    type: 'one-to-many',
+    displayField: '',
+    filter: {},
+    sort: { field: '', direction: 'asc' },
   });
 
   // Watch for field changes and update local state
@@ -92,11 +92,12 @@
 
   <!-- Target Blueprint Selection -->
   <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">
+    <label for="target-blueprint" class="block text-sm font-medium text-gray-700 mb-1">
       Target Blueprint
       <span class="text-red-500">*</span>
     </label>
     <select
+      id="target-blueprint"
       class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
       value={relationConfig.blueprintId}
       onchange={(e) => handleBlueprintChange(e.currentTarget.value)}
@@ -115,9 +116,9 @@
 
   <!-- Relation Type -->
   <div>
-    <label class="block text-sm font-medium text-gray-700 mb-2">
+    <span class="block text-sm font-medium text-gray-700 mb-2">
       Relation Type
-    </label>
+    </span>
     <div class="space-y-2">
       <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
         <input

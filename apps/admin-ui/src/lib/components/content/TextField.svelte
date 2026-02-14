@@ -17,9 +17,9 @@
     onchange 
   }: Props = $props();
 
-  const inputType = field.type === "email" ? "email" : field.type === "url" ? "url" : "text";
-  const maxLength = field.options?.maxLength;
-  const minLength = field.options?.minLength;
+  const inputType = $derived(field.type === "email" ? "email" : field.type === "url" ? "url" : "text");
+  const maxLength = $derived(field.options?.maxLength);
+  const minLength = $derived(field.options?.minLength);
   
   let charCount = $derived(String(value).length);
 </script>

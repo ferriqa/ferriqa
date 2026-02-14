@@ -17,9 +17,9 @@
     onchange 
   }: Props = $props();
 
-  const maxLength = field.options?.maxLength;
-  const minLength = field.options?.minLength;
-  const rows = field.ui?.rows || 4;
+  const maxLength = $derived(field.options?.maxLength);
+  const minLength = $derived(field.options?.minLength);
+  const rows = $derived(field.ui?.rows || 4);
   
   let charCount = $derived(String(value).length);
 </script>

@@ -17,9 +17,9 @@
     onchange 
   }: Props = $props();
 
-  const min = field.options?.min;
-  const max = field.options?.max;
-  const step = field.options?.step || 1;
+  const min = $derived(field.options?.min);
+  const max = $derived(field.options?.max);
+  const step = $derived(field.options?.step || 1);
 </script>
 
 <div class="space-y-2">

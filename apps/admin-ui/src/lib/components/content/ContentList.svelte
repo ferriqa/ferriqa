@@ -39,10 +39,16 @@
     onBulkDelete,
   }: Props = $props();
 
-  let searchQuery = $state(filters.search || "");
-  let selectedBlueprint = $state(filters.blueprintId || "");
-  let selectedStatus = $state(filters.status || "");
+  let searchQuery = $state("");
+  let selectedBlueprint = $state("");
+  let selectedStatus = $state("");
   let selectedIds = $state<Set<string>>(new Set());
+
+  $effect(() => {
+    searchQuery = filters.search || "";
+    selectedBlueprint = filters.blueprintId || "";
+    selectedStatus = filters.status || "";
+  });
 
   const totalPages = $derived(Math.ceil(total / limit));
   const hasSelection = $derived(selectedIds.size > 0);

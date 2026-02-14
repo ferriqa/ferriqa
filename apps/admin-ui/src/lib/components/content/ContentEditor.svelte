@@ -21,18 +21,18 @@
   let errors = $state<Record<string, string>>({});
   let isSubmitting = $state(false);
   let activeTab = $state<"edit" | "seo" | "settings" | "versions">("edit");
-  let status = $state<ContentStatus>(content?.status || "draft");
-  let slug = $state(content?.slug || "");
+  let status = $state<ContentStatus>("draft");
+  let slug = $state("");
 
-  // Initialize form data from existing content
+  // Initialize form data from existing content and keep in sync
   $effect(() => {
     if (content?.data) {
       formData = { ...content.data };
     }
-    if (content?.status) {
+    if (content?.status !== undefined) {
       status = content.status;
     }
-    if (content?.slug) {
+    if (content?.slug !== undefined) {
       slug = content.slug;
     }
   });

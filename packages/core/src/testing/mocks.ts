@@ -175,6 +175,16 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
 
   private mockSelect<T>(sql: string, params?: unknown[]): QueryResult<T> {
     // Extract table name from simple SELECT statements
+    const lowerSql = sql.toLowerCase();
+
+    // Handle COUNT(*) queries specially
+    if (lowerSql.includes("count(*)")) {
+      const match = sql.match(/from\s+(\w+)/i);
+      const tableName = match ? match[1] : "default";
+      const tableData = this.data.get(tableName) || [];
+      return { rows: [{ total: tableData.length } as T], rowCount: 1 };
+    }
+
     const match = sql.match(/from\s+(\w+)/i);
     const tableName = match ? match[1] : "default";
 

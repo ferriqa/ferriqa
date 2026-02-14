@@ -34,7 +34,7 @@
   let total = $state(0);
 
   // Local state for selected IDs to avoid prop mutation
-  let localSelectedIds = $state<string[]>([...selectedIds]);
+  let localSelectedIds = $state<string[]>([]);
   let selectedItemsMap = $state<Map<string, ContentItem>>(new Map());
   
   // Sync localSelectedIds and selectedItemsMap when selectedIds prop changes

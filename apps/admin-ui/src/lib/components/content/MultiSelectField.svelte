@@ -15,9 +15,9 @@
     onchange 
   }: Props = $props();
 
-  const choices = field.options?.choices || [];
-  const minItems = field.validation?.minItems;
-  const maxItems = field.validation?.maxItems;
+  const choices = $derived(field.options?.choices || []);
+  const minItems = $derived(field.validation?.minItems);
+  const maxItems = $derived(field.validation?.maxItems);
 
   function toggleChoice(choice: string) {
     const index = value.indexOf(choice);
@@ -33,12 +33,12 @@
 </script>
 
 <div class="space-y-2">
-  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+  <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">
     {field.name}
     {#if field.required}
       <span class="text-red-500 ml-0.5">*</span>
     {/if}
-  </label>
+  </span>
   
   {#if field.description}
     <p class="text-xs text-gray-500 dark:text-gray-400">{field.description}</p>
