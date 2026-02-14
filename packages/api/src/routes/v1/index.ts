@@ -5,6 +5,7 @@ import {
   filterFieldLevels,
   filterBlueprintFieldLevels,
 } from "../../middleware/field-permissions";
+import { userListHandler, userGetHandler } from "../../handlers/auth";
 
 export const v1Routes = new Hono();
 
@@ -218,6 +219,18 @@ export function setupAuthRoutes(
   authRefresh: any,
 ) {
   v1Routes.get("/users/me", authMiddleware(), userMe);
+  v1Routes.get(
+    "/users",
+    authMiddleware(),
+    requirePermission("user:read"),
+    userListHandler(),
+  );
+  v1Routes.get(
+    "/users/:id",
+    authMiddleware(),
+    requirePermission("user:read"),
+    userGetHandler(),
+  );
   v1Routes.post("/auth/login", authLogin);
   v1Routes.post("/auth/logout", authLogout);
   v1Routes.post("/auth/refresh", authRefresh);
