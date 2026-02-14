@@ -21,6 +21,7 @@
     Heading2,
     Heading3,
     Minus,
+    FileText,
   } from "lucide-svelte";
 
   interface Props {
@@ -102,6 +103,46 @@
       return editor?.isActive(name) ?? false;
     }
     return editor?.isActive(name, attributes) ?? false;
+  }
+
+  function copyAsMarkdown() {
+    if (!editor) return;
+    const html = editor.getHTML();
+    const markdown = convertToMarkdown(html);
+    navigator.clipboard.writeText(markdown);
+  }
+
+  function convertToMarkdown(html: string): string {
+    let md = html
+      .replace(/<h1[^>]*>(.*?)<\/h1>/gi, "# $1\n\n")
+      .replace(/<h2[^>]*>(.*?)<\/h2>/gi, "## $1\n\n")
+      .replace(/<h3[^>]*>(.*?)<\/h3>/gi, "### $1\n\n")
+      .replace(/<strong[^>]*>(.*?)<\/strong>/gi, "**$1**")
+      .replace(/<b[^>]*>(.*?)<\/b>/gi, "**$1**")
+      .replace(/<em[^>]*>(.*?)<\/em>/gi, "*$1*")
+      .replace(/<i[^>]*>(.*?)<\/i>/gi, "*$1*")
+      .replace(/<u[^>]*>(.*?)<\/u>/gi, "_$1_")
+      .replace(/<s[^>]*>(.*?)<\/s>/gi, "~~$1~~")
+      .replace(/<code[^>]*>(.*?)<\/code>/gi, "`$1`")
+      .replace(/<pre[^>]*>(.*?)<\/pre>/gi, "```\n$1\n```\n")
+      .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gi, "> $1\n\n")
+      .replace(/<li[^>]*>(.*?)<\/li>/gi, "- $1\n")
+      .replace(/<ul[^>]*>|<\/ul>/gi, "")
+      .replace(/<ol[^>]*>|<\/ol>/gi, "")
+      .replace(/<p[^>]*>(.*?)<\/p>/gi, "$1\n\n")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, "[$2]($1)")
+      .replace(/<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*\/?>/gi, "![$2]($1)")
+      .replace(/<img[^>]*src="([^"]*)"[^>]*\/?>/gi, "![]($1)")
+      .replace(/<hr\s*\/?>/gi, "\n---\n\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+    return md;
   }
 </script>
 
@@ -300,5 +341,15 @@
         <Image class="w-4 h-4" />
       </button>
     {/if}
+
+    <!-- Copy as Markdown -->
+    <button
+      type="button"
+      onclick={copyAsMarkdown}
+      class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+      title="Copy as Markdown"
+    >
+      <FileText class="w-4 h-4" />
+    </button>
   </div>
 {/if}

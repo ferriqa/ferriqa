@@ -79,6 +79,16 @@ export interface FieldUIOptions {
   width?: "half" | "full";
   group?: string;
   rows?: number;
+  conditional?: FieldConditional;
+}
+
+export interface FieldConditional {
+  when: string;
+  equals?: unknown;
+  notEquals?: unknown;
+  contains?: unknown;
+  isEmpty?: boolean;
+  isNotEmpty?: boolean;
 }
 
 export interface FieldValidation {

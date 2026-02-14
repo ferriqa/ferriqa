@@ -9,16 +9,25 @@
   import Image from "@tiptap/extension-image";
   import EditorToolbar from "./EditorToolbar.svelte";
   import type { FieldDefinition } from "../blueprint/types";
+  import { sanitizeHtml, stripHtml } from "$lib/utils/sanitize";
 
   interface Props {
     field: FieldDefinition;
     value?: string;
     error?: string;
+    sanitize?: boolean;
     oninput?: (e: Event) => void;
     onchange?: (e: Event) => void;
   }
 
-  let { field, value = $bindable(""), error, oninput, onchange }: Props = $props();
+  let { 
+    field, 
+    value = $bindable(""), 
+    error, 
+    sanitize = true,
+    oninput, 
+    onchange 
+  }: Props = $props();
 
   let editor: Editor | undefined = $state();
   let element: HTMLDivElement;
@@ -54,7 +63,13 @@
       ],
       content: value || "",
       onUpdate: ({ editor }) => {
-        value = editor.getHTML();
+        let html = editor.getHTML();
+        
+        if (sanitize) {
+          html = sanitizeHtml(html);
+        }
+        
+        value = html;
         oninput?.(new Event("input"));
         onchange?.(new Event("change"));
       },
@@ -79,6 +94,12 @@
       editor.chain().focus().setImage({ src: mediaUrl }).run();
     }
     mediaPickerOpen = false;
+  }
+
+  function convertToMarkdown(): string {
+    if (!editor) return "";
+    const html = editor.getHTML();
+    return stripHtml(html);
   }
 </script>
 

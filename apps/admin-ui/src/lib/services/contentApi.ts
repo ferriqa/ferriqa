@@ -398,3 +398,28 @@ export async function bulkPublishContents(
     errors,
   };
 }
+
+/**
+ * Bulk unpublish content items
+ */
+export async function bulkUnpublishContents(
+  ids: string[],
+): Promise<{ success: boolean; unpublished: number; errors: string[] }> {
+  const errors: string[] = [];
+  let unpublished = 0;
+
+  for (const id of ids) {
+    const result = await unpublishContent(id);
+    if (result.success) {
+      unpublished++;
+    } else {
+      errors.push(`Failed to unpublish content ${id}: ${result.error}`);
+    }
+  }
+
+  return {
+    success: errors.length === 0,
+    unpublished,
+    errors,
+  };
+}

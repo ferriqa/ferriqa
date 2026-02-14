@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as m from '$lib/paraglide/messages.js';
   import LanguageSwitcher from '$lib/components/ui/LanguageSwitcher.svelte';
+  import Breadcrumbs from '$lib/components/layout/Breadcrumbs.svelte';
   
   interface Props {
     user?: {
@@ -16,9 +17,9 @@
 </script>
 
 <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8">
-  <!-- Left side - Breadcrumb placeholder -->
+  <!-- Left side - Breadcrumbs -->
   <div class="flex items-center gap-4">
-    <h1 class="text-xl font-semibold text-gray-900">{m.app_name()}</h1>
+    <Breadcrumbs />
   </div>
   
   <!-- Right side - Actions -->

@@ -16,6 +16,9 @@
     onDelete: (content: ContentItem) => void;
     onPublish: (content: ContentItem) => void;
     onUnpublish: (content: ContentItem) => void;
+    onBulkPublish?: (ids: string[]) => void;
+    onBulkUnpublish?: (ids: string[]) => void;
+    onBulkDelete?: (ids: string[]) => void;
   }
 
   let {
@@ -31,13 +34,19 @@
     onDelete,
     onPublish,
     onUnpublish,
+    onBulkPublish,
+    onBulkUnpublish,
+    onBulkDelete,
   }: Props = $props();
 
   let searchQuery = $state(filters.search || "");
   let selectedBlueprint = $state(filters.blueprintId || "");
   let selectedStatus = $state(filters.status || "");
+  let selectedIds = $state<Set<string>>(new Set());
 
   const totalPages = $derived(Math.ceil(total / limit));
+  const hasSelection = $derived(selectedIds.size > 0);
+  const allSelected = $derived(contents.length > 0 && selectedIds.size === contents.length);
 
   function applyFilters() {
     onFilterChange({
@@ -93,6 +102,46 @@
       content.slug ||
       "Untitled"
     );
+  }
+
+  function toggleSelect(id: string) {
+    const newSet = new Set(selectedIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    selectedIds = newSet;
+  }
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      selectedIds = new Set();
+    } else {
+      selectedIds = new Set(contents.map(c => c.id));
+    }
+  }
+
+  function handleBulkPublish() {
+    if (onBulkPublish && selectedIds.size > 0) {
+      onBulkPublish(Array.from(selectedIds));
+    }
+  }
+
+  function handleBulkUnpublish() {
+    if (onBulkUnpublish && selectedIds.size > 0) {
+      onBulkUnpublish(Array.from(selectedIds));
+    }
+  }
+
+  function handleBulkDelete() {
+    if (onBulkDelete && selectedIds.size > 0) {
+      const count = selectedIds.size;
+      if (confirm(m.content_bulk_delete_confirm({ count }))) {
+        onBulkDelete(Array.from(selectedIds));
+        selectedIds = new Set();
+      }
+    }
   }
 </script>
 
@@ -155,6 +204,46 @@
     </p>
   </div>
 
+  <!-- Bulk Actions Toolbar -->
+  {#if hasSelection}
+    <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-blue-900 dark:text-blue-200">
+          {m.content_selected_count({ count: selectedIds.size })}
+        </span>
+        <div class="flex items-center gap-2">
+          {#if onBulkPublish}
+            <button
+              type="button"
+              onclick={handleBulkPublish}
+              class="px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
+            >
+              {m.content_bulk_publish()}
+            </button>
+          {/if}
+          {#if onBulkUnpublish}
+            <button
+              type="button"
+              onclick={handleBulkUnpublish}
+              class="px-3 py-1.5 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700"
+            >
+              {m.content_bulk_unpublish()}
+            </button>
+          {/if}
+          {#if onBulkDelete}
+            <button
+              type="button"
+              onclick={handleBulkDelete}
+              class="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+            >
+              {m.content_bulk_delete()}
+            </button>
+          {/if}
+        </div>
+      </div>
+    </div>
+  {/if}
+
   <!-- Content table -->
   {#if contents.length === 0}
     <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
@@ -170,6 +259,14 @@
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead class="bg-gray-50 dark:bg-gray-900">
             <tr>
+              <th scope="col" class="px-6 py-3 text-left">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onchange={toggleSelectAll}
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+              </th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {m.content_title()}
               </th>
@@ -190,6 +287,14 @@
           <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {#each contents as content (content.id)}
               <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(content.id)}
+                    onchange={() => toggleSelect(content.id)}
+                    class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {getContentTitle(content)}
