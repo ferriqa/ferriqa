@@ -82,7 +82,17 @@
       />
     {:else}
       <div class="flex items-center justify-center w-full h-full bg-gray-100">
-        <svelte:component this={getIcon()} class="w-6 h-6 text-gray-400" />
+        {#if getIcon() === Image}
+          <Image class="w-6 h-6 text-gray-400" />
+        {:else if getIcon() === Video}
+          <Video class="w-6 h-6 text-gray-400" />
+        {:else if getIcon() === Music}
+          <Music class="w-6 h-6 text-gray-400" />
+        {:else if getIcon() === FileText}
+          <FileText class="w-6 h-6 text-gray-400" />
+        {:else}
+          <File class="w-6 h-6 text-gray-400" />
+        {/if}
       </div>
     {/if}
   </div>

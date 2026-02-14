@@ -57,7 +57,10 @@
 {#if mobileMenuOpen}
   <div
     class="fixed inset-0 bg-black/50 z-40 lg:hidden"
+    role="button"
+    tabindex="0"
     onclick={() => mobileMenuOpen = false}
+    onkeydown={(e) => e.key === 'Escape' && (mobileMenuOpen = false)}
   ></div>
 {/if}
 

@@ -35,12 +35,12 @@ export async function getMedia(
     const data = await response.json();
     return {
       success: true,
-      data: data.items || data,
-      meta: data.meta || {
-        total: data.length,
+      data: data.data || [],
+      meta: {
+        total: data.pagination?.total || 0,
         page,
         limit,
-        totalPages: Math.ceil(data.length / limit),
+        totalPages: data.pagination?.pages || 0,
       },
     };
   } catch (error) {

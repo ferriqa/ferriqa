@@ -87,7 +87,10 @@
     <!-- Backdrop -->
     <div 
       class="fixed inset-0 bg-gray-900/50 transition-opacity"
+      role="button"
+      tabindex="0"
       onclick={handleClose}
+      onkeydown={(e) => e.key === 'Escape' && handleClose()}
     ></div>
     
     <!-- Modal Panel -->

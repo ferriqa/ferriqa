@@ -29,7 +29,11 @@
   let viewMode = $state<ViewMode>('grid');
   let searchQuery = $state('');
   let selectedType = $state<MediaType>('all');
-  let selectedItems = $state<Set<number>>(new Set(selectedIds));
+  let selectedItems = $state<Set<number>>(new Set());
+
+  $effect(() => {
+    selectedItems = new Set(selectedIds);
+  });
   let uploadDialogOpen = $state(false);
   let page = $state(1);
   let hasMore = $state(true);
