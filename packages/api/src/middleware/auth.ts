@@ -7,8 +7,35 @@ import {
   setRateLimitHeaders,
 } from "./auth-helpers.ts";
 
+function isDevMode(): boolean {
+  try {
+    return (
+      process.env.NODE_ENV === "development" || process.env.SKIP_AUTH === "true"
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function authMiddleware() {
   return async (c: Context, next: Next) => {
+    // Dev mode bypass - skip auth in development
+    if (isDevMode()) {
+      setAuthContext(c, "dev", {
+        user: {
+          id: "1",
+          email: "admin@ferriqa.dev",
+          role: "admin",
+          isActive: true,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        role: "admin",
+      });
+      await next();
+      return;
+    }
+
     const authHeader = c.req.header("Authorization");
     const apiKeyHeader = c.req.header("X-API-Key");
 

@@ -1,3 +1,3 @@
-import { deLocalizeUrl } from "$lib/paraglide/runtime";
+import type { NavigationTarget } from "@sveltejs/kit";
 
-export const reroute = (request) => deLocalizeUrl(request.url).pathname;
+export const reroute = ({ url }: NavigationTarget) => url.pathname;

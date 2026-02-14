@@ -4,6 +4,7 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { setupRoutes } from "./routes/index.ts";
 import { initPlugins } from "./plugins/index.ts";
+import { db } from "./db.ts";
 
 function getEnvVar(name: string): string | undefined {
   try {
@@ -87,6 +88,9 @@ export function securityHeaders() {
 
 export async function createServer(): Promise<Hono> {
   const app = new Hono();
+
+  // Initialize database connection
+  await db.connect();
 
   app.use("*", logger());
   app.use("*", prettyJSON());

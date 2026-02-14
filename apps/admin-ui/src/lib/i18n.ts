@@ -1,4 +1,4 @@
-import * as runtime from "$lib/paraglide/runtime.js";
+import * as runtime from "$lib/paraglide/runtime";
 
 export const i18n = {
   get locale() {
@@ -7,12 +7,6 @@ export const i18n = {
   locales: runtime.locales,
   getLocale: runtime.getLocale,
   setLocale: runtime.setLocale,
-  resolveRoute: (path: string, lang: string) => {
-    const url = new URL(path, "http://localhost");
-    return runtime.localizeUrl(url, { locale: lang }).pathname;
-  },
-  route: (pathname: string) => {
-    return runtime.deLocalizeUrl(new URL(pathname, "http://localhost"))
-      .pathname;
-  },
+  resolveRoute: (path: string, _lang: string) => path,
+  route: (pathname: string) => pathname,
 };

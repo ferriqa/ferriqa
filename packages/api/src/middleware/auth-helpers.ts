@@ -157,19 +157,19 @@ export function validateUserRole(role: string): void {
  * Set authentication context variables on Hono context
  *
  * @param c - Hono context
- * @param authType - Type of authentication ("jwt" or "apikey")
+ * @param authType - Type of authentication ("jwt" or "apikey" or "dev")
  * @param data - Authentication data
  */
 export function setAuthContext(
   c: Context,
-  authType: "jwt" | "apikey",
+  authType: "jwt" | "apikey" | "dev",
   data: AuthContextData,
 ): void {
   c.set("userId", data.user.id.toString());
   c.set("user", data.user);
 
-  if (authType === "jwt") {
-    c.set("userRole", data.role!);
+  if (authType === "dev" || authType === "jwt") {
+    c.set("userRole", data.role || "admin");
   } else {
     c.set("userRole", "api");
     c.set("apiKey", {
