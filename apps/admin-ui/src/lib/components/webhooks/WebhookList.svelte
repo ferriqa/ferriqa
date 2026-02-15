@@ -34,11 +34,15 @@
     onTest,
   }: Props = $props();
 
-  let searchQuery = $state(filters.search || "");
-  let selectedEvent = $state(filters.event || "");
-  let selectedStatus = $state(
-    filters.isActive !== undefined ? filters.isActive.toString() : "",
-  );
+  let searchQuery = $state("");
+  let selectedEvent = $state("");
+  let selectedStatus = $state("");
+
+  $effect(() => {
+    searchQuery = filters.search || "";
+    selectedEvent = filters.event || "";
+    selectedStatus = filters.isActive !== undefined ? filters.isActive.toString() : "";
+  });
 
   const totalPages = $derived(Math.ceil(total / limit));
 

@@ -52,6 +52,7 @@ import {
   authRefreshHandler,
   userMeHandler,
 } from "../handlers/auth.ts";
+import { pluginListHandler, pluginGetHandler } from "../handlers/plugins.ts";
 
 export function setupRoutes(app: Hono): void {
   app.get("/health", (c: Context) =>
@@ -102,6 +103,10 @@ export function setupRoutes(app: Hono): void {
     authLogoutHandler(),
     authRefreshHandler(),
   );
+
+  // Plugin routes
+  app.get("/api/v1/plugins", pluginListHandler());
+  app.get("/api/v1/plugins/:id", pluginGetHandler());
 
   app.route("/api/v1", v1Routes);
   app.route("/api", v1Routes);

@@ -32,9 +32,15 @@
     onToggleStatus,
   }: Props = $props();
 
-  let searchQuery = $state(filters.search || "");
-  let selectedRole = $state(filters.role || "");
-  let selectedStatus = $state(filters.isActive !== undefined ? filters.isActive.toString() : "");
+  let searchQuery = $state("");
+  let selectedRole = $state("");
+  let selectedStatus = $state("");
+
+  $effect(() => {
+    searchQuery = filters.search || "";
+    selectedRole = filters.role || "";
+    selectedStatus = filters.isActive !== undefined ? filters.isActive.toString() : "";
+  });
 
   const totalPages = $derived(Math.ceil(total / limit));
 

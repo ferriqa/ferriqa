@@ -182,7 +182,11 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
       const match = sql.match(/from\s+(\w+)/i);
       const tableName = match ? match[1] : "default";
       const tableData = this.data.get(tableName) || [];
-      return { rows: [{ total: tableData.length } as T], rowCount: 1 };
+      // Return both 'total' and 'count' for compatibility
+      return {
+        rows: [{ total: tableData.length, count: tableData.length } as T],
+        rowCount: 1,
+      };
     }
 
     const match = sql.match(/from\s+(\w+)/i);

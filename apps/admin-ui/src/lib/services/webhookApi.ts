@@ -91,7 +91,7 @@ export async function listWebhooks(
     const responseData = await response.json();
     return {
       success: true,
-      data: responseData.data,
+      data: responseData,
     };
   } catch (error) {
     return {

@@ -7,6 +7,9 @@
   ],
   "scripts": {
     "dev": "bun --filter '*' dev",
+    "dev:all": "npm run dev:api & npm run dev:admin",
+    "dev:api": "cd packages/api && npm run dev",
+    "dev:admin": "cd apps/admin-ui && npm run dev",
     "dev:bun": "bun run packages/core/src/index.ts",
     "dev:node": "node --import tsx packages/core/src/index.ts",
     "dev:deno": "deno run --allow-all packages/core/src/index.ts",

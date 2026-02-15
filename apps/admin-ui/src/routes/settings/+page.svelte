@@ -529,6 +529,7 @@
           <button
             type="button"
             onclick={toggleDarkMode}
+            aria-label={darkMode ? 'Disable dark mode' : 'Enable dark mode'}
             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {darkMode
               ? 'bg-blue-600'
               : 'bg-gray-200'}"
@@ -558,7 +559,7 @@
       class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
     >
       <div
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+        class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity cursor-default"
         aria-hidden="true"
         onclick={closeCreateModal}
       ></div>
@@ -608,6 +609,7 @@
                     >
                     <button
                       type="button"
+                      aria-label="Copy API key to clipboard"
                       onclick={async () => {
                         try {
                           await navigator.clipboard.writeText(createdKey || "");
@@ -698,11 +700,11 @@
                       />
                     </div>
                     <div>
-                      <label
+                      <span
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
                         {m.settings_permissions?.() || "Permissions"}
-                      </label>
+                      </span>
                       <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
                         {#each availablePermissions as permission}
                           <label
