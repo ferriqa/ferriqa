@@ -5,7 +5,7 @@
  */
 
 import type { Context } from "hono";
-import { pluginManager, pluginConfigService } from "../plugins/index.ts";
+import { pluginManager } from "../plugins/index.ts";
 
 interface PluginInstance {
   manifest: {

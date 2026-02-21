@@ -30,7 +30,7 @@
   }: Props = $props();
 
   let editor: Editor | undefined = $state();
-  let element: HTMLDivElement;
+  let element: HTMLDivElement | null = null;
   let mediaPickerOpen = $state(false);
 
   onMount(() => {

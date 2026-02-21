@@ -1,5 +1,4 @@
 import type {
-  ContentItem,
   ContentApiResponse,
   ContentListResponse,
   ContentVersionResponse,

@@ -25,7 +25,7 @@ test.describe("Webhooks List", () => {
 
     // Should show loading indicator
     await page.waitForTimeout(500);
-    const loading = page
+    const _loading = page
       .locator("[class*='animate-spin'], [class*='loading']")
       .first();
     // Loading state is brief
@@ -77,7 +77,7 @@ test.describe("Webhooks List", () => {
 
     const pageText = await page.locator("body").innerText();
     // Should show active/inactive indicators
-    const hasStatus = /active|inactive|enabled|disabled/i.test(pageText);
+    const _hasStatus = /active|inactive|enabled|disabled/i.test(pageText);
   });
 
   test("⏳ should show webhook URL", async ({ page }) => {
@@ -85,7 +85,7 @@ test.describe("Webhooks List", () => {
 
     const pageText = await page.locator("body").innerText();
     // Should show URLs (http/https)
-    const hasUrl = /https?:\/\//i.test(pageText);
+    const _hasUrl = /https?:\/\//i.test(pageText);
   });
 
   test("⏳ should show last trigger time", async ({ page }) => {
@@ -93,7 +93,7 @@ test.describe("Webhooks List", () => {
 
     const pageText = await page.locator("body").innerText();
     // Should show timestamps
-    const hasTime = /last triggered|last delivery|last seen/i.test(pageText);
+    const _hasTime = /last triggered|last delivery|last seen/i.test(pageText);
   });
 
   test("⏳ should navigate to edit webhook", async ({ page }) => {
@@ -248,7 +248,7 @@ test.describe("Webhooks List", () => {
       await page.waitForTimeout(1000);
 
       // Should show only active webhooks
-      const pageText = await page.locator("body").innerText();
+      const _pageText = await page.locator("body").innerText();
     }
   });
 

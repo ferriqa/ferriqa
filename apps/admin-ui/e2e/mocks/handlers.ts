@@ -97,7 +97,7 @@ async function handleBlueprintRoute(
   }
 
   // GET /api/blueprints/:id - Get single blueprint
-  const blueprintMatch = pathname.match(/^\/api\/blueprints\/([^\/]+)$/);
+  const blueprintMatch = pathname.match(/^\/api\/blueprints\/([^/]+)$/);
   if (blueprintMatch && method === "GET") {
     const id = blueprintMatch[1];
     const blueprint = allBlueprints.find((b) => b.id === id);
@@ -225,7 +225,7 @@ async function handleContentRoute(
   }
 
   // GET /api/v1/contents/:id - Get single content
-  const contentGetMatch = pathname.match(/^\/api\/v1\/contents\/([^\/]+)$/);
+  const contentGetMatch = pathname.match(/^\/api\/v1\/contents\/([^/]+)$/);
   if (contentGetMatch && method === "GET") {
     const id = contentGetMatch[1];
     const content = testContentItems.find((c) => c.id === id);
@@ -285,7 +285,7 @@ async function handleContentRoute(
 
   // POST /api/v1/contents/:id/publish - Publish content
   const publishMatch = pathname.match(
-    /^\/api\/v1\/contents\/([^\/]+)\/publish$/,
+    /^\/api\/v1\/contents\/([^/]+)\/publish$/,
   );
   if (publishMatch && method === "POST") {
     const id = publishMatch[1];
@@ -309,7 +309,7 @@ async function handleContentRoute(
 
   // POST /api/v1/contents/:id/unpublish - Unpublish content
   const unpublishMatch = pathname.match(
-    /^\/api\/v1\/contents\/([^\/]+)\/unpublish$/,
+    /^\/api\/v1\/contents\/([^/]+)\/unpublish$/,
   );
   if (unpublishMatch && method === "POST") {
     const id = unpublishMatch[1];
@@ -1026,7 +1026,7 @@ async function handleApiKeysRoute(
   }
 
   // DELETE /api/v1/api-keys/:id - Delete API key
-  const apiKeyMatch = pathname.match(/^\/api\/v1\/api-keys\/([^\/]+)$/);
+  const apiKeyMatch = pathname.match(/^\/api\/v1\/api-keys\/([^/]+)$/);
   if (apiKeyMatch && method === "DELETE") {
     return route.fulfill({
       status: 200,
@@ -1041,7 +1041,7 @@ async function handleApiKeysRoute(
   }
 
   // POST /api/v1/api-keys/:id/rotate - Rotate API key
-  const rotateMatch = pathname.match(/^\/api\/v1\/api-keys\/([^\/]+)\/rotate$/);
+  const rotateMatch = pathname.match(/^\/api\/v1\/api-keys\/([^/]+)\/rotate$/);
   if (rotateMatch && method === "POST") {
     const id = rotateMatch[1];
     const apiKey = testApiKeys.find((k) => k.id === id);

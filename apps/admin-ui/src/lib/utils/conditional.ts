@@ -1,7 +1,4 @@
-import type {
-  FieldConditional,
-  FieldDefinition,
-} from "../components/blueprint/types.ts";
+import type { FieldDefinition } from "../components/blueprint/types.ts";
 
 export function isFieldVisible(
   field: FieldDefinition,

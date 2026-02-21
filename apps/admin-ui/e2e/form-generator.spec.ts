@@ -200,7 +200,7 @@ test.describe("Dynamic Form Generator", () => {
     await page.waitForLoadState("networkidle");
 
     // Look for help text or descriptions
-    const helpText = page
+    const _helpText = page
       .locator("[class*='help'], [class*='description']")
       .first();
     // Optional - not all fields have help text
@@ -265,7 +265,7 @@ test.describe("Dynamic Form Generator", () => {
     await page.waitForLoadState("networkidle");
 
     // Look for conditional fields that appear/disappear
-    const conditionalField = page.locator("[class*='conditional']").first();
+    const _conditionalField = page.locator("[class*='conditional']").first();
     // Conditional fields are optional
   });
 
@@ -312,7 +312,7 @@ test.describe("Dynamic Form Generator", () => {
       await page.waitForTimeout(500);
 
       // Look for validation message
-      const error = page.locator("[class*='error']").first();
+      const _error = page.locator("[class*='error']").first();
       // Real-time validation is optional
     }
   });

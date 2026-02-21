@@ -116,7 +116,7 @@ test.describe("Media Library", () => {
     const fileInput = page.locator("input[type='file']").first();
     if (await fileInput.isVisible().catch(() => false)) {
       await fileInput.setInputFiles("e2e/fixtures/images/test.png");
-      const progress = page
+      const _progress = page
         .locator("[role='progressbar'], [class*='progress'], text=%")
         .first();
     }
