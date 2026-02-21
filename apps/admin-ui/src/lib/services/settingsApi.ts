@@ -119,11 +119,8 @@ export async function createApiKey(
       };
     }
 
-    const data = await response.json();
-    return {
-      success: true,
-      data,
-    };
+    // Response is already {success: true, data: {...}}
+    return await response.json();
   } catch (error) {
     return {
       success: false,

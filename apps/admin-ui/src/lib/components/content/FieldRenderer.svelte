@@ -45,18 +45,26 @@
   // Get the appropriate component for this field type
   const FieldComponent = $derived(fieldComponents[field.type]);
 
+  // Initialize local state with proper default value to avoid undefined
+  let localValue = $state(getInitialValue());
+
+  function getInitialValue(): unknown {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+    return getDefaultValue(field);
+  }
+
   // Handle field value changes
   function handleChange(newValue: unknown) {
+    localValue = newValue;
     onchange?.(field.key, newValue);
   }
 
-  // Initialize value if not set
+  // Sync with parent value when it changes
   $effect(() => {
-    if (value === undefined || value === null) {
-      const defaultValue = getDefaultValue(field);
-      if (defaultValue !== undefined) {
-        handleChange(defaultValue);
-      }
+    if (value !== undefined && value !== null) {
+      localValue = value;
     }
   });
 
@@ -82,7 +90,7 @@
   <div class="field-wrapper {field.ui?.width === 'full' ? 'col-span-full' : ''}">
     <FieldComponent
       {field}
-      bind:value
+      bind:value={localValue}
       {error}
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;

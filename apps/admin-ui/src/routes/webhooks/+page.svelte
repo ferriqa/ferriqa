@@ -34,7 +34,7 @@
 
       if (response.success && response.data) {
         webhooks = response.data.data;
-        total = response.data.pagination.total;
+        total = response.data.pagination?.total || 0;
       } else {
         error = response.error || "Failed to load webhooks";
       }

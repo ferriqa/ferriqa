@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import * as m from "$lib/paraglide/messages.js";
   import {
     listApiKeys,
@@ -41,6 +41,14 @@
     }
 
     loadApiKeys();
+
+    // Expose for testing (only in dev/test mode and browser)
+    if (import.meta.env.DEV && typeof window !== "undefined") {
+      (window as any).__ferriqa_test = {
+        createApiKey: handleCreateApiKey,
+        getCreatedKey: () => createdKey,
+      };
+    }
   });
 
   function toggleDarkMode() {
@@ -89,33 +97,34 @@
     }, 3000);
   }
 
-  async function handleCreateApiKey() {
-    if (!newKeyName.trim()) return;
+   async function handleCreateApiKey() {
+     if (!newKeyName.trim()) return;
 
-    creatingKey = true;
+     creatingKey = true;
 
-    try {
-      const request: CreateApiKeyRequest = {
-        name: newKeyName,
-        permissions: newKeyPermissions,
-        rateLimit: 100,
-        expiresInDays: 365,
-      };
+     try {
+       const request: CreateApiKeyRequest = {
+         name: newKeyName,
+         permissions: newKeyPermissions,
+         rateLimit: 100,
+         expiresInDays: 365,
+       };
 
-      const response = await createApiKey(request);
+       const response = await createApiKey(request);
 
-      if (response.success && response.data) {
-        createdKey = response.data.key;
-        apiKeys = [...apiKeys, response.data];
-      } else {
-        alert(response.error || "Failed to create API key");
-      }
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      creatingKey = false;
-    }
-  }
+       if (response.success && response.data) {
+         createdKey = response.data.key;
+         apiKeys.push(response.data);
+         await tick();
+       } else {
+         alert(response.error || "Failed to create API key");
+       }
+     } catch (err) {
+       alert(err instanceof Error ? err.message : "An error occurred");
+     } finally {
+       creatingKey = false;
+     }
+   }
 
   async function handleDeleteApiKey(id: string) {
     if (!confirm("Are you sure you want to delete this API key?")) return;
@@ -550,7 +559,7 @@
 
 {#if showCreateKeyModal}
   <div
-    class="fixed inset-0 z-50 overflow-y-auto"
+    class="fixed inset-0 z-[60] overflow-y-auto"
     aria-labelledby="modal-title"
     role="dialog"
     aria-modal="true"
@@ -559,7 +568,7 @@
       class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
     >
       <div
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity cursor-default"
+        class="fixed inset-0 z-50 bg-gray-500/75 backdrop-blur-sm transition-opacity cursor-default"
         aria-hidden="true"
         onclick={closeCreateModal}
       ></div>
@@ -568,7 +577,7 @@
         aria-hidden="true">&#8203;</span
       >
       <div
-        class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+        class="relative z-[55] inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
       >
         {#if createdKey}
           <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
