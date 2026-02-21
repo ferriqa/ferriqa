@@ -16,13 +16,21 @@
 
   let { user, onSubmit, onCancel }: Props = $props();
 
-  let name = $state(user?.name || "");
-  let email = $state(user?.email || "");
-  let role = $state<User["role"]>(user?.role || "viewer");
+  let name = $state("");
+  let email = $state("");
+  let role = $state<User["role"]>("viewer");
   let password = $state("");
   let confirmPassword = $state("");
-  let isActive = $state(user?.isActive ?? true);
+  let isActive = $state(true);
   let errors = $state<Record<string, string>>({});
+
+  // Sync form state when user prop changes
+  $effect(() => {
+    name = user?.name || "";
+    email = user?.email || "";
+    role = user?.role || "viewer";
+    isActive = user?.isActive ?? true;
+  });
 
   function validate(): boolean {
     errors = {};

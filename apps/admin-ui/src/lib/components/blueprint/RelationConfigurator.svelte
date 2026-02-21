@@ -2,6 +2,7 @@
   import { m } from '$lib/paraglide/messages.js';
   import type { FieldDefinition, Blueprint, RelationConfig } from './types.js';
   import { updateField } from '$lib/stores/blueprintStore.svelte.js';
+  import { createUniqueId } from '$lib/utils/uniqueId';
 
   interface Props {
     field: FieldDefinition;
@@ -9,6 +10,9 @@
   }
 
   let { field, availableBlueprints = [] }: Props = $props();
+
+  // Generate unique IDs for this component instance
+  const instanceId = createUniqueId('relation-config');
 
   // Local state for relation configuration
   let relationConfig = $state<RelationConfig>({
@@ -92,12 +96,12 @@
 
   <!-- Target Blueprint Selection -->
   <div>
-    <label for="target-blueprint" class="block text-sm font-medium text-gray-700 mb-1">
+    <label for={`${instanceId}-target-blueprint`} class="block text-sm font-medium text-gray-700 mb-1">
       Target Blueprint
       <span class="text-red-500">*</span>
     </label>
     <select
-      id="target-blueprint"
+      id={`${instanceId}-target-blueprint`}
       class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
       value={relationConfig.blueprintId}
       onchange={(e) => handleBlueprintChange(e.currentTarget.value)}
@@ -170,10 +174,11 @@
   <!-- Display Field -->
   {#if relationConfig.blueprintId}
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">
+      <label for={`${instanceId}-display-field`} class="block text-sm font-medium text-gray-700 mb-1">
         Display Field
       </label>
       <select
+        id={`${instanceId}-display-field`}
         class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
         value={relationConfig.displayField}
         onchange={(e) => handleDisplayFieldChange(e.currentTarget.value)}
@@ -193,10 +198,11 @@
       <h6 class="text-xs font-semibold text-gray-700 mb-3">Sort Configuration</h6>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
+          <label for={`${instanceId}-sort-field`} class="block text-xs font-medium text-gray-600 mb-1">
             Sort By
           </label>
           <select
+            id={`${instanceId}-sort-field`}
             class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
             value={relationConfig.sort?.field || ''}
             onchange={(e) => handleSortFieldChange(e.currentTarget.value)}
@@ -208,10 +214,11 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
+          <label for={`${instanceId}-sort-direction`} class="block text-xs font-medium text-gray-600 mb-1">
             Direction
           </label>
           <select
+            id={`${instanceId}-sort-direction`}
             class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
             value={relationConfig.sort?.direction || 'asc'}
             onchange={(e) => handleSortDirectionChange(e.currentTarget.value as 'asc' | 'desc')}

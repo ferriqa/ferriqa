@@ -2,6 +2,7 @@
   import { m } from '$lib/paraglide/messages.js';
   import type { FieldDefinition } from './types.js';
   import { updateField } from '$lib/stores/blueprintStore.svelte.js';
+  import { createUniqueId } from '$lib/utils/uniqueId';
 
   interface Props {
     field: FieldDefinition;
@@ -9,13 +10,16 @@
 
   let { field }: Props = $props();
 
+  // Generate unique IDs for this component instance
+  const instanceId = createUniqueId('field-options');
+
   // Local state for choices
-  let choices = $state<string[]>(field.options?.choices || []);
+  let choices = $state<string[]>([]);
   let newChoice = $state('');
 
   // Media options
-  let mediaMultiple = $state(field.options?.media?.multiple || false);
-  let mediaAccept = $state<string[]>(field.options?.media?.accept || ['image/*']);
+  let mediaMultiple = $state(false);
+  let mediaAccept = $state<string[]>(['image/*']);
 
   $effect(() => {
     choices = field.options?.choices || [];
@@ -167,35 +171,38 @@
 
       <!-- Accept Types -->
       <div class="mt-4">
-        <label class="block text-xs font-medium text-gray-600 mb-2">
-          Accepted File Types
-        </label>
-        <div class="space-y-2">
-          {#each acceptTypeOptions as option}
-            <label class="flex items-center gap-2">
-              <input
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                checked={mediaAccept.includes(option.value)}
-                onchange={(e) => {
-                  const newAccept = e.currentTarget.checked
-                    ? [...mediaAccept, option.value]
-                    : mediaAccept.filter(a => a !== option.value);
-                  handleMediaAcceptChange(newAccept);
-                }}
-              />
-              <span class="text-sm text-gray-700">{option.label}</span>
-            </label>
-          {/each}
-        </div>
+        <fieldset>
+          <legend class="block text-xs font-medium text-gray-600 mb-2">
+            Accepted File Types
+          </legend>
+          <div class="space-y-2">
+            {#each acceptTypeOptions as option}
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked={mediaAccept.includes(option.value)}
+                  onchange={(e) => {
+                    const newAccept = e.currentTarget.checked
+                      ? [...mediaAccept, option.value]
+                      : mediaAccept.filter(a => a !== option.value);
+                    handleMediaAcceptChange(newAccept);
+                  }}
+                />
+                <span class="text-sm text-gray-700">{option.label}</span>
+              </label>
+            {/each}
+          </div>
+        </fieldset>
       </div>
 
       <!-- Custom Accept Type -->
       <div class="mt-4">
-        <label class="block text-xs font-medium text-gray-600 mb-1">
+        <label for={`${instanceId}-custom-accept`} class="block text-xs font-medium text-gray-600 mb-1">
           Custom MIME Type or Extension
         </label>
         <input
+          id={`${instanceId}-custom-accept`}
           type="text"
           class="w-full py-2 px-3 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500"
           placeholder="e.g., .doc,.docx or application/msword"

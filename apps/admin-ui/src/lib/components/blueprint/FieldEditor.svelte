@@ -5,6 +5,7 @@
   import { updateField } from '$lib/stores/blueprintStore.svelte.js';
   import RelationConfigurator from './RelationConfigurator.svelte';
   import FieldOptionsEditor from './FieldOptionsEditor.svelte';
+  import { createUniqueId } from '$lib/utils/uniqueId';
 
   interface Props {
     field: FieldDefinition;
@@ -14,15 +15,42 @@
 
   let { field, availableBlueprints = [], allFields = [] }: Props = $props();
 
+  // Generate unique IDs for this component instance
+  const instanceId = createUniqueId('field-editor');
+
   // Get text fields for slug source
   const textFields = $derived(
     allFields.filter(f => f.type === 'text' || f.type === 'textarea')
   );
 
-  const fieldType = getFieldType(field.type);
+  const fieldType = $derived(getFieldType(field.type));
 
   // Keep local state for form inputs but sync properly
-  let localField = $state({ ...field });
+  let localField = $state<FieldDefinition>({} as FieldDefinition);
+
+  // Generate unique IDs for all form elements
+  const fieldNameId = $derived(`${instanceId}-name`);
+  const fieldTypeId = $derived(`${instanceId}-type`);
+  const fieldKeyId = $derived(`${instanceId}-key`);
+  const fieldPlaceholderId = $derived(`${instanceId}-placeholder`);
+  const fieldWidthId = $derived(`${instanceId}-width`);
+  const validationMinLengthId = $derived(`${instanceId}-min-length`);
+  const validationMaxLengthId = $derived(`${instanceId}-max-length`);
+  const validationMinValueId = $derived(`${instanceId}-min-value`);
+  const validationMaxValueId = $derived(`${instanceId}-max-value`);
+  const validationMinDateId = $derived(`${instanceId}-min-date`);
+  const validationMaxDateId = $derived(`${instanceId}-max-date`);
+  const validationMinItemsId = $derived(`${instanceId}-min-items`);
+  const validationMaxItemsId = $derived(`${instanceId}-max-items`);
+  const validationPatternId = $derived(`${instanceId}-pattern`);
+  const validationMaxFileSizeId = $derived(`${instanceId}-max-file-size`);
+  const validationMaxCharsId = $derived(`${instanceId}-max-chars`);
+  const validationRequiredErrorId = $derived(`${instanceId}-required-error`);
+  const validationLengthErrorId = $derived(`${instanceId}-length-error`);
+  const validationPatternErrorId = $derived(`${instanceId}-pattern-error`);
+  const validationRangeErrorId = $derived(`${instanceId}-range-error`);
+  const validationMaxId = $derived(`${instanceId}-max`);
+  const validationMinId = $derived(`${instanceId}-min`);
 
   // Watch for prop changes and sync local state
   $effect(() => {
@@ -81,12 +109,12 @@
     <div class="space-y-4">
       <!-- Field Name -->
       <div>
-        <label for="field-name" class="block text-sm font-medium text-gray-700 mb-1">
+        <label for={fieldNameId} class="block text-sm font-medium text-gray-700 mb-1">
           {m.blueprint_builder_field_name()}
           <span class="text-red-500">*</span>
         </label>
         <input
-          id="field-name"
+          id={fieldNameId}
           type="text"
           class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
           value={localField.name}
@@ -100,12 +128,12 @@
 
       <!-- Field Key -->
       <div>
-        <label for="field-key" class="block text-sm font-medium text-gray-700 mb-1">
-          {m.blueprint_builder_field_key()}
+        <label for={fieldKeyId} class="block text-sm font-medium text-gray-700 mb-1">
+          API Key
           <span class="text-red-500">*</span>
         </label>
         <input
-          id="field-key"
+          id={fieldKeyId}
           type="text"
           class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 font-mono"
           value={localField.key}
@@ -113,30 +141,40 @@
             localField.key = e.currentTarget.value;
             handleKeyChange();
           }}
-          placeholder="field_key"
+          placeholder="e.g., blog_title"
         />
         <p class="text-xs text-gray-500 mt-1">
-          Auto-generated from name, used in API
+          Used in API responses and database schema
         </p>
       </div>
 
       <!-- Field Type -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label for={fieldTypeId} class="block text-sm font-medium text-gray-700 mb-1">
           {m.blueprint_builder_field_type()}
         </label>
-        <div class="py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
+        <div id={fieldTypeId} class="py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600" role="status" aria-live="polite">
+          {(m as any)[fieldType?.name || ('field_' + field.type)]?.() || field.type}
+        </div>
+      </div>
+
+      <!-- Field Type -->
+      <div>
+        <label for="field-type-display" class="block text-sm font-medium text-gray-700 mb-1">
+          {m.blueprint_builder_field_type()}
+        </label>
+        <div id="field-type-display" class="py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600" role="status" aria-live="polite">
           {(m as any)[fieldType?.name || ('field_' + field.type)]?.() || field.type}
         </div>
       </div>
 
       <!-- Description -->
       <div>
-        <label for="field-description" class="block text-sm font-medium text-gray-700 mb-1">
+        <label for={`${instanceId}-description`} class="block text-sm font-medium text-gray-700 mb-1">
           {m.common_description()}
         </label>
         <textarea
-          id="field-description"
+          id={`${instanceId}-description`}
           rows="2"
           class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
           value={localField.description}
@@ -197,10 +235,11 @@
         <div class="grid grid-cols-2 gap-3">
           {#if hasValidationRule('minLength')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMinLengthId} class="block text-xs font-medium text-gray-600 mb-1">
                 Min Length
               </label>
               <input
+                id={validationMinLengthId}
                 type="number"
                 min="0"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
@@ -217,10 +256,11 @@
           {/if}
           {#if hasValidationRule('maxLength')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMaxLengthId} class="block text-xs font-medium text-gray-600 mb-1">
                 Max Length
               </label>
               <input
+                id={validationMaxLengthId}
                 type="number"
                 min="1"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
@@ -231,7 +271,7 @@
                   localField.validation!.maxLength = value ? parseInt(value) : undefined;
                   handleUpdate();
                 }}
-                placeholder="255"
+                placeholder="100"
               />
             </div>
           {/if}
@@ -243,10 +283,11 @@
         <div class="grid grid-cols-2 gap-3">
           {#if hasValidationRule('min')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMinValueId} class="block text-xs font-medium text-gray-600 mb-1">
                 Min Value
               </label>
               <input
+                id={validationMinValueId}
                 type="number"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                 value={localField.validation?.min ?? ''}
@@ -262,10 +303,11 @@
           {/if}
           {#if hasValidationRule('max')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMaxId} class="block text-xs font-medium text-gray-600 mb-1">
                 Max Value
               </label>
               <input
+                id={validationMaxId}
                 type="number"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                 value={localField.validation?.max ?? ''}
@@ -287,10 +329,11 @@
         <div class="grid grid-cols-2 gap-3">
           {#if hasValidationRule('minDate')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMinDateId} class="block text-xs font-medium text-gray-600 mb-1">
                 Min Date
               </label>
               <input
+                id={validationMinDateId}
                 type="date"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                 value={localField.validation?.minDate || ''}
@@ -304,10 +347,11 @@
           {/if}
           {#if hasValidationRule('maxDate')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMaxDateId} class="block text-xs font-medium text-gray-600 mb-1">
                 Max Date
               </label>
               <input
+                id={validationMaxDateId}
                 type="date"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                 value={localField.validation?.maxDate || ''}
@@ -327,10 +371,11 @@
         <div class="grid grid-cols-2 gap-3">
           {#if hasValidationRule('minItems')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMinItemsId} class="block text-xs font-medium text-gray-600 mb-1">
                 Min Items
               </label>
               <input
+                id={validationMinItemsId}
                 type="number"
                 min="0"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
@@ -347,10 +392,11 @@
           {/if}
           {#if hasValidationRule('maxItems')}
             <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">
+              <label for={validationMaxItemsId} class="block text-xs font-medium text-gray-600 mb-1">
                 Max Items
               </label>
               <input
+                id={validationMaxItemsId}
                 type="number"
                 min="1"
                 class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
@@ -371,10 +417,11 @@
       <!-- Pattern (for text, textarea, slug) -->
       {#if hasValidationRule('pattern')}
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
+          <label for={validationPatternId} class="block text-xs font-medium text-gray-600 mb-1">
             Pattern (Regex)
           </label>
           <input
+            id={validationPatternId}
             type="text"
             class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 font-mono"
             value={localField.validation?.pattern || ''}
@@ -392,10 +439,11 @@
       <!-- Max File Size (for media) -->
       {#if hasValidationRule('maxFileSize')}
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
+          <label for={validationMaxFileSizeId} class="block text-xs font-medium text-gray-600 mb-1">
             Max File Size (MB)
           </label>
           <input
+            id={validationMaxFileSizeId}
             type="number"
             min="0.1"
             step="0.1"
@@ -415,10 +463,11 @@
       <!-- Max Characters (for richtext) -->
       {#if hasValidationRule('maxChars')}
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">
+          <label for={validationMaxCharsId} class="block text-xs font-medium text-gray-600 mb-1">
             Max Characters
           </label>
           <input
+            id={validationMaxCharsId}
             type="number"
             min="1"
             class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
@@ -441,10 +490,11 @@
           <div class="space-y-3">
             {#if localField.required}
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">
+                <label for={validationRequiredErrorId} class="block text-xs font-medium text-gray-600 mb-1">
                   Required Error
                 </label>
                 <input
+                  id={validationRequiredErrorId}
                   type="text"
                   class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                   value={localField.validation?.messages?.required || ''}
@@ -460,10 +510,11 @@
             
             {#if hasValidationRule('minLength') || hasValidationRule('maxLength')}
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">
+                <label for={validationLengthErrorId} class="block text-xs font-medium text-gray-600 mb-1">
                   Length Error
                 </label>
                 <input
+                  id={validationLengthErrorId}
                   type="text"
                   class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                   value={localField.validation?.messages?.minLength || localField.validation?.messages?.maxLength || ''}
@@ -485,10 +536,11 @@
 
             {#if hasValidationRule('pattern')}
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">
+                <label for={validationPatternErrorId} class="block text-xs font-medium text-gray-600 mb-1">
                   Pattern Error
                 </label>
                 <input
+                  id={validationPatternErrorId}
                   type="text"
                   class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                   value={localField.validation?.messages?.pattern || ''}
@@ -504,10 +556,11 @@
 
             {#if hasValidationRule('min') || hasValidationRule('max')}
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">
+                <label for={validationRangeErrorId} class="block text-xs font-medium text-gray-600 mb-1">
                   Range Error
                 </label>
                 <input
+                  id={validationRangeErrorId}
                   type="text"
                   class="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                   value={localField.validation?.messages?.min || localField.validation?.messages?.max || ''}
@@ -540,10 +593,11 @@
     <div class="space-y-4">
       <!-- Width -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <label for={fieldWidthId} class="block text-sm font-medium text-gray-700 mb-1">
           {m.blueprint_builder_width()}
         </label>
         <select
+          id={fieldWidthId}
           class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
           value={localField.ui?.width || 'half'}
           onchange={(e) => {
@@ -555,6 +609,44 @@
           <option value="half">{m.blueprint_builder_width_half()}</option>
           <option value="full">{m.blueprint_builder_width_full()}</option>
         </select>
+      </div>
+
+      <!-- Placeholder -->
+      <div>
+        <label for={fieldPlaceholderId} class="block text-sm font-medium text-gray-700 mb-1">
+          {m.blueprint_builder_placeholder()}
+        </label>
+        <input
+          id={fieldPlaceholderId}
+          type="text"
+          class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
+          value={localField.ui?.placeholder || ''}
+          oninput={(e) => {
+            ensureUi();
+            localField.ui!.placeholder = e.currentTarget.value;
+            handleUpdate();
+          }}
+          placeholder="Enter placeholder text"
+        />
+      </div>
+
+      <!-- Help Text -->
+      <div>
+        <label for={`${instanceId}-helptext`} class="block text-sm font-medium text-gray-700 mb-1">
+          {m.blueprint_builder_help_text()}
+        </label>
+        <textarea
+          id={`${instanceId}-helptext`}
+          rows="2"
+          class="py-2.5 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
+          value={localField.ui?.helpText || ''}
+          oninput={(e) => {
+            ensureUi();
+            localField.ui!.helpText = e.currentTarget.value;
+            handleUpdate();
+          }}
+          placeholder="Enter help text for content editors"
+        ></textarea>
       </div>
 
       <!-- Placeholder -->

@@ -12,15 +12,23 @@
 
   let { webhook, onSubmit, onCancel, loading = false }: Props = $props();
 
-  let name = $state(webhook?.name || "");
-  let url = $state(webhook?.url || "");
-  let secret = $state(webhook?.secret || "");
-  let isActive = $state(webhook?.isActive ?? true);
-  let selectedEvents = $state<string[]>(webhook?.events || []);
-  let headersJson = $state(
-    webhook?.headers ? JSON.stringify(webhook.headers, null, 2) : "",
-  );
+  let name = $state("");
+  let url = $state("");
+  let secret = $state("");
+  let isActive = $state(true);
+  let selectedEvents = $state<string[]>([]);
+  let headersJson = $state("");
   let errors = $state<Record<string, string>>({});
+
+  // Sync form state when webhook prop changes
+  $effect(() => {
+    name = webhook?.name || "";
+    url = webhook?.url || "";
+    secret = webhook?.secret || "";
+    isActive = webhook?.isActive ?? true;
+    selectedEvents = webhook?.events || [];
+    headersJson = webhook?.headers ? JSON.stringify(webhook.headers, null, 2) : "";
+  });
 
   function formatEventName(event: string): string {
     const eventNames: Record<string, () => string> = {
@@ -142,10 +150,10 @@
   </div>
 
   <!-- Events -->
-  <div>
-    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+  <fieldset>
+    <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
       {m.webhooks_events?.() || "Events"} *
-    </label>
+    </legend>
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
       {#each WEBHOOK_EVENTS as event}
         <button
@@ -169,7 +177,7 @@
     {#if errors.events}
       <p class="mt-2 text-sm text-red-600 dark:text-red-400">{errors.events}</p>
     {/if}
-  </div>
+  </fieldset>
 
   <!-- Secret -->
   <div>

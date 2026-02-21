@@ -108,6 +108,7 @@
         <button
           onclick={onCancel}
           class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100"
+          aria-label="Close template selector"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -229,15 +230,17 @@
     <!-- Custom Name Input -->
     {#if selectedTemplate}
       <div class="p-6 border-t border-gray-200 bg-gray-50">
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Blueprint Name (Optional)
+        <label class="block">
+          <span class="block text-sm font-medium text-gray-700 mb-2">
+            Blueprint Name (Optional)
+          </span>
+          <input
+            type="text"
+            placeholder="Enter custom name..."
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            bind:value={customName}
+          />
         </label>
-        <input
-          type="text"
-          placeholder="Enter custom name..."
-          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          bind:value={customName}
-        />
         <p class="text-xs text-gray-500 mt-1">
           Leave blank to use the template name
         </p>

@@ -141,6 +141,7 @@
         <button
           onclick={onCancel}
           class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100"
+          aria-label="Close import dialog"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -201,23 +202,27 @@
       <!-- JSON Input -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <label class="block text-sm font-medium text-gray-700">
+          <span class="block text-sm font-medium text-gray-700">
             JSON Data
-          </label>
+          </span>
           <button
             onclick={loadExample}
             class="text-sm text-blue-600 hover:text-blue-800"
+            type="button"
           >
             Load Example
           </button>
         </div>
-        <textarea
-          rows="12"
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Paste your blueprint JSON here..."
-          bind:value={jsonInput}
-          onpaste={handlePaste}
-        ></textarea>
+        <label class="block">
+          <span class="sr-only">JSON Data Input</span>
+          <textarea
+            bind:value={jsonInput}
+            onpaste={handlePaste}
+            rows="12"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+            placeholder="Paste your JSON blueprint here or upload a file..."
+          ></textarea>
+        </label>
         <p class="text-xs text-gray-500 mt-1">
           Press Ctrl+V to paste from clipboard
         </p>
