@@ -779,7 +779,7 @@ export class WebhookService {
   /**
    * Cleanup - stop queue processor
    */
-  destroy(): void {
+  async destroy(): Promise<void> {
     this.queue.stop();
   }
 }

@@ -5,16 +5,8 @@
  * Based on Task 5.4: Integration Tests
  */
 
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-  runTests,
-} from "../../testing/index.ts";
+import { test } from "@cross/test";
+import { assertStrictEquals, assertExists } from "@std/assert";
 import { MockDatabaseAdapter } from "../../testing/mocks.ts";
 import { HookRegistry } from "../../hooks/registry.ts";
 import { ValidationEngine } from "../../validation/engine.ts";
@@ -24,159 +16,182 @@ import { ContentService } from "../../content/service.ts";
 import { BlueprintService } from "../../blueprint/service.ts";
 import { WebhookService } from "../../webhooks/service.ts";
 
-describe("Webhook Integration", () => {
-  let db: MockDatabaseAdapter;
-  let hooks: HookRegistry;
-  let webhookService: WebhookService;
-  let contentService: ContentService;
-  let blueprintService: BlueprintService;
+interface WebhookTestContext {
+  db: MockDatabaseAdapter;
+  hooks: HookRegistry;
+  webhookService: WebhookService;
+  contentService: ContentService;
+  blueprintService: BlueprintService;
+  originalFetch: typeof fetch;
+}
+
+async function setupWebhookTest(): Promise<WebhookTestContext> {
+  const db = new MockDatabaseAdapter();
+  await db.connect();
+
+  const hooks = new HookRegistry();
+
+  const webhookService = new WebhookService({
+    db,
+    hookRegistry: hooks,
+    queueIntervalMs: 10,
+  });
+
+  const validationEngine = new ValidationEngine(globalFieldRegistry);
+  const slugManager = new SlugManager(db);
+
+  const contentService = new ContentService({
+    db,
+    hookRegistry: hooks,
+    validationEngine,
+    slugManager,
+    webhookService,
+  });
+
+  const blueprintService = new BlueprintService({
+    db,
+    webhookService,
+  });
 
   const originalFetch = global.fetch;
 
-  beforeEach(async () => {
-    webhookService = new WebhookService({
-      db,
-      hookRegistry: hooks,
-      queueIntervalMs: 10,
-    });
+  global.fetch = (async () =>
+    new Response("OK", { status: 200 })) as unknown as typeof fetch;
 
-    const validationEngine = new ValidationEngine(globalFieldRegistry);
-    const slugManager = new SlugManager(db);
-
-    contentService = new ContentService({
-      db,
-      hookRegistry: hooks,
-      validationEngine,
-      slugManager,
-      webhookService,
-    });
-
-    blueprintService = new BlueprintService({
-      db,
-      webhookService,
-    });
-
-    // Mock fetch for all tests
-    global.fetch = (async () =>
-      new Response("OK", { status: 200 })) as unknown as typeof fetch;
-  });
-
-  afterEach(async () => {
-    webhookService.destroy();
-    global.fetch = originalFetch;
-  });
-
-  beforeAll(async () => {
-    db = new MockDatabaseAdapter();
-    await db.connect();
-    hooks = new HookRegistry();
-  });
-
-  afterAll(async () => {
-    await db.close();
-  });
-
-  it("should dispatch webhook when content is created", async () => {
-    // 1. Create a blueprint
-    await blueprintService.create({
-      id: "page",
-      name: "Page",
-      slug: "page",
-      fields: [
-        {
-          id: crypto.randomUUID(),
-          key: "title",
-          name: "Title",
-          type: "text",
-          required: true,
-        },
-      ],
-      settings: {
-        displayField: "title",
-        defaultStatus: "draft",
-        draftMode: true,
-        versioning: true,
-        apiAccess: "public",
-        cacheEnabled: true,
+  await blueprintService.create({
+    id: "page",
+    name: "Page",
+    slug: "page",
+    fields: [
+      {
+        id: crypto.randomUUID(),
+        key: "title",
+        name: "Title",
+        type: "text",
+        required: true,
       },
-    });
+    ],
+    settings: {
+      displayField: "title",
+      defaultStatus: "draft",
+      draftMode: true,
+      versioning: true,
+      apiAccess: "public",
+      cacheEnabled: true,
+    },
+  });
 
-    // 2. Create a webhook for content.created
-    const webhook = await webhookService.create({
+  return {
+    db,
+    hooks,
+    webhookService,
+    contentService,
+    blueprintService,
+    originalFetch,
+  };
+}
+
+async function cleanupWebhookTest(context: WebhookTestContext): Promise<void> {
+  await context.webhookService.destroy();
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  global.fetch = context.originalFetch;
+  await context.db.close();
+}
+
+test("Webhook Integration > Content > should dispatch webhook when content is created", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "Content Hook",
       url: "https://example.com/on-create",
       events: ["content.created"],
       isActive: true,
     });
 
-    // 3. Create content
-    await contentService.create("page", {
+    await context.contentService.create("page", {
       data: { title: "Hello World" },
     });
 
-    // 4. Wait for queue processing
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // 5. Check if delivery was logged
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("content.created");
-    expect(deliveries.data[0].success).toBe(true);
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "content.created");
+    assertStrictEquals(deliveries.data[0].success, true);
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should dispatch webhook when content is updated", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Content > should dispatch webhook when content is updated", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "Update Hook",
       url: "https://example.com/on-update-content",
       events: ["content.updated"],
       isActive: true,
     });
 
-    const content = await contentService.create("page", {
+    const content = await context.contentService.create("page", {
       data: { title: "Original Title" },
     });
 
-    await contentService.update(content.id, {
+    await context.contentService.update(content.id, {
       data: { title: "Updated Title" },
     });
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("content.updated");
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "content.updated");
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should dispatch webhook when content is deleted", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Content > should dispatch webhook when content is deleted", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "Delete Hook",
       url: "https://example.com/on-delete-content",
       events: ["content.deleted"],
       isActive: true,
     });
 
-    const content = await contentService.create("page", {
+    const content = await context.contentService.create("page", {
       data: { title: "To be deleted" },
     });
 
-    await contentService.delete(content.id);
+    await context.contentService.delete(content.id);
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("content.deleted");
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "content.deleted");
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should dispatch webhook when blueprint is created", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Blueprint > should dispatch webhook when blueprint is created", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "Blueprint Hook",
       url: "https://example.com/on-bp-create",
       events: ["blueprint.created"],
       isActive: true,
     });
 
-    await blueprintService.create({
+    await context.blueprintService.create({
       id: "new-bp",
       name: "New BP",
       slug: "new-bp",
@@ -193,21 +208,26 @@ describe("Webhook Integration", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("blueprint.created");
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "blueprint.created");
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should apply webhook:beforeSend filter to modify payload", async () => {
-    await webhookService.create({
+test("Webhook Integration > Filters > should apply webhook:beforeSend filter to modify payload", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    await context.webhookService.create({
       name: "Filter Hook",
       url: "https://example.com/on-filter-test",
       events: ["content.created"],
       isActive: true,
     });
 
-    // Register filter to add a custom field to all webhook payloads
-    hooks.addFilter("webhook:beforeSend", (payload: any) => {
+    context.hooks.addFilter("webhook:beforeSend", (payload: any) => {
       return {
         ...payload,
         customField: "intercepted",
@@ -215,7 +235,7 @@ describe("Webhook Integration", () => {
     });
 
     let capturedPayload: any = null;
-    const testFetch = (async (url: string, init: any) => {
+    const testFetch = (async (_url: string, init: any) => {
       capturedPayload = JSON.parse(init.body);
       return new Response("OK", { status: 200 });
     }) as unknown as typeof fetch;
@@ -224,21 +244,27 @@ describe("Webhook Integration", () => {
     global.fetch = testFetch;
 
     try {
-      await contentService.create("page", {
+      await context.contentService.create("page", {
         data: { title: "Filtered Content" },
       });
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      expect(capturedPayload).not.toBeNull();
-      expect(capturedPayload.customField).toBe("intercepted");
+      assertExists(capturedPayload);
+      assertStrictEquals(capturedPayload.customField, "intercepted");
     } finally {
       global.fetch = original;
     }
-  });
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should emit webhook:afterSend hook with result", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Hooks > should emit webhook:afterSend hook with result", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "Action Hook",
       url: "https://example.com/on-action-hook",
       events: ["content.created"],
@@ -246,30 +272,36 @@ describe("Webhook Integration", () => {
     });
 
     let actionReceived = false;
-    hooks.on("webhook:afterSend", (context: any) => {
+    context.hooks.on("webhook:afterSend", (context: any) => {
       if (context.webhook.id === webhook.id) {
         actionReceived = true;
       }
     });
 
-    await contentService.create("page", {
+    await context.contentService.create("page", {
       data: { title: "Action Content" },
     });
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(actionReceived).toBe(true);
-  });
+    assertStrictEquals(actionReceived, true);
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should dispatch webhook when blueprint is updated", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Blueprint > should dispatch webhook when blueprint is updated", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "BP Update Hook",
       url: "https://example.com/on-bp-update",
       events: ["blueprint.updated"],
       isActive: true,
     });
 
-    const blueprint = await blueprintService.create({
+    const blueprint = await context.blueprintService.create({
       id: "bp-to-update",
       name: "Original Name",
       slug: "original-slug",
@@ -284,26 +316,32 @@ describe("Webhook Integration", () => {
       },
     });
 
-    await blueprintService.update(blueprint.id, {
+    await context.blueprintService.update(blueprint.id, {
       name: "Updated Name",
     });
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("blueprint.updated");
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "blueprint.updated");
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should dispatch webhook when blueprint is deleted", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Blueprint > should dispatch webhook when blueprint is deleted", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "BP Delete Hook",
       url: "https://example.com/on-bp-delete",
       events: ["blueprint.deleted"],
       isActive: true,
     });
 
-    const blueprint = await blueprintService.create({
+    const blueprint = await context.blueprintService.create({
       id: "bp-to-delete",
       name: "To Be Deleted",
       slug: "to-be-deleted",
@@ -318,57 +356,69 @@ describe("Webhook Integration", () => {
       },
     });
 
-    await blueprintService.delete(blueprint.id);
+    await context.blueprintService.delete(blueprint.id);
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("blueprint.deleted");
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "blueprint.deleted");
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should dispatch webhook when content is published", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Content > should dispatch webhook when content is published", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "Publish Hook",
       url: "https://example.com/on-publish",
       events: ["content.published"],
       isActive: true,
     });
 
-    const content = await contentService.create("page", {
+    const content = await context.contentService.create("page", {
       data: { title: "Draft Content" },
     });
 
-    await contentService.publish(content.id);
+    await context.contentService.publish(content.id);
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("content.published");
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "content.published");
+  } finally {
+    await cleanupWebhookTest(context);
+  }
+});
 
-  it("should dispatch webhook when content is unpublished", async () => {
-    const webhook = await webhookService.create({
+test("Webhook Integration > Content > should dispatch webhook when content is unpublished", async () => {
+  const context = await setupWebhookTest();
+
+  try {
+    const webhook = await context.webhookService.create({
       name: "Unpublish Hook",
       url: "https://example.com/on-unpublish",
       events: ["content.unpublished"],
       isActive: true,
     });
 
-    const content = await contentService.create("page", {
+    const content = await context.contentService.create("page", {
       data: { title: "Published Content" },
     });
 
-    await contentService.publish(content.id);
-    await contentService.unpublish(content.id);
+    await context.contentService.publish(content.id);
+    await context.contentService.unpublish(content.id);
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    const deliveries = await webhookService.getDeliveries(webhook.id);
-    expect(deliveries.data.length).toBe(1);
-    expect(deliveries.data[0].event).toBe("content.unpublished");
-  });
+    const deliveries = await context.webhookService.getDeliveries(webhook.id);
+    assertStrictEquals(deliveries.data.length, 1);
+    assertStrictEquals(deliveries.data[0].event, "content.unpublished");
+  } finally {
+    await cleanupWebhookTest(context);
+  }
 });
-
-runTests();

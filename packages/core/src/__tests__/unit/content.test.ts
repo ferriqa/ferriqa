@@ -9,7 +9,8 @@
  * operations (CRUD, query filtering, error handling) should be added separately.
  */
 
-import { describe, it, expect, runTests } from "../../testing/index.ts";
+import { test } from "@cross/test";
+import { assertEquals, assertExists } from "@std/assert";
 import type { Blueprint } from "../../blueprint/types.ts";
 import type {
   Content,
@@ -50,210 +51,199 @@ function createMockBlueprint(overrides?: Partial<Blueprint>): Blueprint {
   };
 }
 
-describe("Content Types", () => {
-  describe("Content Interface", () => {
-    it("should define content with required fields", () => {
-      const content: Content = {
-        id: "123",
-        blueprintId: "456",
-        slug: "my-content",
-        status: "published",
-        data: { title: "Test" },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+// Content Interface
+test("Content Types > Content Interface > should define content with required fields", () => {
+  const content: Content = {
+    id: "123",
+    blueprintId: "456",
+    slug: "my-content",
+    status: "published",
+    data: { title: "Test" },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-      expect(content.id).toBeDefined();
-      expect(content.blueprintId).toBeDefined();
-      expect(content.slug).toBeDefined();
-      expect(content.status).toBeDefined();
-      expect(content.data).toBeDefined();
-    });
-
-    it("should support all status types", () => {
-      const statuses: ContentStatus[] = ["draft", "published", "archived"];
-      expect(statuses).toHaveLength(3);
-    });
-  });
-
-  describe("ContentQuery Interface", () => {
-    it("should support basic query options", () => {
-      const query: ContentQuery = {
-        blueprintId: "456",
-        status: "published",
-        pagination: { page: 1, limit: 10 },
-      };
-
-      expect(query.blueprintId).toBe("456");
-      expect(query.status).toBe("published");
-      expect(query.pagination?.page).toBe(1);
-      expect(query.pagination?.limit).toBe(10);
-    });
-
-    it("should support filters", () => {
-      const filter: FilterCondition = {
-        field: "title",
-        operator: "eq",
-        value: "Test",
-      };
-
-      expect(filter.field).toBe("title");
-      expect(filter.operator).toBe("eq");
-      expect(filter.value).toBe("Test");
-    });
-
-    it("should support multiple filter operators", () => {
-      const operators = [
-        "eq",
-        "ne",
-        "gt",
-        "gte",
-        "lt",
-        "lte",
-        "in",
-        "nin",
-        "contains",
-        "startsWith",
-        "endsWith",
-        "exists",
-      ];
-      expect(operators.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe("CreateContentInput", () => {
-    it("should require data field", () => {
-      const input: CreateContentInput = {
-        data: { title: "New Content" },
-      };
-
-      expect(input.data).toBeDefined();
-      expect(input.data.title).toBe("New Content");
-    });
-
-    it("should support optional fields", () => {
-      const input: CreateContentInput = {
-        slug: "custom-slug",
-        status: "draft",
-        data: { title: "Test" },
-        meta: { seo: "description" },
-      };
-
-      expect(input.slug).toBe("custom-slug");
-      expect(input.status).toBe("draft");
-      expect(input.meta).toBeDefined();
-    });
-  });
-
-  describe("UpdateContentInput", () => {
-    it("should have all fields optional", () => {
-      const input: UpdateContentInput = {
-        data: { title: "Updated" },
-      };
-
-      expect(input.data).toBeDefined();
-    });
-  });
-
-  describe("Hook Contexts", () => {
-    it("should define content create context", () => {
-      const context: ContentCreateContext = {
-        blueprint: createMockBlueprint({ id: "bp-123" }),
-        data: { title: "New Content" },
-        userId: "user-123",
-      };
-
-      expect(context.blueprint).toBeDefined();
-      expect(context.data).toBeDefined();
-      expect(context.userId).toBe("user-123");
-    });
-
-    it("should define content update context", () => {
-      const context: ContentUpdateContext = {
-        content: {
-          id: "content-123",
-          blueprintId: "bp-123",
-          slug: "my-content",
-          status: "draft",
-          data: { title: "Old Title" },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        blueprint: createMockBlueprint({ id: "bp-123" }),
-        data: { title: "New Title" },
-        userId: "user-123",
-      };
-
-      expect(context.content).toBeDefined();
-      expect(context.blueprint).toBeDefined();
-      expect(context.data).toBeDefined();
-    });
-
-    it("should define content delete context", () => {
-      const context: ContentDeleteContext = {
-        content: {
-          id: "content-123",
-          blueprintId: "bp-123",
-          slug: "my-content",
-          status: "draft",
-          data: { title: "To Delete" },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        blueprint: createMockBlueprint({ id: "bp-123" }),
-        userId: "user-123",
-      };
-
-      expect(context.content).toBeDefined();
-      expect(context.blueprint).toBeDefined();
-    });
-
-    it("should define content publish context", () => {
-      const context: ContentPublishContext = {
-        content: {
-          id: "content-123",
-          blueprintId: "bp-123",
-          slug: "my-content",
-          status: "draft",
-          data: { title: "Publish Me" },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        userId: "user-123",
-      };
-
-      expect(context.content).toBeDefined();
-      expect(context.userId).toBe("user-123");
-    });
-  });
+  assertExists(content.id);
+  assertExists(content.blueprintId);
+  assertExists(content.slug);
+  assertExists(content.status);
+  assertExists(content.data);
 });
 
-describe("PaginatedResult", () => {
-  it("should define paginated result structure", () => {
-    const result: PaginatedResult<Content> = {
-      data: [],
-      pagination: {
-        page: 1,
-        limit: 10,
-        total: 0,
-        totalPages: 0,
-      },
-    };
-
-    expect(result.data).toBeDefined();
-    expect(result.pagination).toBeDefined();
-    expect(result.pagination.page).toBe(1);
-    expect(result.pagination.limit).toBe(10);
-  });
+test("Content Types > Content Interface > should support all status types", () => {
+  const statuses: ContentStatus[] = ["draft", "published", "archived"];
+  assertEquals(statuses.length, 3);
 });
 
-describe("Content Validation", () => {
-  it("should have proper ContentStatus type", () => {
-    const validStatuses: ContentStatus[] = ["draft", "published", "archived"];
-    validStatuses.forEach((status) => {
-      expect(status).toBeDefined();
-    });
-  });
+// ContentQuery Interface
+test("Content Types > ContentQuery Interface > should support basic query options", () => {
+  const query: ContentQuery = {
+    blueprintId: "456",
+    status: "published",
+    pagination: { page: 1, limit: 10 },
+  };
+
+  assertEquals(query.blueprintId, "456");
+  assertEquals(query.status, "published");
+  assertEquals(query.pagination?.page, 1);
+  assertEquals(query.pagination?.limit, 10);
 });
 
-runTests();
+test("Content Types > ContentQuery Interface > should support filters", () => {
+  const filter: FilterCondition = {
+    field: "title",
+    operator: "eq",
+    value: "Test",
+  };
+
+  assertEquals(filter.field, "title");
+  assertEquals(filter.operator, "eq");
+  assertEquals(filter.value, "Test");
+});
+
+test("Content Types > ContentQuery Interface > should support multiple filter operators", () => {
+  const operators = [
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "nin",
+    "contains",
+    "startsWith",
+    "endsWith",
+    "exists",
+  ];
+  assertEquals(operators.length > 0, true);
+});
+
+// CreateContentInput
+test("Content Types > CreateContentInput > should require data field", () => {
+  const input: CreateContentInput = {
+    data: { title: "New Content" },
+  };
+
+  assertExists(input.data);
+  assertEquals(input.data.title, "New Content");
+});
+
+test("Content Types > CreateContentInput > should support optional fields", () => {
+  const input: CreateContentInput = {
+    slug: "custom-slug",
+    status: "draft",
+    data: { title: "Test" },
+    meta: { seo: "description" },
+  };
+
+  assertEquals(input.slug, "custom-slug");
+  assertEquals(input.status, "draft");
+  assertExists(input.meta);
+});
+
+// UpdateContentInput
+test("Content Types > UpdateContentInput > should have all fields optional", () => {
+  const input: UpdateContentInput = {
+    data: { title: "Updated" },
+  };
+
+  assertExists(input.data);
+});
+
+// Hook Contexts
+test("Content Types > Hook Contexts > should define content create context", () => {
+  const context: ContentCreateContext = {
+    blueprint: createMockBlueprint({ id: "bp-123" }),
+    data: { title: "New Content" },
+    userId: "user-123",
+  };
+
+  assertExists(context.blueprint);
+  assertExists(context.data);
+  assertEquals(context.userId, "user-123");
+});
+
+test("Content Types > Hook Contexts > should define content update context", () => {
+  const context: ContentUpdateContext = {
+    content: {
+      id: "content-123",
+      blueprintId: "bp-123",
+      slug: "my-content",
+      status: "draft",
+      data: { title: "Old Title" },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    blueprint: createMockBlueprint({ id: "bp-123" }),
+    data: { title: "New Title" },
+    userId: "user-123",
+  };
+
+  assertExists(context.content);
+  assertExists(context.blueprint);
+  assertExists(context.data);
+});
+
+test("Content Types > Hook Contexts > should define content delete context", () => {
+  const context: ContentDeleteContext = {
+    content: {
+      id: "content-123",
+      blueprintId: "bp-123",
+      slug: "my-content",
+      status: "draft",
+      data: { title: "To Delete" },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    blueprint: createMockBlueprint({ id: "bp-123" }),
+    userId: "user-123",
+  };
+
+  assertExists(context.content);
+  assertExists(context.blueprint);
+});
+
+test("Content Types > Hook Contexts > should define content publish context", () => {
+  const context: ContentPublishContext = {
+    content: {
+      id: "content-123",
+      blueprintId: "bp-123",
+      slug: "my-content",
+      status: "draft",
+      data: { title: "Publish Me" },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    userId: "user-123",
+  };
+
+  assertExists(context.content);
+  assertEquals(context.userId, "user-123");
+});
+
+// PaginatedResult
+test("PaginatedResult > should define paginated result structure", () => {
+  const result: PaginatedResult<Content> = {
+    data: [],
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+    },
+  };
+
+  assertExists(result.data);
+  assertExists(result.pagination);
+  assertEquals(result.pagination.page, 1);
+  assertEquals(result.pagination.limit, 10);
+});
+
+// Content Validation
+test("Content Validation > should have proper ContentStatus type", () => {
+  const validStatuses: ContentStatus[] = ["draft", "published", "archived"];
+  validStatuses.forEach((status) => {
+    assertExists(status);
+  });
+});

@@ -87,6 +87,7 @@ export interface IHookRegistry {
   emit<T>(event: string, context: T): Promise<HookResult>;
   filter<T>(event: string, data: T): Promise<FilterResult<T>>;
   clear(): void;
+  dispose?(): void;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, runTests } from "@ferriqa/core/testing";
 import {
   FerriqaError,
   FerriqaDatabaseError,
@@ -199,3 +199,5 @@ describe("FerriqaAuthError", () => {
     expect(error.metadata?.userId).toBe("user-123");
   });
 });
+
+runTests();

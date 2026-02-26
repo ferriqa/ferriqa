@@ -566,7 +566,8 @@ export class ContentService {
     }
 
     // Fetch updated content
-    return (await this.getById(contentId))!;
+    const updated = (await this.getById(contentId))!;
+    return updated;
   }
 
   /**
@@ -602,7 +603,7 @@ export class ContentService {
     }
 
     const row = result.rows[0] as Record<string, unknown>;
-    return {
+    const version = {
       id: String(row.id),
       contentId: String(row.contentId),
       blueprintId: String(row.blueprintId),
@@ -616,6 +617,7 @@ export class ContentService {
       // FIXED: Use parseTimestamp to handle both number and string returns from SQLite
       createdAt: parseTimestamp(row.createdAt),
     };
+    return version;
   }
 
   /**
@@ -643,7 +645,7 @@ export class ContentService {
       [contentId],
     );
 
-    return result.rows.map((row) => {
+    const mapped = result.rows.map((row) => {
       const typedRow = row as Record<string, unknown>;
       return {
         id: String(typedRow.id),
@@ -656,6 +658,8 @@ export class ContentService {
         createdAt: parseTimestamp(typedRow.createdAt),
       };
     });
+
+    return mapped;
   }
 
   // ========== Private Helpers ==========
@@ -719,7 +723,8 @@ export class ContentService {
       ],
     );
 
-    return String(result.lastInsertId);
+    const versionId = String(result.lastInsertId);
+    return versionId;
   }
 
   private async getLatestVersion(
@@ -739,10 +744,11 @@ export class ContentService {
     }
 
     const row = result.rows[0] as Record<string, unknown>;
-    return {
+    const version = {
       id: String(row.id),
       versionNumber: row.versionNumber as number,
     };
+    return version;
   }
 
   private generateChangeSummary(
@@ -774,6 +780,21 @@ export class ContentService {
     }
 
     return changes.join(", ") || "No changes detected";
+  }
+
+  /**
+   * Dispose content service and cleanup resources
+   * Disposes dependent services (hookRegistry, slugManager, validationEngine)
+   */
+  dispose(): void {
+    // Dispose hook registry to clear event listeners
+    this.options.hookRegistry?.dispose?.();
+
+    // Dispose slug manager
+    this.options.slugManager?.dispose?.();
+
+    // Dispose validation engine
+    this.options.validationEngine?.dispose?.();
   }
 }
 

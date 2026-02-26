@@ -177,12 +177,54 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
     // Extract table name from simple SELECT statements
     const lowerSql = sql.toLowerCase();
 
-    // Handle COUNT(*) queries specially
+    // FIX: Handle COUNT(*) queries with proper WHERE clause filtering
     if (lowerSql.includes("count(*)")) {
       const match = sql.match(/from\s+(\w+)/i);
       const tableName = match ? match[1] : "default";
-      const tableData = this.data.get(tableName) || [];
-      // Return both 'total' and 'count' for compatibility
+      let tableData = (this.data.get(tableName) || []) as Record<
+        string,
+        unknown
+      >[];
+
+      // Apply WHERE clause filtering for COUNT(*) queries too
+      if (params && params.length > 0 && lowerSql.includes("where")) {
+        const whereMatch = sql.match(
+          /where\s+(.+?)(?:\s+order\s+by|\s+limit|\s+group\s+by|$)/i,
+        );
+        let whereParamCount = params.length;
+
+        if (whereMatch) {
+          const whereClause = whereMatch[1];
+          whereParamCount = (whereClause.match(/\?/g) || []).length;
+        }
+
+        const filterParams = params.slice(0, whereParamCount);
+
+        tableData = tableData.filter((row) => {
+          for (const param of filterParams) {
+            let paramMatched = false;
+            for (const val of Object.values(row)) {
+              if (
+                val === param ||
+                String(val) === String(param) ||
+                (typeof val === "number" &&
+                  typeof param === "string" &&
+                  val === Number(param)) ||
+                (typeof val === "string" &&
+                  typeof param === "number" &&
+                  Number(val) === param)
+              ) {
+                paramMatched = true;
+                break;
+              }
+            }
+            if (!paramMatched) return false;
+          }
+          return true;
+        });
+      }
+
+      // Return filtered count
       return {
         rows: [{ total: tableData.length, count: tableData.length } as T],
         rowCount: 1,
@@ -198,22 +240,29 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
     if (params && params.length > 0 && sql.toLowerCase().includes("where")) {
       // Count how many parameters are in the WHERE clause versus LIMIT/OFFSET
       const whereMatch = sql.match(
-        /where\s+(.+?)(?:\s+order\s+by|\s+limit|$)/i,
+        /where\s+(.+?)(?:\s+order\s+by|\s+limit|\s+group\s+by|$)/i,
       );
       let whereParamCount = params.length;
 
       if (whereMatch) {
         const whereClause = whereMatch[1];
+        // FIX: Count placeholders more accurately - count ? characters in WHERE clause
         whereParamCount = (whereClause.match(/\?/g) || []).length;
       }
 
       // Only use parameters that belong to the WHERE clause for filtering
       const filterParams = params.slice(0, whereParamCount);
 
+      // FIX: Proper WHERE clause filtering - ALL conditions must match (AND logic)
       rows = rows.filter((row) => {
         const rowObj = row as Record<string, unknown>;
-        return filterParams.some((param) =>
-          Object.values(rowObj).some((val) => {
+
+        // Check if ALL filter params match (AND logic)
+        // If any param doesn't match, the row should be excluded
+        for (const param of filterParams) {
+          let paramMatched = false;
+
+          for (const val of Object.values(rowObj)) {
             // Standard equality
             if (
               val === param ||
@@ -225,7 +274,8 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
                 typeof param === "number" &&
                 Number(val) === param)
             ) {
-              return true;
+              paramMatched = true;
+              break;
             }
 
             // JSON array check (for webhooks/events)
@@ -237,16 +287,22 @@ export class MockDatabaseAdapter implements DatabaseAdapter {
               try {
                 const parsed = JSON.parse(val);
                 if (Array.isArray(parsed) && parsed.includes(param)) {
-                  return true;
+                  paramMatched = true;
+                  break;
                 }
               } catch {
                 // Not valid JSON, ignore
               }
             }
+          }
 
+          // If this param doesn't match any value, exclude the row
+          if (!paramMatched) {
             return false;
-          }),
-        );
+          }
+        }
+        // All params matched (AND logic)
+        return true;
       });
     }
 
@@ -480,7 +536,7 @@ class MockTransaction implements DatabaseTransaction {
     sql: string,
     params?: unknown[],
   ): Promise<QueryResult<T>> {
-    return this.adapter.query(sql, params);
+    return this.adapter.query<T>(sql, params);
   }
 
   async execute(

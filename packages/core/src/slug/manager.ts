@@ -243,6 +243,16 @@ export class SlugManager {
       `Releasing slug "${slug}" for blueprint ${blueprintId}, content ${contentId}`,
     );
   }
+
+  /**
+   * Dispose slug manager and cleanup resources
+   * No-op for now - slug manager holds only a database reference
+   * which will be managed externally (e.g., in test setup/teardown)
+   */
+  dispose(): void {
+    // No-op: Database is managed externally
+    // This method exists for API consistency with other disposable services
+  }
 }
 
 // Helper function for quick slugification

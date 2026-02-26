@@ -57,11 +57,16 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
     this.queue.push(job);
     this.sortQueue();
     // Trigger processing immediately to reduce latency
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       this.process().catch((error) => {
         console.error("[webhook queue] Immediate process error:", error);
       });
     }, 0);
+    // Allow Node.js to exit even if this timeout is still pending.
+    // This is a no-op on Bun/Deno but essential for Node.js test cleanup.
+    if (timer && typeof (timer as any).unref === "function") {
+      (timer as any).unref();
+    }
   }
 
   /**
@@ -206,9 +211,6 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
             };
             this.queue.push(retryJob);
             this.sortQueue();
-            console.log(
-              `[queue] Retrying job ${retryJob.id} (attempt ${job.attempt + 1}/${job.maxRetries}) after ${delayMs}ms`,
-            );
           } else {
             console.error(
               `[queue] Job ${job.id} permanently failed after ${job.maxRetries} attempts`,
@@ -231,6 +233,13 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
         console.error("[webhook queue] Process error:", error);
       });
     }, this.processIntervalMs);
+
+    // Allow Node.js to exit even if this interval is still active.
+    // This is a no-op on Bun/Deno but essential for Node.js test cleanup.
+    const interval = this.timer as any;
+    if (interval && typeof interval.unref === "function") {
+      interval.unref();
+    }
   }
 
   /**
@@ -241,6 +250,33 @@ export class WebhookDeliveryQueue implements WebhookJobProcessor {
       clearInterval(this.timer);
       this.timer = undefined;
     }
+  }
+
+  /**
+   * Wait for all pending jobs to complete processing
+   * Useful for cleanup before shutdown
+   */
+  async waitForIdle(timeoutMs: number = 5000): Promise<void> {
+    const startTime = Date.now();
+    while (this.processingCount > 0 || this.queue.length > 0) {
+      if (Date.now() - startTime > timeoutMs) {
+        console.warn(
+          `[webhook queue] Timeout waiting for idle: ${this.processingCount} processing, ${this.queue.length} pending`,
+        );
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+  }
+
+  /**
+   * Destroy queue - stop processor and wait for cleanup
+   */
+  async destroy(): Promise<void> {
+    this.stop();
+    await this.waitForIdle();
+    this.queue = [];
+    this.processor = undefined;
   }
 
   /**

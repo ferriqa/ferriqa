@@ -4,7 +4,7 @@
  * Tests for error code enum and utilities
  */
 
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, runTests } from "@ferriqa/core/testing";
 import {
   ErrorCode,
   ERROR_CATEGORIES,
@@ -144,3 +144,5 @@ describe("Error Codes", () => {
     });
   });
 });
+
+runTests();

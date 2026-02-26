@@ -272,6 +272,16 @@ export class ValidationEngine {
 
     return sanitized;
   }
+
+  /**
+   * Dispose validation engine and cleanup resources
+   * No-op for now - validation engine has no external resources to cleanup
+   * Kept for API consistency with other disposable services
+   */
+  dispose(): void {
+    // No-op: ValidationEngine holds only a fieldRegistry reference
+    // which will be garbage collected automatically
+  }
 }
 
 // Error class for validation failures

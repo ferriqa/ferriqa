@@ -3,8 +3,6 @@
 
   async function handleSave(blueprint: import('$lib/components/blueprint/types.js').Blueprint) {
     // TODO: Save blueprint to API
-    console.log('Saving blueprint:', blueprint);
-    alert('Blueprint saved! (Check console)');
   }
 
   function handleCancel() {

@@ -11,7 +11,13 @@
  * Based on Task 5.1: WebhookService Unit Tests (20+ test cases)
  */
 
-import { describe, it, expect } from "../../testing/index.ts";
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+} from "../../testing/index.ts";
 import { WebhookService } from "../service.ts";
 import type {
   DatabaseAdapter,
@@ -165,7 +171,8 @@ class MockDatabaseAdapter implements DatabaseAdapter {
       const id = params?.[0];
       const webhooks = this.data.get("webhooks") || [];
       const webhook = webhooks.find(
-        (w: unknown) => (w as Record<string, unknown>).id === id,
+        (w: unknown) =>
+          String((w as Record<string, unknown>).id) === String(id),
       );
       const rows = webhook ? [webhook as T] : [];
       return { rows, rowCount: rows.length };
@@ -366,6 +373,25 @@ class MockHookRegistry implements IHookRegistry {
   }
 }
 
+// Mock fetch for HTTP calls
+let mockFetch:
+  | ((url: string, options?: RequestInit) => Promise<Response>)
+  | undefined;
+
+function setupMockFetch() {
+  const originalFetch = global.fetch;
+  mockFetch = async (_url: string, _options?: RequestInit) => {
+    return new Response("OK", { status: 200 });
+  };
+  global.fetch = mockFetch as unknown as typeof fetch;
+  return originalFetch;
+}
+
+function restoreFetch(original: typeof fetch) {
+  global.fetch = original;
+  mockFetch = undefined;
+}
+
 // Helper to create service for each test
 function createTestService() {
   const mockDb = new MockDatabaseAdapter();
@@ -379,7 +405,7 @@ function createTestService() {
 
 describe("WebhookService", () => {
   describe("Service Creation", () => {
-    it("should create service successfully", () => {
+    it("should create service successfully", async () => {
       const { service } = createTestService();
 
       expect(service).toBeDefined();
@@ -394,7 +420,7 @@ describe("WebhookService", () => {
       expect(typeof service.getStats).toBe("function");
       expect(typeof service.destroy).toBe("function");
 
-      service.destroy();
+      await service.destroy();
     });
   });
 
@@ -422,7 +448,7 @@ describe("WebhookService", () => {
       expect(webhook.isActive).toBe(true);
       expect(webhook.createdAt).toBeInstanceOf(Date);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -444,7 +470,7 @@ describe("WebhookService", () => {
       expect(webhook.headers).toBeUndefined();
       expect(webhook.secret).toBeUndefined();
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -463,7 +489,7 @@ describe("WebhookService", () => {
       expect(fetched?.id).toBe(created.id);
       expect(fetched?.name).toBe(created.name);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -473,7 +499,7 @@ describe("WebhookService", () => {
       const webhook = await service.getById(999);
       expect(webhook).toBeNull();
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -494,7 +520,7 @@ describe("WebhookService", () => {
       expect(updated.name).toBe("Updated Name");
       expect(updated.url).toBe("https://example.com/new");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -512,7 +538,7 @@ describe("WebhookService", () => {
       const fetched = await service.getById(created.id);
       expect(fetched).toBeNull();
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -537,7 +563,7 @@ describe("WebhookService", () => {
       expect(result.pagination.page).toBe(1);
       expect(result.pagination.limit).toBe(10);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -560,7 +586,7 @@ describe("WebhookService", () => {
       expect(result.data).toHaveLength(1);
       expect(result.data[0].name).toBe("Content Webhook");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -585,31 +611,36 @@ describe("WebhookService", () => {
       expect(result.data).toHaveLength(1);
       expect(result.data[0].name).toBe("Active Webhook");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
 
   describe("Event Dispatching", () => {
     it("should dispatch webhook for subscribed event", async () => {
-      const { service, mockDb } = createTestService();
+      const originalFetch = setupMockFetch();
+      try {
+        const { service, mockDb } = createTestService();
 
-      await service.create({
-        name: "Content Webhook",
-        url: "https://example.com/webhook",
-        events: ["content.created"],
-        isActive: true,
-      });
+        await service.create({
+          name: "Content Webhook",
+          url: "https://example.com/webhook",
+          events: ["content.created"],
+          isActive: true,
+        });
 
-      const result = await service.dispatch("content.created", {
-        id: "123",
-        title: "Test",
-      });
+        const result = await service.dispatch("content.created", {
+          id: "123",
+          title: "Test",
+        });
 
-      expect(result.queued).toBe(1);
+        expect(result.queued).toBe(1);
 
-      service.destroy();
-      mockDb.clear();
+        await service.destroy();
+        mockDb.clear();
+      } finally {
+        restoreFetch(originalFetch);
+      }
     });
 
     it("should not dispatch for unsubscribed event", async () => {
@@ -626,7 +657,7 @@ describe("WebhookService", () => {
 
       expect(result.queued).toBe(0);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -644,7 +675,7 @@ describe("WebhookService", () => {
 
       expect(result.queued).toBe(0);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -668,7 +699,7 @@ describe("WebhookService", () => {
 
       expect(result.queued).toBe(2);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -688,40 +719,43 @@ describe("WebhookService", () => {
 
       expect(duration).toBeLessThan(100);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
 
   describe("Delivery Logging", () => {
+    let originalFetch: typeof fetch;
+
+    beforeEach(() => {
+      originalFetch = setupMockFetch();
+    });
+
+    afterEach(() => {
+      restoreFetch(originalFetch);
+    });
+
     it("should log successful delivery", async () => {
-      const originalFetch = global.fetch;
-      global.fetch = (async () =>
-        new Response("OK", { status: 200 })) as unknown as typeof fetch;
+      const { service, mockDb } = createTestService();
 
-      try {
-        const { service, mockDb } = createTestService();
+      const webhook = await service.create({
+        name: "Test Webhook",
+        url: "https://example.com/webhook",
+        events: ["content.created"],
+        isActive: true,
+      });
 
-        const webhook = await service.create({
-          name: "Test Webhook",
-          url: "https://example.com/webhook",
-          events: ["content.created"],
-          isActive: true,
-        });
+      await service.dispatch("content.created", { id: "123" });
 
-        await service.dispatch("content.created", { id: "123" });
+      // Wait for queue to process
+      // Node.js processes the queue slightly slower than Bun/Deno
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-        // Wait for queue to process
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      const deliveries = await service.getDeliveries(webhook.id);
+      expect(deliveries.data.length).toBeGreaterThan(0);
 
-        const deliveries = await service.getDeliveries(webhook.id);
-        expect(deliveries.data.length).toBeGreaterThan(0);
-
-        service.destroy();
-        mockDb.clear();
-      } finally {
-        global.fetch = originalFetch;
-      }
+      await service.destroy();
+      mockDb.clear();
     });
 
     it("should get deliveries with pagination", async () => {
@@ -763,12 +797,22 @@ describe("WebhookService", () => {
       expect(deliveries.data).toHaveLength(3);
       expect(deliveries.pagination.total).toBe(5);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
 
   describe("Webhook Test", () => {
+    let originalFetch: typeof fetch;
+
+    beforeEach(() => {
+      originalFetch = setupMockFetch();
+    });
+
+    afterEach(() => {
+      restoreFetch(originalFetch);
+    });
+
     it("should test webhook synchronously", async () => {
       const { service, mockDb } = createTestService();
 
@@ -786,7 +830,7 @@ describe("WebhookService", () => {
       expect(result.deliveryId).toBeDefined();
       expect(result.duration).toBeGreaterThanOrEqual(0);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -803,13 +847,13 @@ describe("WebhookService", () => {
       expect(error).toBeDefined();
       expect(error?.message).toContain("not found");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
 
   describe("Queue Statistics", () => {
-    it("should return queue stats", () => {
+    it("should return queue stats", async () => {
       const { service, mockDb } = createTestService();
 
       const stats = service.getStats();
@@ -818,7 +862,7 @@ describe("WebhookService", () => {
       expect(typeof stats.pending).toBe("number");
       expect(typeof stats.processing).toBe("number");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
@@ -850,7 +894,7 @@ describe("WebhookService", () => {
       expect(webhooks).toHaveLength(1);
       expect(webhooks[0].name).toBe("Content Webhook");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -879,12 +923,22 @@ describe("WebhookService", () => {
       expect(webhooks).toHaveLength(1);
       expect(webhooks[0].name).toBe("Active Webhook");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
 
   describe("Signature Generation", () => {
+    let originalFetch: typeof fetch;
+
+    beforeEach(() => {
+      originalFetch = setupMockFetch();
+    });
+
+    afterEach(() => {
+      restoreFetch(originalFetch);
+    });
+
     it("should generate HMAC-SHA256 signature", async () => {
       const { service, mockDb } = createTestService();
 
@@ -902,12 +956,22 @@ describe("WebhookService", () => {
       // This test verifies the webhook with secret can be created and dispatched
       expect(webhook.secret).toBe("my-secret-key");
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
 
   describe("Payload Building", () => {
+    let originalFetch: typeof fetch;
+
+    beforeEach(() => {
+      originalFetch = setupMockFetch();
+    });
+
+    afterEach(() => {
+      restoreFetch(originalFetch);
+    });
+
     it("should build payload with correct structure", async () => {
       const { service, mockDb } = createTestService();
 
@@ -927,7 +991,7 @@ describe("WebhookService", () => {
       const deliveries = await service.getDeliveries(webhook.id);
       expect(deliveries).toBeDefined();
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -944,7 +1008,7 @@ describe("WebhookService", () => {
       const result = await service.dispatch("content.created", { id: "123" });
       expect(result.queued).toBe(1);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -965,12 +1029,22 @@ describe("WebhookService", () => {
       // Timestamp should be between before and after
       expect(beforeDispatch).toBeLessThanOrEqual(afterDispatch);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
 
   describe("Error Handling", () => {
+    let originalFetch: typeof fetch;
+
+    beforeEach(() => {
+      originalFetch = setupMockFetch();
+    });
+
+    afterEach(() => {
+      restoreFetch(originalFetch);
+    });
+
     it("should handle missing webhook gracefully in processJob", async () => {
       const { service, mockDb } = createTestService();
 
@@ -986,12 +1060,12 @@ describe("WebhookService", () => {
       await service.dispatch("content.created", { id: "123" });
 
       // Wait for processing
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 20));
 
       // Should complete without throwing
       expect(true).toBe(true);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -1011,7 +1085,7 @@ describe("WebhookService", () => {
 
       expect(true).toBe(true);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });
@@ -1031,7 +1105,7 @@ describe("WebhookService", () => {
       expect(updated.id).toBe(created.id);
       expect(updated.name).toBe(created.name);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -1052,7 +1126,7 @@ describe("WebhookService", () => {
       expect(updated.name).toBe("New Name");
       expect(updated.url).toBe(created.url);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
 
@@ -1072,7 +1146,7 @@ describe("WebhookService", () => {
 
       expect(updated.isActive).toBe(false);
 
-      service.destroy();
+      await service.destroy();
       mockDb.clear();
     });
   });

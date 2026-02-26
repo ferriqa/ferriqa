@@ -5,63 +5,68 @@
  * Tests run on Bun, Node.js, and Deno.
  */
 
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterAll,
-  runTests,
-} from "../../testing/index.ts";
+import { test } from "@cross/test";
+import { assertEquals, assertExists, assertGreater } from "@std/assert";
 import { MockDatabaseAdapter } from "../../testing/mocks.ts";
 
-describe("Database Adapter Integration", () => {
-  let db: MockDatabaseAdapter;
+test("Database Adapter Integration > Connection > should connect to database", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
 
-  beforeAll(async () => {
-    db = new MockDatabaseAdapter({ path: ":memory:" });
-    await db.connect();
-  });
-
-  afterAll(async () => {
+  try {
+    assertEquals(db.isConnected(), true);
+  } finally {
     await db.close();
-  });
+  }
+});
 
-  // Connection Tests
-  it("Connection > should connect to database", () => {
-    expect(db.isConnected()).toBe(true);
-  });
+test("Database Adapter Integration > Connection > should close connection", async () => {
+  const tempDb = new MockDatabaseAdapter({ path: ":memory:" });
+  await tempDb.connect();
+  assertEquals(tempDb.isConnected(), true);
 
-  it("Connection > should close connection", async () => {
-    const tempDb = new MockDatabaseAdapter({ path: ":memory:" });
-    await tempDb.connect();
-    expect(tempDb.isConnected()).toBe(true);
+  await tempDb.close();
+  assertEquals(tempDb.isConnected(), false);
+});
 
-    await tempDb.close();
-    expect(tempDb.isConnected()).toBe(false);
-  });
+test("Database Adapter Integration > CRUD > should insert data", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
 
-  // CRUD Operations Tests
-  it("CRUD > should insert data", async () => {
+  try {
     const result = await db.execute(
       "INSERT INTO users (name, email) VALUES (?, ?)",
       ["John Doe", "john@example.com"],
     );
 
-    expect(result.changes).toBe(1);
-    expect(result.lastInsertId).toBeDefined();
-  });
+    assertEquals(result.changes, 1);
+    assertExists(result.lastInsertId);
+  } finally {
+    await db.close();
+  }
+});
 
-  it("CRUD > should query data", async () => {
+test("Database Adapter Integration > CRUD > should query data", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
+
+  try {
     // Insert test data
     await db.execute("INSERT INTO users (name) VALUES (?)", ["Test User"]);
 
     const result = await db.query("SELECT * FROM users");
-    expect(result.rowCount).toBeGreaterThan(0);
-    expect(result.rows.length).toBeGreaterThan(0);
-  });
+    assertGreater(result.rowCount, 0);
+    assertGreater(result.rows.length, 0);
+  } finally {
+    await db.close();
+  }
+});
 
-  it("CRUD > should update data", async () => {
+test("Database Adapter Integration > CRUD > should update data", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
+
+  try {
     await db.execute("INSERT INTO users (name) VALUES (?)", ["Update Test"]);
 
     const result = await db.execute(
@@ -69,10 +74,17 @@ describe("Database Adapter Integration", () => {
       ["Updated Name", "Update Test"],
     );
 
-    expect(result.changes).toBeGreaterThanOrEqual(0);
-  });
+    assertEquals(result.changes >= 0, true);
+  } finally {
+    await db.close();
+  }
+});
 
-  it("CRUD > should delete data", async () => {
+test("Database Adapter Integration > CRUD > should delete data", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
+
+  try {
     const insertResult = await db.execute(
       "INSERT INTO users (name) VALUES (?)",
       ["Delete Test"],
@@ -82,20 +94,33 @@ describe("Database Adapter Integration", () => {
       insertResult.lastInsertId,
     ]);
 
-    expect(result.changes).toBeGreaterThanOrEqual(0);
-  });
+    assertEquals(result.changes >= 0, true);
+  } finally {
+    await db.close();
+  }
+});
 
-  // Transaction Tests
-  it("Transactions > should support transactions", async () => {
+test("Database Adapter Integration > Transactions > should support transactions", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
+
+  try {
     const result = await db.transaction(async (trx) => {
       await trx.execute("INSERT INTO users (name) VALUES (?)", ["Trx Test"]);
       return { success: true };
     });
 
-    expect(result.success).toBe(true);
-  });
+    assertEquals(result.success, true);
+  } finally {
+    await db.close();
+  }
+});
 
-  it("Transactions > should rollback on error", async () => {
+test("Database Adapter Integration > Transactions > should rollback on error", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
+
+  try {
     let errorThrown = false;
 
     try {
@@ -106,19 +131,25 @@ describe("Database Adapter Integration", () => {
       errorThrown = true;
     }
 
-    expect(errorThrown).toBe(true);
-  });
+    assertEquals(errorThrown, true);
+  } finally {
+    await db.close();
+  }
+});
 
-  // Batch Operations Tests
-  it("Batch Operations > should execute batch statements", async () => {
+test("Database Adapter Integration > Batch Operations > should execute batch statements", async () => {
+  const db = new MockDatabaseAdapter({ path: ":memory:" });
+  await db.connect();
+
+  try {
     const statements = [
       { sql: "INSERT INTO users (name) VALUES (?)", params: ["Batch 1"] },
       { sql: "INSERT INTO users (name) VALUES (?)", params: ["Batch 2"] },
     ];
 
     const results = await db.batch(statements);
-    expect(results.length).toBe(2);
-  });
+    assertEquals(results.length, 2);
+  } finally {
+    await db.close();
+  }
 });
-
-runTests();

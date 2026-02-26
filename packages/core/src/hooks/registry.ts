@@ -229,21 +229,12 @@ export class HookRegistry implements IHookRegistry {
     const errors: Array<{ handlerId: string; error: Error }> = [];
     const errorStrategy = options.errorStrategy ?? "continue";
 
-    // DEBUG: Log the number of actionHandlers found
-    console.log(
-      `[DEBUG emit] event: ${event}, actionHandlers count: ${actionHandlers.length}`,
-    );
-
     if (errorStrategy === "stop") {
       // SEQUENTIAL EXECUTION: When errorStrategy is "stop", execute handlers one by one
       // This ensures that if one handler throws, subsequent handlers don't run
       let caughtError: Error | null = null;
       for (let i = 0; i < actionHandlers.length; i++) {
         const handler = actionHandlers[i];
-        // DEBUG: Log each handler's index, id, and that it's being executed
-        console.log(
-          `[DEBUG emit] errorStrategy: stop, executing handler index: ${i}, id: ${handler.id}, type: ${handler.type}`,
-        );
         try {
           const result = (handler.callback as HookCallback<T>)(context);
 
@@ -257,10 +248,6 @@ export class HookRegistry implements IHookRegistry {
             this.removeHandlerById(event, handler.id);
           }
         } catch (error) {
-          // DEBUG: Log when an error is caught
-          console.log(
-            `[DEBUG emit] error caught from handler index: ${i}, id: ${handler.id}, error: ${error instanceof Error ? error.message : error}`,
-          );
           caughtError =
             error instanceof Error ? error : new Error(String(error));
           errors.push({
@@ -268,10 +255,6 @@ export class HookRegistry implements IHookRegistry {
             error: caughtError,
           });
           // Stop execution on first error
-          // DEBUG: Log when break happens
-          console.log(
-            `[DEBUG emit] breaking loop due to error, handler index: ${i}`,
-          );
           break;
         }
       }
@@ -424,6 +407,14 @@ export class HookRegistry implements IHookRegistry {
   clear(): void {
     this.handlers.clear();
     this.handlerIds.clear();
+  }
+
+  /**
+   * Dispose hook registry and cleanup resources
+   * Alias for clear() - removes all event handlers
+   */
+  dispose(): void {
+    this.clear();
   }
 
   /**

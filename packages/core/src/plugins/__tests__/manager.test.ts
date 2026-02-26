@@ -2,106 +2,119 @@
  * @ferriqa/core - Plugin Manager Tests
  */
 
-import { expect, test, describe } from "bun:test";
+import { test } from "@cross/test";
+import { assertStrictEquals } from "@std/assert";
 import { PluginManager } from "../manager.ts";
 import { HookRegistry } from "../../hooks/registry.ts";
 import { FieldRegistry } from "../../fields/registry.ts";
 import { type FerriqaPlugin } from "../types.ts";
 import { z } from "zod";
 
-describe("PluginManager", () => {
-  const createManager = () => {
-    const hooks = new HookRegistry();
-    const fields = new FieldRegistry();
-    return new PluginManager(hooks, fields);
+const createManager = () => {
+  const hooks = new HookRegistry();
+  const fields = new FieldRegistry();
+  return new PluginManager(hooks, fields);
+};
+
+test("PluginManager > should load a simple plugin", async () => {
+  const manager = createManager();
+  let initCalled = false;
+
+  const dummyPlugin: FerriqaPlugin = {
+    manifest: {
+      id: "dummy",
+      name: "Dummy Plugin",
+      version: "1.0.0",
+    },
+    init: async (ctx) => {
+      initCalled = true;
+      assertStrictEquals(ctx.manifest.id, "dummy");
+    },
   };
 
-  test("should load a simple plugin", async () => {
-    const manager = createManager();
-    let initCalled = false;
+  await manager.load(dummyPlugin);
 
-    const dummyPlugin: FerriqaPlugin = {
-      manifest: {
-        id: "dummy",
-        name: "Dummy Plugin",
-        version: "1.0.0",
-      },
-      init: async (ctx) => {
-        initCalled = true;
-        expect(ctx.manifest.id).toBe("dummy");
-      },
-    };
+  assertStrictEquals(initCalled, true);
+  const instance = manager.getPlugin("dummy");
+  assertStrictEquals(instance?.state, "active");
+});
 
-    await manager.load(dummyPlugin);
+test("PluginManager > should validate plugin config schema", async () => {
+  const manager = createManager();
 
-    expect(initCalled).toBe(true);
-    const instance = manager.getPlugin("dummy");
-    expect(instance?.state).toBe("active");
-  });
+  const configPlugin: FerriqaPlugin = {
+    manifest: {
+      id: "config-test",
+      name: "Config Test",
+      version: "1.0.0",
+      configSchema: z.object({
+        apiKey: z.string(),
+      }),
+    },
+  };
 
-  test("should validate plugin config schema", async () => {
-    const manager = createManager();
+  // Fail validation - using rejects
+  let threw = false;
+  try {
+    await manager.load(configPlugin, { wrong: "key" });
+  } catch {
+    threw = true;
+  }
+  assertStrictEquals(threw, true);
 
-    const configPlugin: FerriqaPlugin = {
-      manifest: {
-        id: "config-test",
-        name: "Config Test",
-        version: "1.0.0",
-        configSchema: z.object({
-          apiKey: z.string(),
-        }),
-      },
-    };
+  // Pass validation
+  await manager.load(configPlugin, { apiKey: "test-key" });
+  const instance = manager.getPlugin("config-test");
+  assertStrictEquals(instance?.context.config.apiKey, "test-key");
+});
 
-    // Fail validation
-    await expect(
-      manager.load(configPlugin, { wrong: "key" }),
-    ).rejects.toThrow();
+test("PluginManager > should handle plugin lifecycle errors", async () => {
+  const manager = createManager();
 
-    // Pass validation
-    await manager.load(configPlugin, { apiKey: "test-key" });
-    const instance = manager.getPlugin("config-test");
-    expect(instance?.context.config.apiKey).toBe("test-key");
-  });
+  const errorPlugin: FerriqaPlugin = {
+    manifest: {
+      id: "error-plugin",
+      name: "Error Plugin",
+      version: "1.0.0",
+    },
+    init: () => {
+      throw new Error("Init Failed");
+    },
+  };
 
-  test("should handle plugin lifecycle errors", async () => {
-    const manager = createManager();
+  // The plugin should throw during load
+  let threw = false;
+  try {
+    await manager.load(errorPlugin);
+  } catch (e) {
+    threw = true;
+    // Error should contain "Init Failed"
+    assertStrictEquals(String(e).includes("Init Failed"), true);
+  }
+  assertStrictEquals(threw, true);
 
-    const errorPlugin: FerriqaPlugin = {
-      manifest: {
-        id: "error-plugin",
-        name: "Error Plugin",
-        version: "1.0.0",
-      },
-      init: () => {
-        throw new Error("Init Failed");
-      },
-    };
+  const instance = manager.getPlugin("error-plugin");
+  assertStrictEquals(instance?.state, "error");
+});
 
-    await expect(manager.load(errorPlugin)).rejects.toThrow("Init Failed");
-    const instance = manager.getPlugin("error-plugin");
-    expect(instance?.state).toBe("error");
-  });
+test("PluginManager > should unload a plugin", async () => {
+  const manager = createManager();
+  let disableCalled = false;
 
-  test("should unload a plugin", async () => {
-    const manager = createManager();
-    let disableCalled = false;
+  const lifecyclePlugin: FerriqaPlugin = {
+    manifest: {
+      id: "lifecycle",
+      name: "Lifecycle",
+      version: "1.0.0",
+    },
+    disable: () => {
+      disableCalled = true;
+    },
+  };
 
-    const lifecyclePlugin: FerriqaPlugin = {
-      manifest: {
-        id: "lifecycle",
-        name: "Lifecycle",
-        version: "1.0.0",
-      },
-      disable: () => {
-        disableCalled = true;
-      },
-    };
+  await manager.load(lifecyclePlugin);
+  await manager.unload("lifecycle");
 
-    await manager.load(lifecyclePlugin);
-    await manager.unload("lifecycle");
-
-    expect(disableCalled).toBe(true);
-    expect(manager.getPlugin("lifecycle")).toBeUndefined();
-  });
+  assertStrictEquals(disableCalled, true);
+  assertStrictEquals(manager.getPlugin("lifecycle"), undefined);
 });
